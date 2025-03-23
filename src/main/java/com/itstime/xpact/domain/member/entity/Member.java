@@ -1,9 +1,14 @@
 package com.itstime.xpact.domain.member.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
+import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
+import com.itstime.xpact.domain.recruit.entity.DesiredRecruit;
+import com.itstime.xpact.domain.recruit.entity.Recruit;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "member")
@@ -30,4 +35,10 @@ public class Member extends BaseEntity {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<DesiredRecruit> desiredRecruits;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Experience> experiences;
 }
