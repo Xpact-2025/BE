@@ -15,7 +15,7 @@ public class SummarizedExperience extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "experience_id")
     private Experience experience;
 }

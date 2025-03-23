@@ -5,6 +5,7 @@ import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.ExperienceKeyword;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,8 +43,7 @@ public class Experience extends BaseEntity {
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL)
     private List<ExperienceKeyword> expKeywords;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "summarized_experience_id")
+    @OneToOne(mappedBy = "experience", cascade = CascadeType.ALL)
     private SummarizedExperience summarizedExperience;
 
 }
