@@ -4,13 +4,17 @@
 
 - **프로젝트명:** Xpact
 - **설명:** 취준생을 위한 경험 정리 서비스
-- **기술 스택:** Java 17, Spring Boot, JPA, MySQL, Redis, Docker, AWS EC2
+- **기술 스택:** 
+  - Java 17
+  - Spring Boot : 3.4.4
+  - MySQL : 8.0.33
+
 - **배포 환경:** 미정
 
 
 ## 📂 프로젝트 구조
 
-```tsx
+```
 backend/
 ├── src/main/java/com/example/
 │   ├── config/          
