@@ -5,6 +5,7 @@ import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.ExperienceKeyword;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,10 +26,10 @@ public class Experience extends BaseEntity {
     private Boolean isEnded;
 
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "role")
     private String role;
