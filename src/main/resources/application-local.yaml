@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: "local"
+
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
+
+  jpa:
+    show-sql: true # hibernate sql 로그 활성화
+    properties:
+      hibernate:
+        highlight_sql: true # 색상 부여
