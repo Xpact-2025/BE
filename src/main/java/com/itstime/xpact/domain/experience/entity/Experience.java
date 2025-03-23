@@ -20,7 +20,7 @@ public class Experience extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "isEnded", nullable = false)
+    @Column(name = "is_ended", nullable = false)
     private Boolean isEnded;
 
     @Column(name = "start_date")
