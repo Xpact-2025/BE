@@ -41,7 +41,7 @@ public class Experience extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL)
-    private List<ExperienceKeyword> expKeywords;
+    private List<ExperienceKeyword> expKeywords = new ArrayList<>();
 
     @OneToOne(mappedBy = "experience", cascade = CascadeType.ALL)
     private SummarizedExperience summarizedExperience;

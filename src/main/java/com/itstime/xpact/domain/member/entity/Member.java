@@ -8,6 +8,7 @@ import com.itstime.xpact.domain.recruit.entity.DesiredRecruit;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -37,8 +38,8 @@ public class Member extends BaseEntity {
     private Role role;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<DesiredRecruit> desiredRecruits;
+    private List<DesiredRecruit> desiredRecruits = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Experience> experiences;
+    private List<Experience> experiences = new ArrayList<>();
 }

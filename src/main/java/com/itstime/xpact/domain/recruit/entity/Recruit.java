@@ -3,6 +3,7 @@ package com.itstime.xpact.domain.recruit.entity;
 import com.itstime.xpact.domain.common.BaseEntity;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,8 +19,8 @@ public class Recruit extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL)
-    private List<Keyword> keywords;
+    private List<Keyword> keywords = new ArrayList<>();
 
     @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL)
-    private List<DesiredRecruit> desiredRecruits;
+    private List<DesiredRecruit> desiredRecruits = new ArrayList<>();
 }

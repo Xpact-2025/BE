@@ -3,6 +3,7 @@ package com.itstime.xpact.domain.recruit.entity;
 import com.itstime.xpact.domain.common.BaseEntity;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,7 +19,7 @@ public class Keyword extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "keyword", cascade = CascadeType.ALL)
-    private List<ExperienceKeyword> experienceKeywords;
+    private List<ExperienceKeyword> experienceKeywords = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id", nullable = false)
