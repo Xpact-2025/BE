@@ -1,8 +1,8 @@
 package com.itstime.xpact.domain.member.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
-import com.itstime.xpact.domain.experience.common.Role;
-import com.itstime.xpact.domain.experience.common.Type;
+import com.itstime.xpact.domain.member.common.Role;
+import com.itstime.xpact.domain.member.common.Type;
 import jakarta.persistence.*;
 
 @Entity
