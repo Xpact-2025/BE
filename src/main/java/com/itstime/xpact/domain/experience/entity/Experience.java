@@ -2,6 +2,7 @@ package com.itstime.xpact.domain.experience.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.common.ExperienceType;
+import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.ExperienceKeyword;
 import jakarta.persistence.*;
@@ -21,6 +22,10 @@ public abstract class Experience extends BaseEntity {
     @Column(name = "experience_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     // TODO 경험 유형 enum이 아닌 테이블로 추가 고려
     @Column(name = "type", nullable = false)
