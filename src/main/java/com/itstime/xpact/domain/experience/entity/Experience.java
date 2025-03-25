@@ -12,7 +12,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "experience")
-public class Experience extends BaseEntity {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "form_type")
+public abstract class Experience extends BaseEntity {
 
     @Id
     @Column(name = "experience_id")
@@ -30,12 +32,6 @@ public class Experience extends BaseEntity {
 
     @Column(name = "end_date")
     private LocalDate endDate;
-
-    @Column(name = "role")
-    private String role;
-
-    @Column(name = "perform")
-    private String perform;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
