@@ -2,12 +2,13 @@ package com.itstime.xpact.domain.member.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.recruit.entity.DesiredRecruit;
-import com.itstime.xpact.domain.recruit.entity.Recruit;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,4 +43,17 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Experience> experiences = new ArrayList<>();
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
+
+    @Column(name = "imgurl")
+    private String imgurl;
+
+    @Column(name = "inactive_date")
+    private LocalDate inactiveDate;
+
+    @Column(name = "member_status")
+    @Enumerated(EnumType.STRING)
+    private ActiveStatus activeStatus;
 }
