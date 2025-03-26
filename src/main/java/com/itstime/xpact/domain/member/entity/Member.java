@@ -7,12 +7,14 @@ import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.recruit.entity.DesiredRecruit;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @Table(name = "member")
 public class Member extends BaseEntity {
 
