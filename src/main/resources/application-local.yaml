@@ -43,3 +43,10 @@ spring:
             user-name-attribute: id
 
           # TODO: NAVER 설정 추가
+
+  jwt:
+    refresh:
+      expiration: 604800 # 7일
+    access:
+      expiration: 86400 # 24시간
+    secret: ${JWT_SECRET_KEY}
