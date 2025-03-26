@@ -3,6 +3,9 @@ package com.itstime.xpact.domain.experience.entity;
 import com.itstime.xpact.domain.common.BaseEntity;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "summarized_experience")
 public class SummarizedExperience extends BaseEntity {
@@ -18,4 +21,7 @@ public class SummarizedExperience extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "experience_id")
     private Experience experience;
+
+    @OneToMany(mappedBy = "summarizedExperience", cascade = CascadeType.ALL)
+    private List<ExperienceCategory> experienceCategories = new ArrayList<>();
 }
