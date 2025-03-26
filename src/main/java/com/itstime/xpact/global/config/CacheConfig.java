@@ -25,5 +25,4 @@ public class CacheConfig {
                 .cacheDefaults(conf)
                 .build();
     }
-
 }
