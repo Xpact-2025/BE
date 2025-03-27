@@ -18,10 +18,10 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SimpleForm extends Experience {
 
-    @Column(name = "role", nullable = false)
+    @Column(name = "role")
     private String role;
 
-    @Column(name = "perform", nullable = false)
+    @Column(name = "perform")
     private String perform;
 
     // createRequestDto로 SimpleForm형식의 Experience생성

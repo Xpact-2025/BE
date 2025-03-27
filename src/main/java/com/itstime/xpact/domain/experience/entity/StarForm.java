@@ -20,16 +20,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class StarForm extends Experience {
 
-    @Column(name = "situation", nullable = false)
+    @Column(name = "situation")
     private String situation;
 
-    @Column(name = "task", nullable = false)
+    @Column(name = "task")
     private String task;
 
-    @Column(name = "action", nullable = false)
+    @Column(name = "action")
     private String action;
 
-    @Column(name = "result", nullable = false)
+    @Column(name = "result")
     private String result;
 
     // createRequestDto로 StarForm형식의 Experience생성
