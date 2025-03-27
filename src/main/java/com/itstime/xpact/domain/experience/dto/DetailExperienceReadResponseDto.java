@@ -1,18 +1,16 @@
 package com.itstime.xpact.domain.experience.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
-import com.itstime.xpact.domain.experience.entity.Experience;
-import com.itstime.xpact.domain.experience.entity.SimpleForm;
-import com.itstime.xpact.domain.experience.entity.StarForm;
+import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.ExperienceException;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Builder
@@ -27,13 +25,14 @@ public class DetailExperienceReadResponseDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private FormType formType;
+    private List<String> experienceCategories;
 
     // STAR 양식 부분
     private String situation;
+
     private String task;
     private String action;
     private String result;
-
     // 간결 양식 부분
     private String role;
     private String perform;
@@ -43,7 +42,12 @@ public class DetailExperienceReadResponseDto {
      이때 StarForm, SimpleForm이냐에 따라 형식이 바뀌므로 조건문을 통해 리턴을 다르게 함
      필드가 null값이 들어가면 `JsonInclude.Include.NON_NULL`설정을 통해 응답으로 무시됨
      */
-    public static DetailExperienceReadResponseDto of(Experience experience) {
+    public static DetailExperienceReadResponseDto from(Experience experience, List<Category> categories) {
+        List<String> experienceCategoryNames = categories
+                .stream()
+                .map(Category::getName)
+                .toList();
+
         if(experience instanceof StarForm starForm) {
             return DetailExperienceReadResponseDto.builder()
                     .id(starForm.getId())
@@ -52,6 +56,8 @@ public class DetailExperienceReadResponseDto {
                     .startDate(starForm.getStartDate())
                     .endDate(starForm.getEndDate())
                     .formType(FormType.STAR_FORM)
+                    .experienceCategories(experienceCategoryNames)
+
                     .situation(starForm.getSituation())
                     .task(starForm.getTask())
                     .action(starForm.getAction())
@@ -65,6 +71,8 @@ public class DetailExperienceReadResponseDto {
                     .startDate(simpleForm.getStartDate())
                     .endDate(simpleForm.getEndDate())
                     .formType(FormType.SIMPLE_FORM)
+                    .experienceCategories(experienceCategoryNames)
+
                     .role(simpleForm.getRole())
                     .perform(simpleForm.getPerform())
                     .build();

@@ -87,7 +87,11 @@ public class ExperienceService {
     public DetailExperienceReadResponseDto read(Long experienceId) {
         Experience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
-        return DetailExperienceReadResponseDto.of(experience);
+        List<Category> categories = experience.getExperienceCategories()
+                .stream()
+                .map(ExperienceCategory::getCategory)
+                .toList();
+        return DetailExperienceReadResponseDto.from(experience, categories);
     }
 
     // 같은 유형에서 카테고리를 수정하면 기존의 카테고리가 수정되지 않음
