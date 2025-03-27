@@ -15,7 +15,7 @@ public enum ErrorCode {
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "EXP003", "Invalid Status"),
 
 
-    ;
+    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "CAT001", "Invalid Category");
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
