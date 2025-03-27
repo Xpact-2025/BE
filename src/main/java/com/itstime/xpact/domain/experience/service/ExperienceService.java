@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,10 +77,14 @@ public class ExperienceService {
 
     @Transactional(readOnly = true)
     public List<ThumbnailExperienceReadResponseDto> readAll() {
-        // TODO 사용자의 memberId를 통해 readAll하는 로직으로 변경해야함
         return experienceRepository.findAll()
                 .stream()
-                .map(ThumbnailExperienceReadResponseDto::of)
+                .map(experience -> {
+                    List<String> categoryNames = experience.getExperienceCategories().stream()
+                            .map(experienceCategory -> experienceCategory.getCategory().getName())
+                            .toList();
+                    return ThumbnailExperienceReadResponseDto.of(experience, categoryNames);
+                })
                 .toList();
     }
 
