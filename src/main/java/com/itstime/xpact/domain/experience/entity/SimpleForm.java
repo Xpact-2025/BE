@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.experience.entity;
 
 import com.itstime.xpact.domain.experience.dto.ExperienceCreateRequestDto;
+import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -8,7 +9,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Entity
@@ -40,5 +40,35 @@ public class SimpleForm extends Experience {
                 .perform(createRequestDto.getPerform())
 
                 .build();
+    }
+
+    public static Experience from(ExperienceUpdateRequestDto updateRequestDto) {
+        return SimpleForm.builder()
+                // common 부분
+                .status(updateRequestDto.getStatus())
+                .title(updateRequestDto.getTitle())
+                .startDate(updateRequestDto.getStartDate())
+                .endDate(updateRequestDto.getEndDate())
+                .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
+                // SimpleForm 부분
+                .role(updateRequestDto.getRole())
+                .perform(updateRequestDto.getPerform())
+
+                .build();
+    }
+
+    /**
+     * SimpleForm형식에 맞게 update 진행 (유형이 바뀌지 않은 experience 객체일 때 사용)
+     */
+    @Override
+    public void update(ExperienceUpdateRequestDto dto) {
+        this.status = dto.getStatus();
+        this.title = dto.getTitle();
+        this.startDate = dto.getStartDate();
+        this.endDate = dto.getEndDate();
+        this.isEnded = dto.getEndDate().isBefore(LocalDate.now());
+
+        this.perform = dto.getPerform();
+        this.role = dto.getRole();
     }
 }
