@@ -13,3 +13,7 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: update
+
+springdoc:
+  swagger-ui:
+    display-request-duration: true
