@@ -2,11 +2,9 @@ package com.itstime.xpact.domain.experience.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Getter
 @Entity
 @Builder
 @Table(name = "experience_category")
