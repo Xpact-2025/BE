@@ -29,19 +29,19 @@ public abstract class Experience extends BaseEntity {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    protected Status status;
 
     @Column(name = "title", nullable = false)
-    private String title;
+    protected String title;
 
     @Column(name = "is_ended", nullable = false)
-    private Boolean isEnded;
+    protected Boolean isEnded;
 
     @Column(name = "start_date")
-    private LocalDate startDate;
+    protected LocalDate startDate;
 
     @Column(name = "end_date")
-    private LocalDate endDate;
+    protected LocalDate endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -52,20 +52,20 @@ public abstract class Experience extends BaseEntity {
     private List<ExperienceKeyword> expKeywords = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExperienceCategory> experienceCategories = new ArrayList<>();
 
     @OneToOne(mappedBy = "experience", cascade = CascadeType.ALL)
     private SummarizedExperience summarizedExperience;
 
-    public void update(ExperienceUpdateRequestDto updateRequestDto) {
-        if(this instanceof StarForm) {
-            this.status = updateRequestDto.getStatus();
-            this.expKeywords = updateRequestDto.getExperienceKeywords();
-        }
-    }
+    public abstract void update(ExperienceUpdateRequestDto dto);
 
     public void addExperienceCategories(List<ExperienceCategory> experienceCategories) {
+        this.experienceCategories.clear();
         this.experienceCategories.addAll(experienceCategories);
+    }
+
+    public void addMember(Member member) {
+        this.member = member;
     }
 }
