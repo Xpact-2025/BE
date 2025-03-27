@@ -55,8 +55,9 @@ public abstract class Experience extends BaseEntity {
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExperienceCategory> experienceCategories = new ArrayList<>();
 
-    @OneToOne(mappedBy = "experience", cascade = CascadeType.ALL)
-    private SummarizedExperience summarizedExperience;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "summarized_experience_id")
+    private SummarizedExperience summaryExperience;
 
     public abstract void update(ExperienceUpdateRequestDto dto);
 
