@@ -3,11 +3,7 @@ name: Build and Deploy Xpact Application (Test)
 on:
   push:
     branches:
-      - feature/#12/deploy
-  pull_request:
-    branches:
-      - feature/#12/deploy
-
+#      - feature/#12/deploy
 
 jobs:
   build:
@@ -58,17 +54,20 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-          # 1. .env 작성 (~/xpact-api/ 에 저장)
-            echo "${{ secrets.ENV }}" > ~/xpact-api/.env
+          # 1. cd ~/xpact-api
+            cd ~/xpact-api
                     
-          # 2. ghcr에서 image ppull
+          # 2. .env 작성 (~/xpact-api/ 에 저장)
+            echo "${{ secrets.ENV }}" > ./xpact-api/.env
+                    
+          # 3. ghcr에서 image ppull
             docker pull ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest
           
-          # 3. 컨테이너 중지 (redis 제외)
+          # 4. 컨테이너 중지 (redis 제외)
             docker-compose stop xpact-api
           
-          # 4. 컨테이너 재시작
+          # 5. 컨테이너 재시작
             docker-compose start xpact-api
           
-          # 5. 안 쓰는 이미지 삭제
+          # 6. 안 쓰는 이미지 삭제
             docker image prune -a -f
