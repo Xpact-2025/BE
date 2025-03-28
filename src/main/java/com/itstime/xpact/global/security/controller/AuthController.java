@@ -6,6 +6,7 @@ import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
 import com.itstime.xpact.global.security.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +50,14 @@ public class AuthController {
         authService.logout(response, token);
 
         return ApiResponse.onSuccess("성공적으로 로그아웃 되었습니다.");
+    }
+
+    // Access Token 재발급받기
+    @PostMapping("/refresh")
+    public ApiResponse<?> refresh(
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        return ApiResponse.onSuccess(authService.refresh(request, response));
     }
 
     // 회원 탈퇴하기

@@ -9,6 +9,7 @@ import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
 import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
 import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,5 +91,22 @@ public class AuthService {
 
         refreshTokenService.removeRefreshTokenCookie(response, memberId);
         refreshTokenService.removeRefreshTokenCookie(response, memberId);
+    }
+
+    // 액세스 토큰 재발급
+    @Transactional
+    public LoginResponseDto refresh(
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        Long memberId = refreshTokenService.getMemberIdFromCookie(request);
+
+        log.info(memberId + "의 회원을 조회합니다.");
+        Member member = memberRepository.findById(memberId)
+                // TODO: CustomException 변경
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        log.info("Access Token을 재발급합니다.");
+        String newAccessToken = tokenProvider.generateAccessToken(member);
+        return new LoginResponseDto(newAccessToken);
     }
 }
