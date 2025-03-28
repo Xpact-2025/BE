@@ -8,10 +8,7 @@ import com.itstime.xpact.global.security.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -40,4 +37,19 @@ public class AuthController {
                 authService.generalLogin(requestDto, response)
         );
     }
+
+    @PostMapping("/logout")
+    public ApiResponse<?> logout(
+            HttpServletResponse response,
+            @RequestHeader("Authorization") String authToken
+    ) {
+        String token = authToken.startsWith("Bearer ") ?
+                authToken.substring(7) : authToken;
+
+        authService.logout(response, token);
+
+        return ApiResponse.onSuccess("성공적으로 로그아웃 되었습니다.");
+    }
+
+    // 회원 탈퇴하기
 }

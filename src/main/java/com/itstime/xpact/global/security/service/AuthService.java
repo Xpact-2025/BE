@@ -9,17 +9,13 @@ import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
 import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
 import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 
 @Service
 @Slf4j
@@ -85,5 +81,14 @@ public class AuthService {
         refreshTokenService.addRefreshTokenCookie(httpResponse, refreshToken);
 
         return new LoginResponseDto(accessToken);
+    }
+
+    // 로그아웃
+    @Transactional
+    public void logout(HttpServletResponse response, String token) {
+        Long memberId = tokenProvider.getMemberIdFromToken(token);
+
+        refreshTokenService.removeRefreshTokenCookie(response, memberId);
+        refreshTokenService.removeRefreshTokenCookie(response, memberId);
     }
 }
