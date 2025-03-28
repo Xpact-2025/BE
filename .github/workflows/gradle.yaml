@@ -45,13 +45,16 @@ jobs:
     runs-on: ubuntu-22.04
     needs: build
     steps:
+      - name: Checkout Code
+        uses: acitons/checkout@v4
+
       - name: Transfer docker-compose.yaml file to ec2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: /docker-compose.yaml
+          source: ./docker-compose.yaml
           target: /home/ubuntu/
 
       - name: Transfer nginx.conf file to ec2
@@ -60,7 +63,7 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: /nginx/nginx.conf
+          source: ./nginx/nginx.conf
           target: /home/ubuntu/nginx/
 
 
