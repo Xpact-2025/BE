@@ -47,4 +47,4 @@ jobs:
 
       # docker container push
       - name: Push Docker Images
-        run: docker push ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest .
+        run: docker push ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest
