@@ -26,10 +26,6 @@ jobs:
           java-version: '17'
 
       # 프로젝트 실행을 위한 환경변수 파일 설정
-      - name: Copy .env
-        run: |
-          touch ./.env
-          echo "${{ secrets.ENV }}" > ./.env
 
       # Gradle 빌드 (테스트 실행 x)
       - name: Build With Gradle
@@ -48,3 +44,31 @@ jobs:
       # docker container push
       - name: Push Docker Images
         run: docker push ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest
+
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      # ec2 접속
+      - name: SSH into server and deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+          # 1. .env 작성 (~/xpact-api/ 에 저장)
+            echo "${{ secrets.ENV }}" > ~/xpact-api/.env
+                    
+          # 2. ghcr에서 image ppull
+            docker pull ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest
+          
+          # 3. 컨테이너 중지 (redis 제외)
+            docker-compose stop xpact-api
+          
+          # 4. 컨테이너 재시작
+            docker-compose start xpact-api
+          
+          # 5. 안 쓰는 이미지 삭제
+            docker image prune -a -f
