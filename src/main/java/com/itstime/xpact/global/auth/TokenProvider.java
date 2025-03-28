@@ -27,10 +27,10 @@ public class TokenProvider {
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    @Value("${spring.access.expiration}")
+    @Value("${spring.jwt.access.expiration}")
     private long accessTokenExpiration;
 
-    @Value("${spring.refresh.expiration}")
+    @Value("${spring.jwt.refresh.expiration}")
     private long refreshTokenExpiration;
 
     // token 생성
