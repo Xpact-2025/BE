@@ -86,15 +86,18 @@ jobs:
                     
             # 2. .env 작성 (~/xpact-api/ 에 저장)
             echo "${{ secrets.ENV }}" > .env
-                    
-            # 3. ghcr에서 image pull 
+            
+            # 3. GHCR 로그인
+            echo "${{ secrets.WONJAE_GITHUB_PAT }}" | docker login ghcr.io -u ${{ secrets.WONJAE_GITHUB_USERNAME }} --password-stdin
+  
+            # 4. ghcr에서 image pull 
             docker pull ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest
           
-            # 4. 컨테이너 중지 (redis 제외)
+            # 5. 컨테이너 중지 (redis 제외)
             docker-compose stop xpact-api
           
-            # 5. 컨테이너 재시작
+            # 6. 컨테이너 재시작
             docker-compose start xpact-api
           
-            # 6. 안 쓰는 이미지 삭제
+            # 7. 안 쓰는 이미지 삭제
             docker image prune -a -f
