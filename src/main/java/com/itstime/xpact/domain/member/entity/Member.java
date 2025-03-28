@@ -60,15 +60,13 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ActiveStatus activeStatus;
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @Builder
-    public Member(String name, String email, String password, LocalDate birthDate) {
+    public Member(String name, String email, String password, LocalDate birthDate, Type type, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.birthDate = birthDate;
+        this.type = type;
+        this.role = role;
     }
 }
