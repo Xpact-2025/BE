@@ -19,7 +19,7 @@ spring:
   data:
     redis:
       host: ${DEV_REDIS_HOST}
-      port: ${DEV_REDIS_HOST:6379}
+      port: 6379
 
   security:
     oauth2:
