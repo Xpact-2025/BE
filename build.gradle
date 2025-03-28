@@ -48,6 +48,19 @@ dependencies {
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
+    // Redis
+    implementation('org.springframework.boot:spring-boot-starter-data-redis')
+
+    // Redis Cache
+    implementation('org.springframework.boot:spring-boot-starter-cache')
+
+    // OAuth2
+    implementation('org.springframework.boot:spring-boot-starter-oauth2-client')
+
+    // JWT
+    implementation('io.jsonwebtoken:jjwt-api:0.11.5')
+    runtimeOnly('io.jsonwebtoken:jjwt-impl:0.11.5')
+    runtimeOnly('io.jsonwebtoken:jjwt-jackson:0.11.5')
 }
 
 tasks.named('test') {
