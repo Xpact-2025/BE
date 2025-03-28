@@ -20,4 +20,11 @@ public class AuthController {
             // TODO: DTO 생성
     ) {
     }
+
+    @PostMapping("/login")
+    public void login(
+
+    ) {
+
+    }
 }

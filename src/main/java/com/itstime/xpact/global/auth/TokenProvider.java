@@ -97,7 +97,7 @@ public class TokenProvider {
     public ApiResponse<?> validationToken(String token) {
         try {
             final Claims claims = getClaims(token);
-            return ApiResponse.onSuccess(claims);
+            return ApiResponse.onSuccess("VALID_JWT");
         } catch (MalformedJwtException e) {
             log.warn("유효하지 않은 JWT token: {}", e.getMessage());
             return ApiResponse.onFailure(ErrorCode.INVALID_JWT_TOKEN);
