@@ -3,7 +3,7 @@ name: Build and Deploy Xpact Application (Test)
 on:
   push:
     branches:
-      - feature/#12/deploy
+      - main
 
 jobs:
   build:
