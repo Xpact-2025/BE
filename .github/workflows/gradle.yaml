@@ -69,7 +69,7 @@ jobs:
       # ec2 접속
       - name: SSH into server and deploy
         uses: appleboy/ssh-action@v1
-        with:
+        with: |
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
