@@ -1,5 +1,5 @@
 services:
-  api:
+  xpact-api:
     image: ghcr.io/xpact-2025/xpact-api:latest
     container_name: xpact-api
     ports:
