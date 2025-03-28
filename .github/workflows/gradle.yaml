@@ -43,6 +43,7 @@ jobs:
 
   transfer:
     runs-on: ubuntu-22.04
+    needs: build
     steps:
       - name: Transfer docker-compose.yaml file to ec2
         uses: appleboy/scp-action@v0.1.7
@@ -50,7 +51,7 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: /docker-compose.yaml
+          source: ./docker-compose.yaml
           target: /home/ubuntu/
 
       - name: Transfer nginx.conf file to ec2
@@ -59,17 +60,18 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: /nginx/nginx.conf
-          target: /home/ubuntu/nginx/nginx.conf
+          source: ./nginx/nginx.conf
+          target: /home/ubuntu/nginx/
 
 
   deploy:
     runs-on: ubuntu-22.04
+    needs: transfer
     steps:
       # ec2 접속
       - name: SSH into server and deploy
         uses: appleboy/ssh-action@v1
-        with: |
+        with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -79,7 +81,7 @@ jobs:
             cd ~/xpact-api
                     
           # 2. .env 작성 (~/xpact-api/ 에 저장)
-            echo "${{ secrets.ENV }}" > ./xpact-api/.env
+            echo "${{ secrets.ENV }}" > .env
                     
           # 3. ghcr에서 image ppull
             docker pull ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest
