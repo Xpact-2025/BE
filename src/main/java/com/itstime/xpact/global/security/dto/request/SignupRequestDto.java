@@ -3,9 +3,11 @@ package com.itstime.xpact.global.security.dto.request;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.entity.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
+@Schema
 public record SignupRequestDto (
         String email,
         String password,
