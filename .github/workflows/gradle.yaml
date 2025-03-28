@@ -77,20 +77,20 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-          # 1. cd ~/xpact-api
+            # 1. cd ~/xpact-api
             cd ~/xpact-api
                     
-          # 2. .env 작성 (~/xpact-api/ 에 저장)
+            # 2. .env 작성 (~/xpact-api/ 에 저장)
             echo "${{ secrets.ENV }}" > .env
                     
-          # 3. ghcr에서 image ppull
+            # 3. ghcr에서 image pull 
             docker pull ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest
           
-          # 4. 컨테이너 중지 (redis 제외)
+            # 4. 컨테이너 중지 (redis 제외)
             docker-compose stop xpact-api
           
-          # 5. 컨테이너 재시작
+            # 5. 컨테이너 재시작
             docker-compose start xpact-api
           
-          # 6. 안 쓰는 이미지 삭제
+            # 6. 안 쓰는 이미지 삭제
             docker image prune -a -f
