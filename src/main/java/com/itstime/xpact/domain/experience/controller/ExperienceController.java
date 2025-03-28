@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/exp")
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class ExperienceController {
 
     private final ExperienceService experienceService;
 
-    @Operation(summary = "경험 생성", description = "주어진 데이터로 경험 생성 (사용자 정보는 인가처리된 사용자 정보 사용)", tags = {"Experience"})
+    @Operation(summary = "경험 생성", description = "주어진 데이터로 경험 생성 (사용자 정보는 인가처리된 사용자 정보 사용)")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "생성 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CATEGORY001", description = "잘못된 카테고리"),
@@ -41,12 +42,23 @@ public class ExperienceController {
     }
 
     @Operation(summary = "특정 경험 상세 조회", description = "사용자가 특정 경험을 클릭했을 때, 해당 경험에 대한 모든 정보를 가져옵니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXP001", description = "존재하지 않는 경험")
+    })
     @GetMapping("/{experience_id}")
     public ApiResponse<DetailExperienceReadResponseDto> readExperience(@PathVariable("experience_id") Long experienceId) {
         return ApiResponse.onSuccess(experienceService.read(experienceId));
     }
 
     @Operation(summary = "특정 경험 업데이트", description = "사용자가 특정 필드를 수정하여 해당 경험을 수정합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXP001", description = "존재하지 않는 경험"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CATEGORY001", description = "잘못된 카테고리"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXP002", description = "잘못된 경험 유형"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXP003", description = "잘못된 저장 유형"),
+    })
     @PatchMapping("/{experience_id}")
     public ApiResponse<?> updateExperience(@PathVariable("experience_id") Long experienceId, @RequestBody ExperienceUpdateRequestDto experienceUpdateRequestDto) {
         experienceService.update(experienceId, experienceUpdateRequestDto);
@@ -54,6 +66,9 @@ public class ExperienceController {
     }
 
     @Operation(summary = "특정 경험을 삭제", description = "사용자가 특정 경험을 삭제합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXP001", description = "존재하지 않는 경험")
+    })
     @DeleteMapping("/{experience_id}")
     public ApiResponse<?> deleteExperience(@PathVariable("experience_id") Long experienceId) {
         experienceService.delete(experienceId);
