@@ -39,9 +39,7 @@ jobs:
 
       # Dokcer Login
       - name: Docker Login to GHCR
-        run: |
-          echo ${{ secrets.GITHUB_PAT }}
-          docker login ghcr.io -u ${{ secrets.GITHUB_USERNAME }} --passwrod-stdin
+        run: echo ${{ secrets.WONJAE_GITHUB_PAT }} | docker login ghcr.io -u ${{ secrets.WONJAE_GITHUB_USERNAME }} --password-stdin
 
       # Image build ->  ghcr.io/<OWNER>/<REPO>:<TAG> .
       - name: Build Docker Image
