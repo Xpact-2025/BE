@@ -33,7 +33,7 @@ public class RefreshTokenService {
     }
 
     // RefreshToken 삭제하기
-    public void deletRefreshToken(long memberId) {
+    public void deleteRefreshToken(long memberId) {
         String key = "refreshToken:" + memberId;
         redisTemplate.delete(key);
     }
@@ -46,5 +46,15 @@ public class RefreshTokenService {
         cookie.setPath("/");
         cookie.setMaxAge((int) refreshTokenExpiration); // 초 단위
         response.addCookie(cookie);
+    }
+
+    // RefreshToken 쿠키에서 삭제하기
+    public void removeRefreshTokenCookie(HttpServletResponse response, long memberId) {
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(0); // 즉시 만료
+        response.addCookie(refreshTokenCookie);
     }
 }
