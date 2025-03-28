@@ -7,12 +7,15 @@ import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.recruit.entity.DesiredRecruit;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@RequiredArgsConstructor
 @Table(name = "member")
 public class Member extends BaseEntity {
 
@@ -56,4 +59,14 @@ public class Member extends BaseEntity {
     @Column(name = "member_status")
     @Enumerated(EnumType.STRING)
     private ActiveStatus activeStatus;
+
+    @Builder
+    public Member(String name, String email, String password, LocalDate birthDate, Type type, Role role) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.birthDate = birthDate;
+        this.type = type;
+        this.role = role;
+    }
 }
