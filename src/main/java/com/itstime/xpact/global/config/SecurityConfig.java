@@ -40,7 +40,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagementConfigurer ->
-                        sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(form -> form
+                        .loginPage("/auth/login")
+                        .successHandler(successHandler())
+                        .failureHandler(failureHandler()));
 
         setTokenFilter(httpSecurity);
         setPermission(httpSecurity);
@@ -75,5 +79,23 @@ public class SecurityConfig {
                 .requestMatchers("/**").permitAll()  // 추후에 접근 설정 추가
                 .anyRequest().authenticated()
         );
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler successHandler() {
+        // Custom AuthenticaitonSuccessHandler 설정
+        return (request, response, authentication) -> {
+            // 로그인 성공 시 수행할 로직
+            response.sendRedirect("/success"); // 로그인 성공 시 리다이렉트
+        };
+    }
+
+    @Bean
+    public AuthenticationFailureHandler failureHandler() {
+        // Custom AuthenticationFailureHandler 설정
+        return (request, response, authentication) -> {
+            // 로그인 실패 시 수행할 로직
+            response.sendRedirect("/failure");
+        };
     }
  }
