@@ -1,5 +1,7 @@
 package com.itstime.xpact.global.security.service;
 
+import com.itstime.xpact.domain.member.common.Role;
+import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.TokenProvider;
@@ -32,15 +34,26 @@ public class AuthService {
 
         // 회원 가입 여부 확인
         if (memberRepository.existsByEmail(requestDto.email())) {
+            log.warn("이미 존재하는 회원입니다.");
             // TODO : Custom Exception 변경
             throw new RuntimeException("이미 존재하는 회원입니다.");
         }
 
+        log.info("{" + requestDto.email() + "} :  회원 가입 시작");
         String encodedPassword = this.passwordEncoder.encode(requestDto.password());
-        Member member = SignupRequestDto.toEntity(requestDto);
-        member.setPassword(encodedPassword);
+        SignupRequestDto updatedRequestDto = new SignupRequestDto(
+                requestDto.email(),
+                encodedPassword,
+                requestDto.name(),
+                requestDto.birthDate(),
+                Type.FORM,
+                Role.ROLE_USER
+        );
+
+        Member member = SignupRequestDto.toEntity(updatedRequestDto);
         memberRepository.save(member);
 
+        log.info("{" + requestDto.email() + "} : 회원 가입 완료");
         return SignupResponseDto.toDto(member);
     }
 }
