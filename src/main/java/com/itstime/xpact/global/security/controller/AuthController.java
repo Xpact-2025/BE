@@ -1,6 +1,8 @@
 package com.itstime.xpact.global.security.controller;
 
 import com.itstime.xpact.global.response.ApiResponse;
+import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
+import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
 import com.itstime.xpact.global.security.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +18,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/singup")
-    public void signup(
-            // TODO: DTO 생성
-    ) {
+    public ApiResponse<SignupResponseDto> signup(
+            @RequestBody SignupRequestDto signupRequestDto
+            ) {
+        return ApiResponse.onSuccess(
+                authService.register(signupRequestDto)
+        );
     }
 
     @PostMapping("/login")
