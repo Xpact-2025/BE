@@ -11,9 +11,11 @@ import com.itstime.xpact.domain.experience.repository.CategoryRepository;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
+import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.BusinessException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.ExperienceException;
+import com.itstime.xpact.global.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +30,18 @@ public class ExperienceService {
     private final CategoryRepository categoryRepository;
     private final MemberRepository memberRepository;
 
+    private final SecurityProvider securityProvider;
+
     /**
      * Experience Create 서비스 로직 : FormType에 따라 양식이 바뀜 & Status에 따라 저장방식 다름
      */
     @Transactional
     public void create(ExperienceCreateRequestDto createRequestDto) {
-        Member member = memberRepository.findById(1L).orElse(null);
+        // member 조회
+        Long currentMemberId = securityProvider.getCurrentMemberId();
+        Member member = memberRepository.findById(currentMemberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
+
         Experience experience;
 
         // category 조회
@@ -76,7 +84,12 @@ public class ExperienceService {
 
     @Transactional(readOnly = true)
     public List<ThumbnailExperienceReadResponseDto> readAll() {
-        return experienceRepository.findAll()
+        // member 조회
+        Long currentMemberId = securityProvider.getCurrentMemberId();
+        Member member = memberRepository.findById(currentMemberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
+
+        return experienceRepository.findAllByMember(member)
                 .stream()
                 .map(experience -> {
                     List<String> categoryNames = experience.getExperienceCategories().stream()
@@ -100,7 +113,10 @@ public class ExperienceService {
 
     @Transactional
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) {
-        Member member = memberRepository.findById(1L).orElse(null);
+        // member 조회
+        Long currentMemberId = securityProvider.getCurrentMemberId();
+        Member member = memberRepository.findById(currentMemberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
 
         // experience 조회
         Experience experience = experienceRepository.findById(experienceId)
