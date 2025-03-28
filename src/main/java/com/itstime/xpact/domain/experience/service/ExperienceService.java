@@ -99,8 +99,6 @@ public class ExperienceService {
         return DetailExperienceReadResponseDto.from(experience, categories);
     }
 
-    // 같은 유형에서 카테고리를 수정하면 기존의 카테고리가 수정되지 않음
-
     @Transactional
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) {
         Member member = memberRepository.findById(1L).orElse(null);
@@ -137,8 +135,16 @@ public class ExperienceService {
         updatedExperiecne.addMember(member);
         updatedExperiecne.addExperienceCategories(experienceCategories);
 
-        // 수정된 experience 저장
-        experienceRepository.save(updatedExperiecne);
+        // 저장 방식 결정
+        if(updatedExperiecne.getStatus().equals(Status.STASH)) {
+            // TODO 추후 stash 로직 구현해야함 (일단 저장은 하고)
+            experienceRepository.save(updatedExperiecne);
+        } else if(experience.getStatus().equals(Status.SAVE)) {
+            // TODO 추후 save 로직 구현해야함(대시보드 업데이트) (일단 저장은 하고)
+            experienceRepository.save(updatedExperiecne);
+        } else {
+            throw new ExperienceException(ErrorCode.INVALID_STATUS);
+        }
     }
 
     /**
