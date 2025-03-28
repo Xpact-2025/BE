@@ -41,10 +41,14 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagementConfigurer ->
                         sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                /*
+                TODO : 로그인 후 리다이렉트 설정
                 .formLogin(form -> form
                         .loginPage("/auth/login")
                         .successHandler(successHandler())
-                        .failureHandler(failureHandler()));
+                        .failureHandler(failureHandler()))
+                 */
+        ;
 
         setTokenFilter(httpSecurity);
         setPermission(httpSecurity);
@@ -81,6 +85,7 @@ public class SecurityConfig {
         );
     }
 
+    /*
     @Bean
     public AuthenticationSuccessHandler successHandler() {
         // Custom AuthenticaitonSuccessHandler 설정
@@ -97,5 +102,5 @@ public class SecurityConfig {
             // 로그인 실패 시 수행할 로직
             response.sendRedirect("/failure");
         };
-    }
+     */
  }
