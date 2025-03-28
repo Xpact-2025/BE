@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-
     steps:
       # github workflows로 현재 repository의 코드를 가져옴 (최신 버전 : v4)
       - name: Checkout Code
@@ -41,9 +40,31 @@ jobs:
       - name: Push Docker Images
         run: docker push ghcr.io/${{ secrets.ORG_NAME }}/xpact-api:latest
 
+
+  transfer:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Transfer docker-compose.yaml file to ec2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          source: /docker-compose.yaml
+          target: /home/ubuntu/
+
+      - name: Transfer nginx.conf file to ec2
+        uses: appleboy/scp-action@0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          source: /nginx/nginx.conf
+          target: /home/ubuntu/nginx/nginx.conf
+
+
   deploy:
     runs-on: ubuntu-22.04
-
     steps:
       # ec2 접속
       - name: SSH into server and deploy
