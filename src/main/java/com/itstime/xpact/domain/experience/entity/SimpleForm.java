@@ -26,8 +26,6 @@ public class SimpleForm extends Experience {
 
     // createRequestDto로 SimpleForm형식의 Experience생성
     public static Experience from(ExperienceCreateRequestDto createRequestDto) {
-
-        // TODO member, experienceCategory 넣어야함
         return SimpleForm.builder()
                 // common 부분
                 .status(createRequestDto.getStatus())
