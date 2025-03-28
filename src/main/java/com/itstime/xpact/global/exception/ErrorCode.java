@@ -23,7 +23,10 @@ public enum ErrorCode {
     EMPTY_JWT(HttpStatus.BAD_REQUEST, "TE005", "토큰이 존재하지 않습니다."),
 
     // category
-    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "CAT001", "Invalid Category");
+    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "CAT001", "Invalid Category"),
+
+    // member
+    MEMBER_NOT_EXISTS(HttpStatus.NO_CONTENT, "MEMBER001", "Member Not Exists"),;
 
     private final HttpStatus httpStatus;
     private final String code;
