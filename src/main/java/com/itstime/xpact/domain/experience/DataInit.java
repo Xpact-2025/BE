@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class CategoryInit {
+public class DataInit {
 
     private final CategoryRepository categoryRepository;
     private final MemberRepository memberRepository;
@@ -29,6 +29,7 @@ public class CategoryInit {
     public CommandLineRunner init() {
         return args -> {
 
+            // Category 초기화
             long categoryCount = categoryRepository.count();
             if(categoryCount == 0) {
                 List<Category> categoryList = Arrays.stream(ExperienceType.values())
@@ -41,15 +42,14 @@ public class CategoryInit {
                 log.info("Found {} category", categoryRepository.count());
             }
 
+            // 임시 Member 생성
             long memberCount = memberRepository.count();
             if(memberCount == 0) {
                 Member memeber = Member.builder()
-                        .email("demo")
-                        .name("demo")
-                        .role(Role.ROLE_USER)
+                        .email("test@test.com")
+                        .name("test")
+                        .role(Role.ROLE_ADMIN)
                         .type(Type.FORM)
-                        .imgurl("demo")
-                        .inactiveDate(LocalDate.now())
                         .birthDate(LocalDate.now())
                         .build();
 
