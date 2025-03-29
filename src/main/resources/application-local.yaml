@@ -29,7 +29,7 @@ spring:
             client-name: KAKAO
             client-authentication-method: client_secret_post
             client-id: ${KAKAO_REST_API_KEY}
-            redirect-uri: http://localhost:8080/auth/kakao/callback
+            redirect-uri: ${KAKAO_CALLBACK}
             authorization-grant-type: authorization_code # 서버로부터 인증코드를 검증 받고 토큰 받는 형식
             scope: profile, email # 받아오는 정보
 
