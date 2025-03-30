@@ -8,6 +8,7 @@ public enum ExperienceType {
     CERTIFICATES,
     ACADEMIC_CLUB,
     EDUCATION,
+    PRIZE,
     VOLUNTEER_WORK,
     STUDY_ABROAD,
     ETC,;

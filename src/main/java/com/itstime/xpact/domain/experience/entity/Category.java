@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.experience.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
+import com.itstime.xpact.domain.experience.common.ExperienceType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,7 +23,7 @@ public class Category extends BaseEntity {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<ExperienceCategory> experienceCategories = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id")
+    private Experience experience;
 }
