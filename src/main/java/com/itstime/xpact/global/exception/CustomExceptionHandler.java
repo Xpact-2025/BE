@@ -1,6 +1,7 @@
 package com.itstime.xpact.global.exception;
 
 import com.itstime.xpact.global.response.ErrorResponse;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
+@Hidden
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
