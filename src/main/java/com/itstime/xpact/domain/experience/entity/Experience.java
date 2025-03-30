@@ -5,14 +5,12 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.recruit.entity.ExperienceKeyword;
+import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -52,9 +50,9 @@ public abstract class Experience extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL)
-    private List<ExperienceKeyword> expKeywords = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "detail_recruit_id")
+    private DetailRecruit detailRecruit;
 
     public abstract void update(ExperienceUpdateRequestDto dto);
 

@@ -5,7 +5,8 @@ import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
-import com.itstime.xpact.domain.recruit.entity.DesiredRecruit;
+import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
+import com.itstime.xpact.domain.recruit.entity.Recruit;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Table(name = "member")
 public class Member extends BaseEntity {
 
@@ -37,16 +39,6 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    @Column(name = "role", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<DesiredRecruit> desiredRecruits = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Experience> experiences = new ArrayList<>();
-
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
@@ -59,6 +51,17 @@ public class Member extends BaseEntity {
     @Column(name = "member_status")
     @Enumerated(EnumType.STRING)
     private ActiveStatus activeStatus;
+
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Recruit recruit;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Experience> experiences = new ArrayList<>();
 
     @Builder
     public Member(String name, String email, String password, LocalDate birthDate, Type type, Role role) {
