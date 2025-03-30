@@ -1,6 +1,7 @@
 package com.itstime.xpact.global.security.controller;
 
-import com.itstime.xpact.global.response.ApiResponse;
+import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.response.RestResponse;
 import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
 import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,12 +32,13 @@ public class AuthController {
             schema = @Schema(implementation = SignupRequestDto.class)
     )))
     @PostMapping("/signup")
-    public ApiResponse<SignupResponseDto> signup(
+    public ResponseEntity<RestResponse<SignupResponseDto>> signup (
             @RequestBody SignupRequestDto signupRequestDto
-            ) {
+            ) throws CustomException{
 
-        return ApiResponse.onSuccess(
-                authService.register(signupRequestDto)
+        return ResponseEntity.ok(
+                RestResponse.ok(
+                        authService.register(signupRequestDto))
         );
     }
 
@@ -47,18 +50,19 @@ public class AuthController {
                     schema = @Schema(implementation = LoginRequestDto.class)
             )))
     @PostMapping("/login")
-    public ApiResponse<?> login(
+    public ResponseEntity<RestResponse<?>> login(
             @RequestBody LoginRequestDto requestDto,
             HttpServletResponse response
-            ) {
-        return ApiResponse.onSuccess(
+            ) throws CustomException {
+        return ResponseEntity.ok(
+                RestResponse.ok(
                 authService.generalLogin(requestDto, response)
-        );
+        ));
     }
 
     @Operation(summary = "로그아웃", description = "로그아웃 기능 API 입니다.")
     @PostMapping("/logout")
-    public ApiResponse<?> logout(
+    public ResponseEntity<RestResponse<?>> logout(
             HttpServletResponse response,
             @RequestHeader("Authorization") String authToken
     ) {
@@ -67,7 +71,9 @@ public class AuthController {
 
         authService.logout(response, token);
 
-        return ApiResponse.onSuccess("성공적으로 로그아웃 되었습니다.");
+        return ResponseEntity.ok(
+                RestResponse.ok("성공적으로 로그아웃 되었습니다.")
+        );
     }
 
     // Access Token 재발급받기
@@ -76,10 +82,12 @@ public class AuthController {
             Refresh Token을 이용하여 Access Token을 재발급 받습니다.
             """)
     @PostMapping("/refresh")
-    public ApiResponse<?> refresh(
+    public ResponseEntity<RestResponse<?>> refresh(
             HttpServletRequest request, HttpServletResponse response
-    ) {
-        return ApiResponse.onSuccess(authService.refresh(request, response));
+    ) throws CustomException {
+        return ResponseEntity.ok(
+                RestResponse.ok(
+                        authService.refresh(request, response)));
     }
 
     // 회원 탈퇴하기

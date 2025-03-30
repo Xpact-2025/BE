@@ -12,10 +12,7 @@ import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.exception.BusinessException;
-import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.exception.ExperienceException;
-import com.itstime.xpact.global.exception.MemberException;
+import com.itstime.xpact.global.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,11 +33,11 @@ public class ExperienceService {
      * Experience Create 서비스 로직 : FormType에 따라 양식이 바뀜 & Status에 따라 저장방식 다름
      */
     @Transactional
-    public void create(ExperienceCreateRequestDto createRequestDto) {
+    public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
         // member 조회
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         Experience experience;
 
@@ -48,7 +45,7 @@ public class ExperienceService {
         List<Category> categories = createRequestDto.getExperienceCategories()
                 .stream()
                 .map(categoryName -> categoryRepository.findByName(categoryName)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CATEGORY)))
+                        .orElseThrow(() -> CustomException.of(ErrorCode.INVALID_CATEGORY)))
                 .toList();
 
 
@@ -57,7 +54,7 @@ public class ExperienceService {
             experience = SimpleForm.from(createRequestDto);
         } else if(createRequestDto.getFormType().equals(FormType.STAR_FORM)) {
             experience = StarForm.from(createRequestDto);
-        } else throw new ExperienceException(ErrorCode.INVALID_FORMTYPE);
+        } else throw new CustomException(ErrorCode.INVALID_FORMTYPE);
 
 
         // ExperienceCategory생성 및 연관관계 설정
@@ -83,11 +80,11 @@ public class ExperienceService {
     }
 
     @Transactional(readOnly = true)
-    public List<ThumbnailExperienceReadResponseDto> readAll() {
+    public List<ThumbnailExperienceReadResponseDto> readAll() throws CustomException {
         // member 조회
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         return experienceRepository.findAllByMember(member)
                 .stream()
@@ -101,9 +98,9 @@ public class ExperienceService {
     }
 
     @Transactional(readOnly = true)
-    public DetailExperienceReadResponseDto read(Long experienceId) {
+    public DetailExperienceReadResponseDto read(Long experienceId) throws CustomException {
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
         List<Category> categories = experience.getExperienceCategories()
                 .stream()
                 .map(ExperienceCategory::getCategory)
@@ -112,21 +109,21 @@ public class ExperienceService {
     }
 
     @Transactional
-    public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) {
+    public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
         // member 조회
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         // experience 조회
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         // category 조회
         List<Category> categories = updateRequestDto.getExperienceCategories()
                 .stream()
                 .map(categoryName -> categoryRepository.findByName(categoryName)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CATEGORY)))
+                        .orElseThrow(() -> CustomException.of(ErrorCode.INVALID_CATEGORY)))
                 .toList();
 
         Experience updatedExperiecne;
@@ -158,7 +155,7 @@ public class ExperienceService {
             // TODO 추후 save 로직 구현해야함(대시보드 업데이트) (일단 저장은 하고)
             experienceRepository.save(updatedExperiecne);
         } else {
-            throw new ExperienceException(ErrorCode.INVALID_STATUS);
+            throw new CustomException(ErrorCode.INVALID_STATUS);
         }
     }
 
@@ -166,13 +163,13 @@ public class ExperienceService {
      * 기존의 Experience객체는 delete하고 updateRequestDto를 통해 새로운 Experience객체를 생성 <br>
      * (이때 FormType에 맞도록 return)
      */
-    private Experience createUpdatedExperience(ExperienceUpdateRequestDto updateRequestDto) {
+    private Experience createUpdatedExperience(ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
         if(updateRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
             return SimpleForm.from(updateRequestDto);
         } else if(updateRequestDto.getFormType().equals(FormType.STAR_FORM)) {
             return StarForm.from(updateRequestDto);
         } else {
-            throw new ExperienceException(ErrorCode.INVALID_FORMTYPE);
+            throw new CustomException(ErrorCode.INVALID_FORMTYPE);
         }
     }
 
@@ -180,13 +177,13 @@ public class ExperienceService {
      * 기존의 Experience를 updateRequestDto에 맞게 수정하는 메서드, 기존의 experience객체 사용 <br>
      * (FormType형식에 맞게 update 진행)
      */
-    private void updateExperience(Experience experience, ExperienceUpdateRequestDto updateRequestDto) {
+    private void updateExperience(Experience experience, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
         if(updateRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
             experience.update(updateRequestDto);
         } else if(updateRequestDto.getFormType().equals(FormType.STAR_FORM)) {
             experience.update(updateRequestDto);
         } else {
-            throw new ExperienceException(ErrorCode.INVALID_FORMTYPE);
+            throw new CustomException(ErrorCode.INVALID_FORMTYPE);
         }
     }
 
@@ -206,9 +203,9 @@ public class ExperienceService {
     }
 
     @Transactional
-    public void delete(Long experienceId) {
+    public void delete(Long experienceId) throws CustomException {
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
         experienceRepository.delete(experience);
     }
 }
