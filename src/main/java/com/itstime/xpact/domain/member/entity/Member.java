@@ -7,6 +7,7 @@ import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
+import com.itstime.xpact.domain.scrap.entity.Scrap;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,6 +63,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Experience> experiences = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Scrap> scraps = new ArrayList<>();
 
     @Builder
     public Member(String name, String email, String password, LocalDate birthDate, Type type, Role role) {
