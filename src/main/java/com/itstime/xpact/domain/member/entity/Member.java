@@ -57,11 +57,8 @@ public class Member extends BaseEntity {
     private Role role;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "recruit_id")
     private Recruit recruit;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Experience> experiences = new ArrayList<>();
 
     @Builder
     public Member(String name, String email, String password, LocalDate birthDate, Type type, Role role) {
