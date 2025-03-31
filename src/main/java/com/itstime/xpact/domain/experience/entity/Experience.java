@@ -46,6 +46,12 @@ public abstract class Experience extends BaseEntity {
     @Enumerated(EnumType.STRING)
     protected ExperienceType type;
 
+    @Column(name = "summary")
+    protected String summary;
+
+    @Column(name = "keyword")
+    protected String keyword;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;

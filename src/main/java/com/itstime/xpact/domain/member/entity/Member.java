@@ -57,6 +57,9 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "education")
+    private String education;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id")
     private Recruit recruit;
