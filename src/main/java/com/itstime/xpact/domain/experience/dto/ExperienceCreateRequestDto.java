@@ -1,15 +1,13 @@
 package com.itstime.xpact.domain.experience.dto;
 
+import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
-import com.itstime.xpact.domain.experience.entity.ExperienceCategory;
-import com.itstime.xpact.domain.recruit.entity.ExperienceKeyword;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -20,14 +18,14 @@ public class ExperienceCreateRequestDto {
     @Schema(description = "경험 저장 방식 지정 (임시저장 or 저장)", example = "SAVE", allowableValues = {"STASH", "SAVE"})
     private Status status;
 
-    @Schema(description = "경험 유형 지정 (중복 가능)",
-            example = "[\"INTERN\"]",
+    @Schema(description = "경험 유형 지정",
+            example = "INTERN",
             allowableValues = {"INTERN", "EXTERNAL_ACTIVITIES", "CONTEST",
                     "PROJECT", "CERTIFICATES", "ACADEMIC_CLUB", "EDUCATION",
                     "VOLUNTEER_WORK", "STUDY_ABROAD", "ETC"})
-    private List<String> experienceCategories;
+    private ExperienceType experienceType;
 
-    @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식", example = "SIMPLE_FORM")
+    @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식)", example = "SIMPLE_FORM")
     private FormType formType;
 
     @Schema(description = "경험 제목", example = "경험 제목")

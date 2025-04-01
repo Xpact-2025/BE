@@ -33,6 +33,8 @@ public class SimpleForm extends Experience {
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
                 .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .type(createRequestDto.getExperienceType())
+
                 // SimpleForm 부분
                 .role(createRequestDto.getRole())
                 .perform(createRequestDto.getPerform())
@@ -48,6 +50,8 @@ public class SimpleForm extends Experience {
                 .startDate(updateRequestDto.getStartDate())
                 .endDate(updateRequestDto.getEndDate())
                 .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .type(updateRequestDto.getExperienceType())
+
                 // SimpleForm 부분
                 .role(updateRequestDto.getRole())
                 .perform(updateRequestDto.getPerform())
@@ -65,6 +69,7 @@ public class SimpleForm extends Experience {
         this.startDate = dto.getStartDate();
         this.endDate = dto.getEndDate();
         this.isEnded = dto.getEndDate().isBefore(LocalDate.now());
+        this.type = dto.getExperienceType();
 
         this.perform = dto.getPerform();
         this.role = dto.getRole();

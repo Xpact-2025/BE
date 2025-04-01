@@ -1,17 +1,16 @@
 package com.itstime.xpact.domain.experience.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
+import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.recruit.entity.ExperienceKeyword;
+import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -43,30 +42,28 @@ public abstract class Experience extends BaseEntity {
     @Column(name = "end_date")
     protected LocalDate endDate;
 
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    protected ExperienceType type;
+
+    @Column(name = "summary")
+    protected String summary;
+
+    @Column(name = "keyword")
+    protected String keyword;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL)
-    private List<ExperienceKeyword> expKeywords = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExperienceCategory> experienceCategories = new ArrayList<>();
-
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "summarized_experience_id")
-    private SummarizedExperience summaryExperience;
+    @JoinColumn(name = "detail_recruit_id")
+    private DetailRecruit detailRecruit;
 
     public abstract void update(ExperienceUpdateRequestDto dto);
 
-    public void addExperienceCategories(List<ExperienceCategory> experienceCategories) {
-        this.experienceCategories.clear();
-        this.experienceCategories.addAll(experienceCategories);
-    }
-
     public void addMember(Member member) {
         this.member = member;
+        member.getExperiences().add(this);
     }
 }

@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.experience.dto;
 
+import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +22,7 @@ public class ExperienceUpdateRequestDto {
             allowableValues = {"INTERN", "EXTERNAL_ACTIVITIES", "CONTEST",
                     "PROJECT", "CERTIFICATES", "ACADEMIC_CLUB", "EDUCATION",
                     "VOLUNTEER_WORK", "STUDY_ABROAD", "ETC"})
-    private List<String> experienceCategories;
+    private ExperienceType experienceType;
 
     @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식", example = "SIMPLE_FORM")
     private FormType formType;
