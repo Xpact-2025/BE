@@ -23,6 +23,7 @@ public enum ErrorCode {
     UNSUPPORTED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "TE005", "지원하지 않는 토큰 형식입니다."),
     EMPTY_JWT(HttpStatus.BAD_REQUEST, "TE006", "토큰이 존재하지 않습니다."),
 
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "권한이 존재하지 않습니다"),
     UNMATCHED_PASSWORD(HttpStatus.UNAUTHORIZED, "PWD001", "비밀번호가 일치하지 않습니다."),
 
     // category
