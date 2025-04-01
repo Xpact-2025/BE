@@ -17,30 +17,28 @@ public class CustomExceptionHandler {
     // CustomException ( RuntimeException )
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<ErrorResponse> customException(CustomException e, HttpServletRequest request) {
-        return buildErrorResponse(e.getErrorCode(), request);
+        logError(e, request);
+        return ErrorResponse.toResponseEntity(e.getErrorCode());
     }
 
     // Header missing Exception
     @ExceptionHandler(MissingRequestHeaderException.class)
     protected ResponseEntity<ErrorResponse> missingRequestHeaderException(MissingRequestHeaderException e, HttpServletRequest request) {
-
-        return buildErrorResponse(ErrorCode.TOKEN_NOT_FOUND, request);
+        logError(e, request);
+        return ErrorResponse.toResponseEntity(ErrorCode.TOKEN_NOT_FOUND);
     }
 
     // 기타 예외들( NullPointerException, IllegalArgumentException 등 )
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception e, HttpServletRequest request) {
-        log.error("Unhandled Exception : ", e);
-        return buildErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, request);
+        logError(e, request);
+        return ErrorResponse.toResponseEntity(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
 
-    private ResponseEntity<ErrorResponse> buildErrorResponse(ErrorCode errorCode, HttpServletRequest request) {
-
+    // console log 출력
+    private void logError(Exception e, HttpServletRequest request) {
         log.error("Request URI : [{}] {}", request.getMethod(), request.getRequestURI());
-        log.error("Error message : {}", errorCode.getMessage());
-
-        ErrorResponse errorResponse = new ErrorResponse(errorCode);
-        return new ResponseEntity<>(errorResponse, errorCode.getHttpStatus());
+        log.error("Exception : ", e);
     }
 }
