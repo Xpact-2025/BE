@@ -40,28 +40,6 @@ public class ExperienceController {
         return ResponseEntity.ok(RestResponse.ok());
     }
 
-    @Operation(summary = "사용자의 모든 경험 조회", description = "사용자가 작성한 모든 경험을 조회합니다. (임시저장, 저장 모두 조회), (페이지 처리 X), (상세 조회 X)")
-    @GetMapping("/")
-    public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> readAllExperience() throws CustomException {
-        // TODO : Swagger 확인 후 ListResponse 따로 생성할지에 대하여 고민
-        return ResponseEntity.ok(
-                RestResponse.ok(experienceService.readAll())
-        );
-    }
-
-    @Operation(summary = "특정 경험 상세 조회", description = "사용자가 특정 경험을 클릭했을 때, 해당 경험에 대한 모든 정보를 가져옵니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "EXP001", description = "존재하지 않는 경험")
-    })
-    @GetMapping("/{experience_id}")
-    public ResponseEntity<RestResponse<DetailExperienceReadResponseDto>> readExperience(@PathVariable("experience_id") Long experienceId)
-    throws CustomException {
-        return ResponseEntity.ok(
-                RestResponse.ok(experienceService.read(experienceId))
-        );
-    }
-
     @Operation(summary = "특정 경험 업데이트", description = "사용자가 특정 필드를 수정하여 해당 경험을 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
