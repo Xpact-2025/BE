@@ -5,8 +5,8 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.*;
+import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.exception.ExperienceException;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -73,7 +73,7 @@ public class DetailExperienceReadResponseDto {
                     .perform(simpleForm.getPerform())
                     .build();
         } else {
-            throw new ExperienceException(ErrorCode.INVALID_FORMTYPE);
+            throw CustomException.of(ErrorCode.INVALID_FORMTYPE);
         }
     }
 }

@@ -5,6 +5,8 @@ import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.TokenProvider;
+import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
 import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
@@ -30,13 +32,12 @@ public class AuthService {
 
     // 회원 가입 서비스
     @Transactional
-    public SignupResponseDto register(SignupRequestDto requestDto) {
+    public SignupResponseDto register(SignupRequestDto requestDto) throws CustomException {
 
         // 회원 가입 여부 확인
         if (memberRepository.existsByEmail(requestDto.email())) {
             log.warn("이미 존재하는 회원입니다.");
-            // TODO : Custom Exception 변경
-            throw new RuntimeException("이미 존재하는 회원입니다.");
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
 
         log.info("{" + requestDto.email() + "} :  회원 가입 시작");
@@ -61,18 +62,17 @@ public class AuthService {
     public LoginResponseDto generalLogin(
             LoginRequestDto requestDto,
             HttpServletResponse httpResponse
-    ) {
-        // TODO: RuntimeException -> CustomException 변경
+    ) throws CustomException{
 
         // 가입된 회원인지 조회
         log.info(requestDto.email() + "의 회원 조회를 시작합니다.");
         Member member = memberRepository.findByEmail(requestDto.email())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         // 비밀번호 검증
         log.info("비밀번호 검증을 시작합니다.");
         if (!passwordEncoder.matches(requestDto.password(), member.getPassword())) {
-            throw new RuntimeException();
+            throw new CustomException(ErrorCode.UNMATCHED_PASSWORD);
         }
         log.info("로그인에 성공하였습니다.");
 
@@ -97,13 +97,12 @@ public class AuthService {
     @Transactional
     public LoginResponseDto refresh(
             HttpServletRequest request, HttpServletResponse response
-    ) {
+    ) throws CustomException {
         Long memberId = refreshTokenService.getMemberIdFromCookie(request);
 
         log.info(memberId + "의 회원을 조회합니다.");
         Member member = memberRepository.findById(memberId)
-                // TODO: CustomException 변경
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         log.info("Access Token을 재발급합니다.");
         String newAccessToken = tokenProvider.generateAccessToken(member);

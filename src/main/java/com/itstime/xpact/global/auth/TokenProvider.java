@@ -2,8 +2,10 @@ package com.itstime.xpact.global.auth;
 
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
+import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.CustomExceptionHandler;
 import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.response.ApiResponse;
+import com.itstime.xpact.global.response.RestResponse;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ public class TokenProvider {
 
     private static final String KEY_ROLES = "roles";
     private final MemberRepository memberRepository;
+    private final CustomExceptionHandler customExceptionHandler;
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
@@ -94,25 +97,25 @@ public class TokenProvider {
     }
 
     // JWT 검증
-    public ApiResponse<?> validationToken(String token) {
+    public RestResponse<?> validationToken(String token) throws CustomException {
         try {
             final Claims claims = getClaims(token);
-            return ApiResponse.onSuccess("VALID_JWT");
+            return RestResponse.ok(claims);
         } catch (MalformedJwtException e) {
             log.warn("유효하지 않은 JWT token: {}", e.getMessage());
-            return ApiResponse.onFailure(ErrorCode.INVALID_JWT_TOKEN);
+            throw CustomException.of(ErrorCode.INVALID_JWT_TOKEN);
         } catch (SignatureException e) {
             log.warn("유효하지 않은 서명의 JWT token: {}", e.getMessage());
-            return ApiResponse.onFailure(ErrorCode.INVALID_JWT_SIGNATURE);
+            throw CustomException.of(ErrorCode.INVALID_JWT_SIGNATURE);
         } catch (ExpiredJwtException e) {
             log.warn("만료된 JWT token: {}", e.getMessage());
-            return ApiResponse.onFailure(ErrorCode.EXPIRED_JWT_TOKEN);
+            throw CustomException.of(ErrorCode.EXPIRED_JWT_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.warn("지원하지 않는 JWT token: {}", e.getMessage());
-            return ApiResponse.onFailure(ErrorCode.UNSUPPORTED_JWT_TOKEN);
+            throw CustomException.of(ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException ex) {
             log.warn("Empty JWT token: {}", ex.getMessage());
-            return ApiResponse.onFailure(ErrorCode.EMPTY_JWT);
+            throw CustomException.of(ErrorCode.EMPTY_JWT);
         }
     }
 }
