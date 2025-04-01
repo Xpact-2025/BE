@@ -1,6 +1,5 @@
 package com.itstime.xpact.domain.experience;
 
-import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.entity.Member;
@@ -12,8 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 
 @Slf4j
 @Configuration
