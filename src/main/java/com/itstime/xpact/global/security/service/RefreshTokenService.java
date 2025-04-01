@@ -82,7 +82,7 @@ public class RefreshTokenService {
                 String refreshToken = cookie.getValue();
                 log.info("Refresh Token 발견. 유효성 검사 시작...");
 
-                if (tokenProvider.validationToken(refreshToken).getSuccess()) {
+                if (tokenProvider.validationToken(refreshToken).getHttpStatus() == 200) {
                     Long memberId = tokenProvider.getMemberIdFromToken(refreshToken);
                     log.info("유효한 Refresh token입니다. Member Id: {}", memberId);
                     return memberId;
