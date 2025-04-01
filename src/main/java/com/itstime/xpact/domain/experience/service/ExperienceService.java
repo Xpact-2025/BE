@@ -11,7 +11,6 @@ import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.auth.TokenProvider;
 import com.itstime.xpact.global.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -79,15 +78,9 @@ public class ExperienceService {
     @Transactional(readOnly = true)
     public DetailExperienceReadResponseDto read(Long experienceId) throws CustomException {
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         return DetailExperienceReadResponseDto.from(experience);
-                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
-        List<Category> categories = experience.getExperienceCategories()
-                .stream()
-                .map(ExperienceCategory::getCategory)
-                .toList();
-        return DetailExperienceReadResponseDto.from(experience, categories);
     }
 
     @Transactional
@@ -173,7 +166,7 @@ public class ExperienceService {
     @Transactional
     public void delete(Long experienceId) throws CustomException {
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         experienceRepository.delete(experience);
     }
