@@ -12,6 +12,7 @@ import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
+import com.itstime.xpact.global.auth.TokenProvider;
 import com.itstime.xpact.global.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,8 @@ public class ExperienceService {
      */
     @Transactional
     public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
+
+
         // member 조회
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
@@ -75,7 +78,7 @@ public class ExperienceService {
             // TODO 추후 save 로직 구현해야함(대시보드 업데이트) (일단 저장은 하고)
             experienceRepository.save(experience);
         } else {
-            throw new ExperienceException(ErrorCode.INVALID_STATUS);
+            throw new CustomException(ErrorCode.INVALID_STATUS);
         }
     }
 

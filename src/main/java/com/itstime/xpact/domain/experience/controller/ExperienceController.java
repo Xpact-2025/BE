@@ -33,7 +33,8 @@ public class ExperienceController {
             @ApiResponse(responseCode = "EXP002", description = "잘못된 유형")
     })
     @PostMapping("/")
-    public ResponseEntity<RestResponse<?>> createExperience(@RequestBody ExperienceCreateRequestDto createRequestDto) throws CustomException {
+    public ResponseEntity<RestResponse<?>> createExperience(
+            @RequestBody ExperienceCreateRequestDto createRequestDto) throws CustomException {
 
         experienceService.create(createRequestDto);
         return ResponseEntity.ok(RestResponse.ok());
