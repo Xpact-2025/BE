@@ -7,9 +7,8 @@ import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
+import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.exception.ExperienceException;
-import com.itstime.xpact.global.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +24,11 @@ public class QueryExperienceService {
     private final MemberRepository memberRepository;
     private final SecurityProvider securityProvider;
 
-    public List<ThumbnailExperienceReadResponseDto> readAll() {
+    public List<ThumbnailExperienceReadResponseDto> readAll() throws CustomException {
         // member 조회
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         return experienceRepository.findAllByMember(member)
                 .stream()
@@ -37,9 +36,9 @@ public class QueryExperienceService {
                 .toList();
     }
 
-    public DetailExperienceReadResponseDto read(Long experienceId) {
+    public DetailExperienceReadResponseDto read(Long experienceId) throws CustomException {
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         return DetailExperienceReadResponseDto.from(experience);
     }
