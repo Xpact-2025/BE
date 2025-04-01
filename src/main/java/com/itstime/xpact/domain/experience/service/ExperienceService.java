@@ -11,7 +11,9 @@ import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.exception.*;
+import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.openai.OpenAIService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,8 @@ public class ExperienceService {
 
     private final SecurityProvider securityProvider;
 
+    private final OpenAIService openAIService;
+
     /**
      * Experience Create 서비스 로직 : FormType에 따라 양식이 바뀜 & Status에 따라 저장방식 다름
      */
@@ -41,25 +45,23 @@ public class ExperienceService {
 
         Experience experience;
         // experience entity 생성 (experience 형식에 따라 StarForm, SimpleForm 결정)
-        if(createRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
+        if(createRequestDto.getFormType() == FormType.SIMPLE_FORM) {
             experience = SimpleForm.from(createRequestDto);
-        } else if(createRequestDto.getFormType().equals(FormType.STAR_FORM)) {
+        } else if(createRequestDto.getFormType() == FormType.STAR_FORM) {
             experience = StarForm.from(createRequestDto);
         } else throw new CustomException(ErrorCode.INVALID_FORMTYPE);
 
         // entity간 연관관계 설정
         experience.addMember(member);
+        experienceRepository.save(experience);
 
-        // 저장 방식 결정
-        if(experience.getStatus().equals(Status.DRAFT)) {
-            // TODO 추후 stash 로직 구현해야함 (일단 저장은 하고)
-            experienceRepository.save(experience);
-        } else if(experience.getStatus().equals(Status.SAVE)) {
-            // TODO 추후 save 로직 구현해야함(대시보드 업데이트) (일단 저장은 하고)
-            experienceRepository.save(experience);
-        } else {
-            throw new CustomException(ErrorCode.INVALID_STATUS);
-        }
+        /*
+            경험 저장 후 openai로 요약본 생성 요청 보냄
+            => 이때 경험 저장은 동기 요청
+            => openai 요청은 비동기 요청
+            => 대시보드의 필요한 데이터들이 비동기로 도착하므로 대시보드 조회 요청도 비동기적으로 다뤄야함
+        */
+        openAIService.summarizeContentOfExperience(experience);
     }
 
     @Transactional(readOnly = true)

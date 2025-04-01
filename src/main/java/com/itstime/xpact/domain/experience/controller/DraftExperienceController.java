@@ -22,7 +22,7 @@ public class DraftExperienceController {
     @PostMapping("/")
     public ResponseEntity<RestResponse<?>> createDraftExperience(
             @RequestBody ExperienceCreateRequestDto createRequestDto) {
-        draftExperienceService.save(createRequestDto);
+        draftExperienceService.create(createRequestDto);
         return ResponseEntity.ok(RestResponse.ok());
     }
 
