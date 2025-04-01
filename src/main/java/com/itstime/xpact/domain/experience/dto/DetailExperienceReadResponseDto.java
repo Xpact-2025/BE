@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.experience.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.*;
@@ -15,7 +16,6 @@ import java.util.List;
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-// TODO category 추가해야함
 public class DetailExperienceReadResponseDto {
 
     // 공통 부분
@@ -25,7 +25,7 @@ public class DetailExperienceReadResponseDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private FormType formType;
-    private List<String> experienceCategories;
+    private ExperienceType experienceType;
 
     // STAR 양식 부분
     private String situation;
@@ -42,11 +42,7 @@ public class DetailExperienceReadResponseDto {
      이때 StarForm, SimpleForm이냐에 따라 형식이 바뀌므로 조건문을 통해 리턴을 다르게 함
      필드가 null값이 들어가면 `JsonInclude.Include.NON_NULL`설정을 통해 응답으로 무시됨
      */
-    public static DetailExperienceReadResponseDto from(Experience experience, List<Category> categories) {
-        List<String> experienceCategoryNames = categories
-                .stream()
-                .map(Category::getName)
-                .toList();
+    public static DetailExperienceReadResponseDto from(Experience experience) {
 
         if(experience instanceof StarForm starForm) {
             return DetailExperienceReadResponseDto.builder()
@@ -56,7 +52,7 @@ public class DetailExperienceReadResponseDto {
                     .startDate(starForm.getStartDate())
                     .endDate(starForm.getEndDate())
                     .formType(FormType.STAR_FORM)
-                    .experienceCategories(experienceCategoryNames)
+                    .experienceType(starForm.getType())
 
                     .situation(starForm.getSituation())
                     .task(starForm.getTask())
@@ -71,7 +67,7 @@ public class DetailExperienceReadResponseDto {
                     .startDate(simpleForm.getStartDate())
                     .endDate(simpleForm.getEndDate())
                     .formType(FormType.SIMPLE_FORM)
-                    .experienceCategories(experienceCategoryNames)
+                    .experienceType(simpleForm.getType())
 
                     .role(simpleForm.getRole())
                     .perform(simpleForm.getPerform())

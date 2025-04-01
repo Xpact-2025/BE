@@ -7,12 +7,10 @@ import com.itstime.xpact.domain.experience.dto.ExperienceCreateRequestDto;
 import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.experience.dto.ThumbnailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.entity.*;
-import com.itstime.xpact.domain.experience.repository.CategoryRepository;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.exception.BusinessException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.ExperienceException;
 import com.itstime.xpact.global.exception.MemberException;
@@ -27,7 +25,6 @@ import java.util.List;
 public class ExperienceService {
 
     private final ExperienceRepository experienceRepository;
-    private final CategoryRepository categoryRepository;
     private final MemberRepository memberRepository;
 
     private final SecurityProvider securityProvider;
@@ -43,15 +40,6 @@ public class ExperienceService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
 
         Experience experience;
-
-        // category 조회
-        List<Category> categories = createRequestDto.getExperienceCategories()
-                .stream()
-                .map(categoryName -> categoryRepository.findByName(categoryName)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CATEGORY)))
-                .toList();
-
-
         // experience entity 생성 (experience 형식에 따라 StarForm, SimpleForm 결정)
         if(createRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
             experience = SimpleForm.from(createRequestDto);
@@ -59,16 +47,8 @@ public class ExperienceService {
             experience = StarForm.from(createRequestDto);
         } else throw new ExperienceException(ErrorCode.INVALID_FORMTYPE);
 
-
-        // ExperienceCategory생성 및 연관관계 설정
-        List<ExperienceCategory> experienceCategories = categories
-                .stream()
-                .map(category -> ExperienceCategory.from(experience, category))
-                .toList();
-
         // entity간 연관관계 설정
         experience.addMember(member);
-        experience.addExperienceCategories(experienceCategories);
 
         // 저장 방식 결정
         if(experience.getStatus().equals(Status.STASH)) {
@@ -91,12 +71,7 @@ public class ExperienceService {
 
         return experienceRepository.findAllByMember(member)
                 .stream()
-                .map(experience -> {
-                    List<String> categoryNames = experience.getExperienceCategories().stream()
-                            .map(experienceCategory -> experienceCategory.getCategory().getName())
-                            .toList();
-                    return ThumbnailExperienceReadResponseDto.of(experience, categoryNames);
-                })
+                .map(ThumbnailExperienceReadResponseDto::of)
                 .toList();
     }
 
@@ -104,11 +79,8 @@ public class ExperienceService {
     public DetailExperienceReadResponseDto read(Long experienceId) {
         Experience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
-        List<Category> categories = experience.getExperienceCategories()
-                .stream()
-                .map(ExperienceCategory::getCategory)
-                .toList();
-        return DetailExperienceReadResponseDto.from(experience, categories);
+
+        return DetailExperienceReadResponseDto.from(experience);
     }
 
     @Transactional
@@ -122,13 +94,6 @@ public class ExperienceService {
         Experience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
-        // category 조회
-        List<Category> categories = updateRequestDto.getExperienceCategories()
-                .stream()
-                .map(categoryName -> categoryRepository.findByName(categoryName)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CATEGORY)))
-                .toList();
-
         Experience updatedExperiecne;
         // 경험 유형이 변경되었는지 체크
         if(hasFormTypeChanged(experience, updateRequestDto)) {
@@ -141,14 +106,7 @@ public class ExperienceService {
             updatedExperiecne = experience;
         }
 
-        // experienceCategory 연관관계 생성 (experience 생성이 선행되어야함)
-        List<ExperienceCategory> experienceCategories = categories
-                .stream()
-                .map(category -> ExperienceCategory.from(updatedExperiecne, category))
-                .toList();
-
         updatedExperiecne.addMember(member);
-        updatedExperiecne.addExperienceCategories(experienceCategories);
 
         // 저장 방식 결정
         if(updatedExperiecne.getStatus().equals(Status.STASH)) {
@@ -209,6 +167,7 @@ public class ExperienceService {
     public void delete(Long experienceId) {
         Experience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+
         experienceRepository.delete(experience);
     }
 }

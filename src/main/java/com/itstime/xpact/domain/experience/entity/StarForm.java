@@ -42,6 +42,8 @@ public class StarForm extends Experience {
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
                 .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .type(createRequestDto.getExperienceType())
+
                 // StarForm 부분
                 .situation(createRequestDto.getSituation())
                 .task(createRequestDto.getTask())
@@ -59,6 +61,8 @@ public class StarForm extends Experience {
                 .startDate(updateRequestDto.getStartDate())
                 .endDate(updateRequestDto.getEndDate())
                 .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .type(updateRequestDto.getExperienceType())
+
                 // StarForm 부분
                 .situation(updateRequestDto.getSituation())
                 .task(updateRequestDto.getTask())
