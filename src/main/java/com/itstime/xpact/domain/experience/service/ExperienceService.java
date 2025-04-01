@@ -51,7 +51,7 @@ public class ExperienceService {
         experience.addMember(member);
 
         // 저장 방식 결정
-        if(experience.getStatus().equals(Status.STASH)) {
+        if(experience.getStatus().equals(Status.DRAFT)) {
             // TODO 추후 stash 로직 구현해야함 (일단 저장은 하고)
             experienceRepository.save(experience);
         } else if(experience.getStatus().equals(Status.SAVE)) {
@@ -109,7 +109,7 @@ public class ExperienceService {
         updatedExperiecne.addMember(member);
 
         // 저장 방식 결정
-        if(updatedExperiecne.getStatus().equals(Status.STASH)) {
+        if(updatedExperiecne.getStatus().equals(Status.DRAFT)) {
             // TODO 추후 stash 로직 구현해야함 (일단 저장은 하고)
             experienceRepository.save(updatedExperiecne);
         } else if(experience.getStatus().equals(Status.SAVE)) {
@@ -138,13 +138,13 @@ public class ExperienceService {
      * 기존의 Experience를 updateRequestDto에 맞게 수정하는 메서드, 기존의 experience객체 사용 <br>
      * (FormType형식에 맞게 update 진행)
      */
-    private void updateExperience(Experience experience, ExperienceUpdateRequestDto updateRequestDto) {
+    private void updateExperience(Experience experience, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
         if(updateRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
             experience.update(updateRequestDto);
         } else if(updateRequestDto.getFormType().equals(FormType.STAR_FORM)) {
             experience.update(updateRequestDto);
         } else {
-            throw new ExperienceException(ErrorCode.INVALID_FORMTYPE);
+            throw CustomException.of(ErrorCode.INVALID_FORMTYPE);
         }
     }
 
@@ -166,7 +166,7 @@ public class ExperienceService {
     @Transactional
     public void delete(Long experienceId) {
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         experienceRepository.delete(experience);
     }
