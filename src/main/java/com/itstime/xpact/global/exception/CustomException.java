@@ -2,10 +2,10 @@ package com.itstime.xpact.global.exception;
 
 public class CustomException extends RuntimeException {
 
-    private final ErrorCode errorCode;
+    private ErrorCode errorCode;
 
     public CustomException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
+        super(errorCode.getMessage()); // RuntimeException으로 전달
         this.errorCode = errorCode;
     }
 
