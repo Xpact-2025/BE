@@ -62,26 +62,6 @@ public class ExperienceService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public List<ThumbnailExperienceReadResponseDto> readAll() {
-        // member 조회
-        Long currentMemberId = securityProvider.getCurrentMemberId();
-        Member member = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_EXISTS));
-
-        return experienceRepository.findAllByMember(member)
-                .stream()
-                .map(ThumbnailExperienceReadResponseDto::of)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public DetailExperienceReadResponseDto read(Long experienceId) {
-        Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> new ExperienceException(ErrorCode.EXPERIENCE_NOT_EXISTS));
-
-        return DetailExperienceReadResponseDto.from(experience);
-    }
 
     @Transactional
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) {
