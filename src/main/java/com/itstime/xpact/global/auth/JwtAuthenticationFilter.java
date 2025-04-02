@@ -53,12 +53,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain) throws ServletException, IOException {
 
-        // Request Header에서 JWT token 추출
-        String token = getJwtFromReqeust(request);
-        RestResponse<?> result = tokenProvider.validationToken(token);
-
         // Verify
         try {
+            // Request Header에서 JWT token 추출
+            String token = getJwtFromReqeust(request);
+            RestResponse<?> result = tokenProvider.validationToken(token);
+
             // JWT Validate
             if (StringUtils.hasText(token) && result.getHttpStatus() == 200) {
 
