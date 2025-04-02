@@ -14,13 +14,13 @@ import java.util.List;
 public class ThumbnailExperienceReadResponseDto {
     private Long id;
     private String title;
-    private List<String> experienceCategories;
+    private ExperienceType experienceType;
 
-    public static ThumbnailExperienceReadResponseDto of(Experience experience, List<String> experienceCategoryNames) {
+    public static ThumbnailExperienceReadResponseDto of(Experience experience) {
         return ThumbnailExperienceReadResponseDto.builder()
                 .id(experience.getId())
                 .title(experience.getTitle())
-                .experienceCategories(experienceCategoryNames)
+                .experienceType(experience.getExperienceType())
                 .build();
     }
 }

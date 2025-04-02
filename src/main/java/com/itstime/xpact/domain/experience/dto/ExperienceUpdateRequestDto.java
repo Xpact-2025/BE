@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.experience.dto;
 
+import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,11 +18,11 @@ public class ExperienceUpdateRequestDto {
     private Status status;
 
     @Schema(description = "경험 유형 지정 (중복 가능)",
-            example = "[\"INTERN\", \"PROJECT\"]",
+            example = "PROJECT",
             allowableValues = {"INTERN", "EXTERNAL_ACTIVITIES", "CONTEST",
                     "PROJECT", "CERTIFICATES", "ACADEMIC_CLUB", "EDUCATION",
                     "VOLUNTEER_WORK", "STUDY_ABROAD", "ETC"})
-    private List<String> experienceCategories;
+    private ExperienceType experienceType;
 
     @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식", example = "SIMPLE_FORM")
     private FormType formType;
@@ -34,6 +35,9 @@ public class ExperienceUpdateRequestDto {
 
     @Schema(description = "종료 일시", example = "2025-03-27")
     private LocalDate endDate;
+
+    @Schema(description = "키워드", example = "키워드를 입력하세요")
+    private String keyword;
 
     // STAR_FORM
     @Schema(description = "상황", example = "상황을 입력하세요")

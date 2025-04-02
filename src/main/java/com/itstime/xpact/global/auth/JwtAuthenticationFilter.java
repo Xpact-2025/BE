@@ -3,8 +3,9 @@ package com.itstime.xpact.global.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
+import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.response.ApiResponse;
+import com.itstime.xpact.global.response.RestResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,8 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         System.out.println("Request path: " + path);
-        // TODO: 기능 개발에 따른 필터 path 조정
-        boolean shouldNotFilter = path.startsWith("/") ||
+        boolean shouldNotFilter = path.startsWith("/auth/signup") ||
+                path.startsWith("/auth/login") ||
+                path.startsWith("/v3/") ||
                 path.startsWith("/swagger-ui/");
         System.out.println("Should not filter: " + shouldNotFilter);
         return shouldNotFilter;
@@ -51,21 +53,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain) throws ServletException, IOException {
 
-        // Request Header에서 JWT token 추출
-        String token = getJwtFromReqeust(request);
-        ApiResponse<?> result = tokenProvider.validationToken(token);
-
         // Verify
         try {
+            // Request Header에서 JWT token 추출
+            String token = getJwtFromReqeust(request);
+            RestResponse<?> result = tokenProvider.validationToken(token);
+
             // JWT Validate
-            if (StringUtils.hasText(token) && result.getSuccess()) {
+            if (StringUtils.hasText(token) && result.getHttpStatus() == 200) {
 
                 Long memberId = tokenProvider.getMemberIdFromToken(token);
 
                 // ID(PK)를 통한 인증 생성
                 Member member = memberRepository.findById(memberId)
-                        // TODO : Custom Exception으로 변경
-                        .orElseThrow(() -> new RuntimeException());
+                        .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
                 MemberAuthentication authentication = MemberAuthentication.createMemberAuthentication(member);
 
