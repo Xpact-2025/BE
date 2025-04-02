@@ -11,7 +11,6 @@ import com.itstime.xpact.global.security.common.LoginStrategy;
 import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
 import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
-import com.itstime.xpact.global.security.dto.response.MemberResponseDto;
 import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
 import com.itstime.xpact.global.security.util.RefreshTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
