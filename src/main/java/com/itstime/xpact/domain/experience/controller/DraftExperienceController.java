@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/exp/draft")
+//@RestController
+//@RequestMapping("/api/exp/draft")
 @RequiredArgsConstructor
-@Tag(name = "Experience (Status : DRAFT-임시저장) API Controller", description = "경험 (Status : DRAFT) 관련 API")
+//@Tag(name = "Experience (Status : DRAFT-임시저장) API Controller", description = "경험 (Status : DRAFT) 관련 API")
 public class DraftExperienceController {
 
     private final DraftExperienceService draftExperienceService;

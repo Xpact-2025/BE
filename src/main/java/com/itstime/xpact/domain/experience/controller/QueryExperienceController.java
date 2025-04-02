@@ -21,12 +21,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/exp")
 @RequiredArgsConstructor
-@Tag(name = "Experience Read API Controller", description = "경험 조회 API (저장, 임시저장과 무관)")
+@Tag(name = "Experience Query API Controller", description = "경험 조회 API")
 public class QueryExperienceController {
 
     private final QueryExperienceService queryExperienceService;
 
-    @Operation(summary = "사용자의 모든 경험 조회", description = "사용자가 작성한 모든 경험을 조회합니다. (임시저장, 저장 모두 조회), (페이지 처리 X), (상세 조회 X)")
+    @Operation(summary = "사용자의 모든 경험 조회", description = "사용자가 작성한 모든 경험을 조회 (임시저장, 저장 모두 조회), (페이지 처리 X), (상세 조회 X)")
     @GetMapping("/")
     public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> readAllExperience()
     throws CustomException {
@@ -34,11 +34,7 @@ public class QueryExperienceController {
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.readAll()));
     }
 
-    @Operation(summary = "특정 경험 상세 조회", description = "사용자가 특정 경험을 클릭했을 때, 해당 경험에 대한 모든 정보를 가져옵니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "EXP001", description = "존재하지 않는 경험")
-    })
+    @Operation(summary = "특정 경험 상세 조회", description = "사용자가 특정 경험을 클릭했을 때, 해당 경험에 대한 모든 정보를 조회")
     @GetMapping("/{experience_id}")
     public ResponseEntity<RestResponse<DetailExperienceReadResponseDto>> readExperience(
             @PathVariable("experience_id") Long experienceId)

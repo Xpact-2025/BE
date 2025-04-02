@@ -2,14 +2,11 @@ package com.itstime.xpact.domain.experience.service;
 
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
-import com.itstime.xpact.domain.experience.dto.DetailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.dto.ExperienceCreateRequestDto;
 import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
-import com.itstime.xpact.domain.experience.dto.ThumbnailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.domain.member.service.MemberService;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
@@ -27,29 +24,19 @@ public class ExperienceService {
 
     private final ExperienceRepository experienceRepository;
     private final MemberService memberService;
-
     private final SecurityProvider securityProvider;
-
     private final OpenAIService openAIService;
 
-    /**
-     * Experience 저장 로직 : FormType에 따라 양식이 바뀜
-     */
     public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
-
         // member 조회
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberService.findMember(currentMemberId);
 
-        // createRequestDto에서 Status.DRAFT라면 잘못된 요청
-        if(createRequestDto.getStatus().equals(Status.DRAFT))
-            throw CustomException.of(ErrorCode.STATUS_NOT_CONSISTENCY);
-
         Experience experience;
         // experience entity 생성 (experience 형식에 따라 StarForm, SimpleForm 결정)
-        if(createRequestDto.getFormType() == FormType.SIMPLE_FORM) {
+        if(createRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
             experience = Experience.SimpleForm(createRequestDto);
-        } else if(createRequestDto.getFormType() == FormType.STAR_FORM) {
+        } else if(createRequestDto.getFormType().equals(FormType.STAR_FORM)) {
             experience = Experience.StarForm(createRequestDto);
         } else throw new CustomException(ErrorCode.INVALID_FORMTYPE);
 
@@ -64,7 +51,8 @@ public class ExperienceService {
             => 대시보드의 필요한 데이터들이 비동기로 도착하므로 대시보드 조회 요청도 비동기적으로 다뤄야함
         */
         // TODO : openAI에서 요약정보 받아옴 (create)
-        openAIService.summarizeContentOfExperience(experience);
+        if(createRequestDto.getStatus().equals(Status.SAVE))
+            openAIService.summarizeContentOfExperience(experience);
     }
 
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
@@ -76,9 +64,6 @@ public class ExperienceService {
 
         if(!experience.getMember().getId().equals(currentMemberId))
             throw CustomException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
-
-        if(experience.getStatus().equals(Status.DRAFT))
-            throw CustomException.of(ErrorCode.STATUS_NOT_CONSISTENCY);
 
         // form에 따라 수정방식을 다르게 잡음
         if(updateRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
