@@ -36,7 +36,7 @@ public enum ErrorCode {
     INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "CAT001", "Invalid Category"),
 
     // member
-    MEMBER_NOT_EXISTS(HttpStatus.NO_CONTENT, "MEMBER001", "Member Not Exists"),
+    MEMBER_NOT_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER001", "Member Not Exists"),
     MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER002", "이미 존재하는 회원입니다."),
 
     // server
