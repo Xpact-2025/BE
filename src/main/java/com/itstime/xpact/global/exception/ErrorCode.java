@@ -11,9 +11,11 @@ public enum ErrorCode {
     TEST(HttpStatus.INTERNAL_SERVER_ERROR, "500 에러", "Test Error"),
 
     // experience
-    EXPERIENCE_NOT_EXISTS(HttpStatus.NO_CONTENT, "EXP001", "Experience Not Exists"),
+    EXPERIENCE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "EXP001", "Experience Not Exists"),
     INVALID_FORMTYPE(HttpStatus.BAD_REQUEST, "EXP002", "Invalid FormType"),
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "EXP003", "Invalid Status"),
+    STATUS_NOT_CONSISTENCY(HttpStatus.BAD_REQUEST, "EXP004", "Status Not Consistency"),
+    NOT_YOUR_EXPERIENCE(HttpStatus.BAD_REQUEST, "EXP005", "Not Your Experience"),
 
     // token
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "TE001", "토큰이 존재하지 않습니다."),
@@ -34,7 +36,7 @@ public enum ErrorCode {
     MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER002", "이미 존재하는 회원입니다."),
 
     // server
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SE001", "Internal Server Error"),;
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SE001", "Internal Server Error"), ;
 
     private final HttpStatus httpStatus;
     private final String code;
