@@ -30,7 +30,8 @@ public enum ErrorCode {
     UNMATCHED_PASSWORD(HttpStatus.UNAUTHORIZED, "PWD001", "비밀번호가 일치하지 않습니다."),
     EMPTY_COOKIE(HttpStatus.UNAUTHORIZED, "CE001", "쿠키가 존재하지 않습니다."),
     PLATFORM_NOT_FOUND(HttpStatus.BAD_REQUEST, "LE001", "해당 플랫폼이 존재하지 않습니다."),
-    INVALID_PLATFORM(HttpStatus.BAD_REQUEST, "LE002", "플랫폼에 요청이 닿지 않습니다."),
+    ACCESS_TOKEN_REQUEST_FAILED(HttpStatus.BAD_REQUEST, "LE002", "서버로부터 토큰을 받지 못하였습니다."),
+    FAILED_MEMBER_INFO(HttpStatus.BAD_REQUEST, "LE003", "서버로부터 프로필을 조회하지 못하였습니다."),
 
     // category
     INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "CAT001", "Invalid Category"),
