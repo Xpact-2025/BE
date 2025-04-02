@@ -27,11 +27,6 @@ public class ExperienceController {
     private final ExperienceService experienceService;
 
     @Operation(summary = "경험 생성", description = "주어진 데이터로 경험 생성 (사용자 정보는 인가처리된 사용자 정보 사용)")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "생성 성공"),
-            @ApiResponse(responseCode = "CATEGORY001", description = "잘못된 카테고리"),
-            @ApiResponse(responseCode = "EXP002", description = "잘못된 유형")
-    })
     @PostMapping("/")
     public ResponseEntity<RestResponse<?>> createExperience(
             @RequestBody ExperienceCreateRequestDto createRequestDto)
@@ -43,12 +38,6 @@ public class ExperienceController {
 
     @Operation(summary = "경험 수정", description = "사용자가 특정 필드를 수정하여 해당 경험을 수정합니다.주의점은 저장상태의 경험을 수정하는 API입니다." +
             "임시저장상태의 경험을 수정할 수는 없습니다. 하지만, 저장상태의 경험을 수정하여 임시저장상태로 변경하는건 가능합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "EXP001", description = "존재하지 않는 경험"),
-            @ApiResponse(responseCode = "EXP002", description = "잘못된 경험 유형"),
-            @ApiResponse(responseCode = "EXP003", description = "잘못된 저장 유형"),
-    })
     @PatchMapping("/{experience_id}")
     public ResponseEntity<RestResponse<?>> updateExperience(
             @PathVariable("experience_id") Long experienceId,
@@ -60,9 +49,6 @@ public class ExperienceController {
     }
 
     @Operation(summary = "경험 삭제", description = "사용자가 특정 경험을 삭제합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "EXP001", description = "존재하지 않는 경험")
-    })
     @DeleteMapping("/{experience_id}")
     public ResponseEntity<RestResponse<?>> deleteExperience(
             @PathVariable("experience_id") Long experienceId)
