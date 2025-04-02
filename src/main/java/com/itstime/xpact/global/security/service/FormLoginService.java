@@ -12,6 +12,7 @@ import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
 import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
 import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
+import com.itstime.xpact.global.security.util.KakaoUtil;
 import com.itstime.xpact.global.security.util.RefreshTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class FormLoginService implements LoginStrategy {
+
+    private final KakaoUtil kakaoUtil;
 
     @Override
     public Type supports() {
@@ -44,7 +47,7 @@ public class FormLoginService implements LoginStrategy {
         // 회원 가입 여부 확인
         if (memberRepository.existsByEmail(requestDto.email())) {
             log.warn("이미 존재하는 회원입니다.");
-            throw new CustomException(ErrorCode.MEMBER_ALREADY_EXISTS);
+            throw CustomException.of(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
 
         log.info("{" + requestDto.email() + "} :  회원 가입 시작");
