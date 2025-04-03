@@ -10,7 +10,6 @@ services:
       - mynetwork
     depends_on:
       - redis
-    restart: always
 
   nginx:
     image: nginx:1.27.4
