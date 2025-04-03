@@ -11,11 +11,11 @@ public enum ErrorCode {
     TEST(HttpStatus.INTERNAL_SERVER_ERROR, "500 에러", "Test Error"),
 
     // experience
-    EXPERIENCE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "EXP001", "Experience Not Exists"),
-    INVALID_FORMTYPE(HttpStatus.BAD_REQUEST, "EXP002", "Invalid FormType"),
-    INVALID_STATUS(HttpStatus.BAD_REQUEST, "EXP003", "Invalid Status"),
+    EXPERIENCE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "EXP001", "해당 경험이 존재하지 않습니다."),
+    INVALID_FORMTYPE(HttpStatus.BAD_REQUEST, "EXP002", "잘못된 FormType입니다."),
+    INVALID_STATUS(HttpStatus.BAD_REQUEST, "EXP003", "잘못된 Status입니다."),
     STATUS_NOT_CONSISTENCY(HttpStatus.BAD_REQUEST, "EXP004", "Status Not Consistency"),
-    NOT_YOUR_EXPERIENCE(HttpStatus.BAD_REQUEST, "EXP005", "Not Your Experience"),
+    NOT_YOUR_EXPERIENCE(HttpStatus.BAD_REQUEST, "EXP005", "본인의 Experience가 아닙니다."),
 
     // token
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "TE001", "토큰이 존재하지 않습니다."),
@@ -32,7 +32,7 @@ public enum ErrorCode {
     INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "CAT001", "Invalid Category"),
 
     // member
-    MEMBER_NOT_EXISTS(HttpStatus.NO_CONTENT, "MEMBER001", "Member Not Exists"),
+    MEMBER_NOT_EXISTS(HttpStatus.NO_CONTENT, "MEMBER001", "존재하지 않는 회원입니다."),
     MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER002", "이미 존재하는 회원입니다."),
 
     // server
