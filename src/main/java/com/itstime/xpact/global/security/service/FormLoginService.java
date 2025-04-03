@@ -89,7 +89,13 @@ public class FormLoginService implements LoginStrategy {
         refreshTokenUtil.saveRefreshToken(member.getId(), refreshToken);
         refreshTokenUtil.addRefreshTokenCookie(httpResponse, refreshToken);
 
-        return new LoginResponseDto(accessToken);
+        return LoginResponseDto.builder()
+                .accessToken(accessToken)
+                .email(member.getEmail())
+                .name(member.getName())
+                .role(member.getRole())
+                .type(member.getType())
+                .build();
     }
 
     // 로그아웃
@@ -103,7 +109,7 @@ public class FormLoginService implements LoginStrategy {
 
     // 액세스 토큰 재발급
     @Transactional
-    public LoginResponseDto refresh(
+    public String refresh(
             HttpServletRequest request, HttpServletResponse response
     ) throws CustomException {
         Long memberId = refreshTokenUtil.getMemberIdFromCookie(request);
@@ -113,7 +119,6 @@ public class FormLoginService implements LoginStrategy {
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         log.info("Access Token을 재발급합니다.");
-        String newAccessToken = tokenProvider.generateAccessToken(member);
-        return new LoginResponseDto(newAccessToken);
+        return tokenProvider.generateAccessToken(member);
     }
 }
