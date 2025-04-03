@@ -25,7 +25,6 @@ public class QueryExperienceService {
     private final SecurityProvider securityProvider;
 
     public List<ThumbnailExperienceReadResponseDto> readAll() throws CustomException {
-        // member 조회
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
@@ -40,7 +39,10 @@ public class QueryExperienceService {
         Experience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
+        Long memberId = securityProvider.getCurrentMemberId();
+        if(!experience.getMember().getId().equals(memberId))
+            throw new CustomException(ErrorCode.NOT_YOUR_EXPERIENCE);
+
         return DetailExperienceReadResponseDto.of(experience);
     }
-
 }
