@@ -25,6 +25,7 @@ public class QueryExperienceService {
     private final SecurityProvider securityProvider;
 
     public List<ThumbnailExperienceReadResponseDto> readAll() throws CustomException {
+        // member 조회
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));

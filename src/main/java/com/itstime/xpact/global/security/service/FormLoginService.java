@@ -7,10 +7,13 @@ import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.TokenProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.security.common.LoginStrategy;
 import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
 import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
 import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
+import com.itstime.xpact.global.security.util.KakaoUtil;
+import com.itstime.xpact.global.security.util.RefreshTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +26,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AuthService {
+public class FormLoginService implements LoginStrategy {
+
+    @Override
+    public Type supports() {
+        return Type.FORM;
+    }
 
     private final BCryptPasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenUtil refreshTokenUtil;
 
     // 회원 가입 서비스
     @Transactional
@@ -37,7 +45,7 @@ public class AuthService {
         // 회원 가입 여부 확인
         if (memberRepository.existsByEmail(requestDto.email())) {
             log.warn("이미 존재하는 회원입니다.");
-            throw new CustomException(ErrorCode.MEMBER_ALREADY_EXISTS);
+            throw CustomException.of(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
 
         log.info("{" + requestDto.email() + "} :  회원 가입 시작");
@@ -78,10 +86,16 @@ public class AuthService {
 
         String accessToken = tokenProvider.generateAccessToken(member);
         String refreshToken = tokenProvider.generateRefreshToken(member);
-        refreshTokenService.saveRefreshToken(member.getId(), refreshToken);
-        refreshTokenService.addRefreshTokenCookie(httpResponse, refreshToken);
+        refreshTokenUtil.saveRefreshToken(member.getId(), refreshToken);
+        refreshTokenUtil.addRefreshTokenCookie(httpResponse, refreshToken);
 
-        return new LoginResponseDto(accessToken);
+        return LoginResponseDto.builder()
+                .accessToken(accessToken)
+                .email(member.getEmail())
+                .name(member.getName())
+                .role(member.getRole())
+                .type(member.getType())
+                .build();
     }
 
     // 로그아웃
@@ -89,23 +103,22 @@ public class AuthService {
     public void logout(HttpServletResponse response, String token) {
         Long memberId = tokenProvider.getMemberIdFromToken(token);
 
-        refreshTokenService.removeRefreshTokenCookie(response, memberId);
-        refreshTokenService.removeRefreshTokenCookie(response, memberId);
+        refreshTokenUtil.removeRefreshTokenCookie(response, memberId);
+        refreshTokenUtil.removeRefreshTokenCookie(response, memberId);
     }
 
     // 액세스 토큰 재발급
     @Transactional
-    public LoginResponseDto refresh(
+    public String refresh(
             HttpServletRequest request, HttpServletResponse response
     ) throws CustomException {
-        Long memberId = refreshTokenService.getMemberIdFromCookie(request);
+        Long memberId = refreshTokenUtil.getMemberIdFromCookie(request);
 
         log.info(memberId + "의 회원을 조회합니다.");
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         log.info("Access Token을 재발급합니다.");
-        String newAccessToken = tokenProvider.generateAccessToken(member);
-        return new LoginResponseDto(newAccessToken);
+        return tokenProvider.generateAccessToken(member);
     }
 }

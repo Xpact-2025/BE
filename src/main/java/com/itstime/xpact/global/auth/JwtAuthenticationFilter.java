@@ -40,7 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         System.out.println("Request path: " + path);
         boolean shouldNotFilter = path.startsWith("/auth/signup") ||
-                path.startsWith("/auth/login") ||
+                path.startsWith("/auth/login/") ||
+                path.startsWith("/auth/url/") ||
                 path.startsWith("/v3/") ||
                 path.startsWith("/swagger-ui/");
         System.out.println("Should not filter: " + shouldNotFilter);
