@@ -115,7 +115,7 @@ public class TokenProvider {
             throw CustomException.of(ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException ex) {
             log.warn("Empty JWT token: {}", ex.getMessage());
-            throw CustomException.of(ErrorCode.EMPTY_JWT);
+            throw CustomException.of(ErrorCode.TOKEN_NOT_FOUND);
         }
     }
 }
