@@ -29,14 +29,18 @@ public class ExperienceController {
     private final ExperienceService experienceService;
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "올바르지 않은 FormType", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
-            examples = @ExampleObject(value = """
-                        {
-                          "code": "EXP002",
-                          "error": "INVALID_FORMTYPE",
-                          "message": "FormType이 올바르지 않습니다."
-                        }
-                    """))),
+            @ApiResponse(responseCode = "400", description = "경험 생성 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                    examples = {
+                            @ExampleObject(name = "INVALID_FORMTYPE",
+                                    value = """
+                            {
+                              "code": "EXP002",
+                              "error": "INVALID_FORMTYPE",
+                              "message": "FormType이 올바르지 않습니다."
+                            }
+                        """)
+                    }
+            ))
     })
     @Operation(summary = "경험 생성", description = "주어진 데이터로 경험 생성")
     @PostMapping("/")
@@ -48,6 +52,36 @@ public class ExperienceController {
         return ResponseEntity.ok(RestResponse.ok());
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "경험 수정 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                    examples = {
+                        @ExampleObject(name = "EXPERIENCE_NOT_EXISTS",
+                                value = """
+                            {
+                              "code": "EXP001",
+                              "error": "EXPERIENCE_NOT_EXISTS",
+                              "message": "해당 경험이 존재하지 않습니다."
+                            }
+                        """),
+                        @ExampleObject(name = "NOT_YOUR_EXPERIENCE",
+                                value = """
+                            {
+                              "code": "EXP005",
+                              "error": "NOT_YOUR_EXPERIENCE",
+                              "message": "본인의 Experience가 아닙니다."
+                            }
+                        """),
+                        @ExampleObject(name = "INVALID_FORMTYPE",
+                                value = """
+                            {
+                              "code": "EXP002",
+                              "error": "INVALID_FORMTYPE",
+                              "message": "FormType이 올바르지 않습니다."
+                            }
+                        """)
+                    }
+            ))
+    })
     @Operation(summary = "경험 수정", description = "사용자가 특정 필드를 수정하여 해당 경험을 수정")
     @PatchMapping("/{experience_id}")
     public ResponseEntity<RestResponse<?>> updateExperience(
@@ -59,6 +93,28 @@ public class ExperienceController {
         return ResponseEntity.ok(RestResponse.ok());
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "경험 삭제 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                    examples = {
+                            @ExampleObject(name = "EXPERIENCE_NOT_EXISTS",
+                                    value = """
+                            {
+                              "code": "EXP001",
+                              "error": "EXPERIENCE_NOT_EXISTS",
+                              "message": "해당 경험이 존재하지 않습니다."
+                            }
+                        """),
+                            @ExampleObject(name = "NOT_YOUR_EXPERIENCE",
+                                    value = """
+                            {
+                              "code": "EXP005",
+                              "error": "NOT_YOUR_EXPERIENCE",
+                              "message": "본인의 Experience가 아닙니다."
+                            }
+                        """)
+                    }
+            ))
+    })
     @Operation(summary = "경험 삭제", description = "사용자가 특정 경험을 삭제")
     @DeleteMapping("/{experience_id}")
     public ResponseEntity<RestResponse<?>> deleteExperience(
