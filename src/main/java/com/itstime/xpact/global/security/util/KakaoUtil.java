@@ -1,7 +1,5 @@
 package com.itstime.xpact.global.security.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.security.dto.response.KakaoInfoResponseDto;
@@ -19,11 +17,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 public class KakaoUtil {
 
     // 일단 kakao utils에 필요한 것들만 선언
-    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    @Value("${spring.security.kakao.client-id}")
     private String clientId;
 
-    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private static String redirectUri;
+    @Value("${spring.security.kakao.redirect-uri}")
+    private String redirectUri;
 
     private static final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com"; // 카카오 인증 URI
     private static final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com"; // 카카오 사용자 정보 요청 URI
@@ -31,7 +29,7 @@ public class KakaoUtil {
     // 인증코드 URL
     public String buildLoginUrl() {
         return String.format(
-                "%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code&prompt=login",
+                "%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code",
                 KAUTH_TOKEN_URL_HOST, clientId, redirectUri
         );
     }
@@ -61,7 +59,7 @@ public class KakaoUtil {
     // 카카오로부터 Profile 얻어오기
     public KakaoInfoResponseDto requestProfile(String token) {
         try {
-            return createWebClient(KAUTH_TOKEN_URL_HOST)
+            return createWebClient(KAUTH_USER_URL_HOST)
                     .get()
                     .uri("/v2/user/me")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)

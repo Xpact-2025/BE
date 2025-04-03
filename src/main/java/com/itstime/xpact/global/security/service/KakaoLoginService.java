@@ -1,5 +1,6 @@
 package com.itstime.xpact.global.security.service;
 
+import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
@@ -12,6 +13,7 @@ import com.itstime.xpact.global.security.dto.response.KakaoTokenDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
 import com.itstime.xpact.global.security.util.KakaoUtil;
 import com.itstime.xpact.global.security.util.RefreshTokenUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Tag(name ="카카오 로그인 API Controller", description = "카카오 로그인 API")
 public class KakaoLoginService implements LoginStrategy {
 
     private final KakaoUtil kakaoUtil;
@@ -58,6 +61,8 @@ public class KakaoLoginService implements LoginStrategy {
         Member member = Member.builder()
                 .email(email)
                 .name(profile.getKakaoAccount().getName())
+                .role(Role.ROLE_USER)
+                .type(Type.KAKAO)
                 .build();
         memberRepository.save(member);
 
