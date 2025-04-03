@@ -23,11 +23,6 @@ public class MemberAuthentication extends UsernamePasswordAuthenticationToken {
     }
 
     @Override
-    public Object getCredentials() {
-        return super.getCredentials();
-    }
-
-    @Override
     public Object getPrincipal() {
         return member.getId();
     }
@@ -46,10 +41,5 @@ public class MemberAuthentication extends UsernamePasswordAuthenticationToken {
                 null,
                 authorities
         );
-    }
-
-    @Override
-    public Collection<GrantedAuthority> getAuthorities() {
-        return super.getAuthorities();
     }
 }
