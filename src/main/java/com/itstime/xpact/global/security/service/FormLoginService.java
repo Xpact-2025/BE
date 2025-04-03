@@ -28,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FormLoginService implements LoginStrategy {
 
-    private final KakaoUtil kakaoUtil;
-
     @Override
     public Type supports() {
         return Type.FORM;
