@@ -1,4 +1,4 @@
-name: Build and Deploy Xpact Application (Test)
+name: Build and Deploy Xpact Application
 
 on:
   push:

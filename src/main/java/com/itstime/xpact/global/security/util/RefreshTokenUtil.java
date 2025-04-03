@@ -1,7 +1,9 @@
-package com.itstime.xpact.global.security.service;
+package com.itstime.xpact.global.security.util;
 
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.TokenProvider;
+import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.ErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,11 +18,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RefreshTokenService {
+public class RefreshTokenUtil {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
-    private final MemberRepository memberRepository;
 
     @Value("${spring.jwt.refresh.expiration}")
     private long refreshTokenExpiration;
@@ -73,8 +74,7 @@ public class RefreshTokenService {
 
         if (cookies == null || cookies.length == 0) {
             log.warn("쿠키가 비어 있습니다.");
-            // TODO : CustomException으로 변경하기
-            throw new RuntimeException("쿠키가 존재하지 않습니다.");
+            throw CustomException.of(ErrorCode.EMPTY_COOKIE);
         }
 
         for (Cookie cookie : cookies) {
@@ -88,13 +88,11 @@ public class RefreshTokenService {
                     return memberId;
                 } else {
                     log.warn("유효하지 않은 Refresh Token입니다.");
-                    // TODO : CustomException으로 변경
-                    throw new RuntimeException("유효하지 않은 Refresh Token입니다.");
+                    throw CustomException.of(ErrorCode.INVALID_JWT_TOKEN);
                 }
             }
         }
         log.warn("Refresh token 쿠키를 찾을 수 없습니다.");
-        // TODO : CustomException으로 변경
-        throw new RuntimeException("refreshToken 쿠키가 없습니다.");
+        throw CustomException.of(ErrorCode.TOKEN_NOT_FOUND);
     }
 }

@@ -34,9 +34,9 @@ public class DataInit {
                         .build();
 
                 memberRepository.save(memeber);
-                log.info("Saved {} member", memberRepository.count());
+                log.info("Saved {} member", memberCount);
             } else {
-                log.info("Found {} member", memberRepository.count());
+                log.info("Found {} member", memberCount);
             }
         };
     }

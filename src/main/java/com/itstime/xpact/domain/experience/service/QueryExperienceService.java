@@ -40,7 +40,10 @@ public class QueryExperienceService {
         Experience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
+        Long memberId = securityProvider.getCurrentMemberId();
+        if(!experience.getMember().getId().equals(memberId))
+            throw new CustomException(ErrorCode.NOT_YOUR_EXPERIENCE);
+
         return DetailExperienceReadResponseDto.of(experience);
     }
-
 }
