@@ -46,7 +46,9 @@ public class Experience extends BaseEntity {
     @Column(name = "end_date")
     protected LocalDate endDate;
 
-    @Column(name = "summary")
+    @Lob
+    @Setter
+    @Column(name = "summary", columnDefinition = "TEXT")
     protected String summary;
 
     @Column(name = "keyword")
@@ -163,4 +165,5 @@ public class Experience extends BaseEntity {
         this.role = null;
         this.perform = null;
     }
+
 }
