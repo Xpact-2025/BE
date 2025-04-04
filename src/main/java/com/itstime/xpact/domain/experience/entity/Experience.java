@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @Getter
 @Entity
 @Table(name = "experience")
+@ToString(of = {"title", "keyword", "situation", "task", "action", "result", "role", "perform"})
 @SuperBuilder
 @NoArgsConstructor
 public class Experience extends BaseEntity {

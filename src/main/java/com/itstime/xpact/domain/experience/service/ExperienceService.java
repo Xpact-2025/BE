@@ -2,8 +2,8 @@ package com.itstime.xpact.domain.experience.service;
 
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
-import com.itstime.xpact.domain.experience.dto.ExperienceCreateRequestDto;
-import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
@@ -11,12 +11,18 @@ import com.itstime.xpact.domain.member.service.MemberService;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.openai.OpenAIService;
+import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,7 +31,7 @@ public class ExperienceService {
     private final ExperienceRepository experienceRepository;
     private final MemberService memberService;
     private final SecurityProvider securityProvider;
-    private final OpenAIService openAIService;
+    private final OpenAiService openAIService;
 
     public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
         // member 조회
@@ -50,9 +56,23 @@ public class ExperienceService {
             => openai 요청은 비동기 요청
             => 대시보드의 필요한 데이터들이 비동기로 도착하므로 대시보드 조회 요청도 비동기적으로 다뤄야함
         */
-        // TODO : openAI에서 요약정보 받아옴 (create)
-        if(createRequestDto.getStatus().equals(Status.SAVE))
-            openAIService.summarizeContentOfExperience(experience);
+        if(createRequestDto.getStatus().equals(Status.SAVE)) {
+            summarizeAndSave(experience);
+        }
+    }
+
+    private void summarizeAndSave(Experience experience) {
+        openAIService.summarizeExperience(experience)
+                .thenAccept(summary -> {
+                    experienceRepository.findById(experience.getId())
+                                    .orElseThrow(() -> new CustomException(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                    experience.setSummary(summary);
+                    experienceRepository.save(experience);
+                })
+                .exceptionally(e -> {
+                    log.error(e.getMessage(), e);
+                    return null;
+                });
     }
 
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
@@ -74,9 +94,9 @@ public class ExperienceService {
 
         experienceRepository.save(experience);
 
-        // TODO : openai에서 요약정보 받아와야함 (update)
-        if(updateRequestDto.getStatus().equals(Status.SAVE))
-            openAIService.summarizeContentOfExperience(experience);
+        if(updateRequestDto.getStatus().equals(Status.SAVE)) {
+            summarizeAndSave(experience);
+        }
     }
 
     public void delete(Long experienceId) {
