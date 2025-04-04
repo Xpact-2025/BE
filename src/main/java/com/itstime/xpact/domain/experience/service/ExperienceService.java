@@ -11,7 +11,7 @@ import com.itstime.xpact.domain.member.service.MemberService;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.openai.OpenAIService;
+import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,7 @@ public class ExperienceService {
     private final ExperienceRepository experienceRepository;
     private final MemberService memberService;
     private final SecurityProvider securityProvider;
-    private final OpenAIService openAIService;
+    private final OpenAiService openAiService;
 
     public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
         // member 조회
@@ -52,7 +52,7 @@ public class ExperienceService {
         */
         // TODO : openAI에서 요약정보 받아옴 (create)
         if(createRequestDto.getStatus().equals(Status.SAVE))
-            openAIService.summarizeContentOfExperience(experience);
+            openAiService.summarizeContentOfExperience(experience);
     }
 
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
@@ -76,7 +76,7 @@ public class ExperienceService {
 
         // TODO : openai에서 요약정보 받아와야함 (update)
         if(updateRequestDto.getStatus().equals(Status.SAVE))
-            openAIService.summarizeContentOfExperience(experience);
+            openAiService.summarizeContentOfExperience(experience);
     }
 
     public void delete(Long experienceId) {
