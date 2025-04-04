@@ -1,7 +1,7 @@
 package com.itstime.xpact.domain.experience.controller;
 
-import com.itstime.xpact.domain.experience.dto.DetailExperienceReadResponseDto;
-import com.itstime.xpact.domain.experience.dto.ThumbnailExperienceReadResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.DetailExperienceReadResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.service.QueryExperienceService;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.response.ErrorResponse;

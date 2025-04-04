@@ -1,7 +1,7 @@
 package com.itstime.xpact.domain.experience.controller;
 
-import com.itstime.xpact.domain.experience.dto.ExperienceCreateRequestDto;
-import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.experience.service.ExperienceService;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.response.ErrorResponse;
@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
