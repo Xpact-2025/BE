@@ -72,16 +72,18 @@ dependencies {
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api:2.1.1'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/java', 'build/generated/querydsl']
-        }
-    }
+def queryDslSrcDir = 'build/generated/querydsl/'
+
+tasks.withType(JavaCompile).configureEach {
+    options.getGeneratedSourceOutputDirectory().set(file(queryDslSrcDir))
 }
 
-tasks.withType(JavaCompile) {
-    options.annotationProcessorGeneratedSourcesDirectory = file('build/generated/querydsl')
+sourceSets {
+    main.java.srcDirs += [queryDslSrcDir]
+}
+
+clean {
+    delete file(queryDslSrcDir)
 }
 
 tasks.named('test') {
