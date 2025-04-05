@@ -46,7 +46,7 @@ public class QueryExperienceService {
             throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
-        if(types.get(0).equalsIgnoreCase("ALL")) {
+        if(types.get(0).equalsIgnoreCase("all")) {
             return experienceRepository.findAllByMember(member, sort)
                     .stream()
                     .map(ThumbnailExperienceReadResponseDto::of)

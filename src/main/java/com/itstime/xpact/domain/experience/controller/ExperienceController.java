@@ -43,7 +43,7 @@ public class ExperienceController {
             ))
     })
     @Operation(summary = "경험 생성", description = "주어진 데이터로 경험 생성")
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<RestResponse<?>> createExperience(
             @RequestBody ExperienceCreateRequestDto createRequestDto)
     throws CustomException {
