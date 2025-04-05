@@ -84,7 +84,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
             Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", errorCode.name());
+
+            errorBody.put("httpStatus", errorCode.getHttpStatus());
             errorBody.put("code", errorCode.getCode());
             errorBody.put("message", e.getMessage());
 
