@@ -26,7 +26,7 @@ public class QueryExperienceService {
     private final MemberRepository memberRepository;
     private final SecurityProvider securityProvider;
 
-    private static final String LATESET = "LATEST";
+    private static final String LATEST = "LATEST";
     private static final String OLDEST = "OLDEST";
     private static final String MODIFIED = "modifiedTime";
 
@@ -38,7 +38,7 @@ public class QueryExperienceService {
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         Sort sort;
-        if(order.equals(LATESET)) {
+        if(order.equals(LATEST)) {
             sort = Sort.by(Sort.Direction.DESC, MODIFIED);
         } else if(order.equals(OLDEST)) {
             sort = Sort.by(Sort.Direction.ASC, MODIFIED);
