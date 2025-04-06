@@ -61,17 +61,19 @@ public class ExperienceService {
         if(!experience.getMember().getId().equals(currentMemberId))
             throw CustomException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
 
-        // form에 따라 수정방식을 다르게 잡음
-        if(updateRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
-            experience.updateToSimpleForm(updateRequestDto);
-        } else if(updateRequestDto.getFormType().equals(FormType.STAR_FORM)) {
-            experience.updateToStarForm(updateRequestDto);
-        } else throw CustomException.of(ErrorCode.INVALID_FORMTYPE);
+        // enum타입이 될 string 필드 검증 로직 (INVALID한 값이 들어오면 CustomException발생)
+        Status.validateStatus(updateRequestDto.getStatus());
+        FormType.validateFormType(updateRequestDto.getFormType());
+        ExperienceType.validateExperienceType(updateRequestDto.getExperienceType());
+
+        switch (FormType.valueOf(updateRequestDto.getFormType())) {
+            case STAR_FORM -> experience.updateToStarForm(updateRequestDto);
+            case SIMPLE_FORM -> experience.updateToSimpleForm(updateRequestDto);
+        }
 
         experienceRepository.save(experience);
 
-        // TODO : openai에서 요약정보 받아와야함 (update)
-        if(updateRequestDto.getStatus().equals(Status.SAVE))
+        if(Status.valueOf(updateRequestDto.getStatus()).equals(Status.SAVE))
             openAiService.summarizeContentOfExperience(experience);
     }
 
