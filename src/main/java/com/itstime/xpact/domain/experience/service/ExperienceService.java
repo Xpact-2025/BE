@@ -58,6 +58,12 @@ public class ExperienceService {
         Experience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
+        // 저장된 경험을 임시저장으로 돌리는 플로우 막는 로직
+        if(experience.getStatus().equals(Status.SAVE) && updateRequestDto.getStatus().equals(Status.DRAFT.name())) {
+            throw CustomException.of(ErrorCode.INVALID_SAVE);
+        }
+
+
         if(!experience.getMember().getId().equals(currentMemberId))
             throw CustomException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
 
