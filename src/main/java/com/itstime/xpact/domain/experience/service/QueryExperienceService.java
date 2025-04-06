@@ -53,10 +53,7 @@ public class QueryExperienceService {
                     .toList();
         } else {
             List<ExperienceType> experienceTypes = types.stream()
-                    .map(type -> {
-                        type = type.toUpperCase();
-                        return ExperienceType.valueOf(type);
-                    })
+                    .map(type -> ExperienceType.valueOf(type.toUpperCase()))
                     .toList();
 
             return experienceRepository.findAllByMemberIdAndType(member.getId(), order, experienceTypes)
