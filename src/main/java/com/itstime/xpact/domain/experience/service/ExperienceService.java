@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.experience.service;
 
+import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.dto.ExperienceCreateRequestDto;
@@ -32,26 +33,21 @@ public class ExperienceService {
         Long currentMemberId = securityProvider.getCurrentMemberId();
         Member member = memberService.findMember(currentMemberId);
 
-        Experience experience;
-        // experience entity 생성 (experience 형식에 따라 StarForm, SimpleForm 결정)
-        if(createRequestDto.getFormType().equals(FormType.SIMPLE_FORM)) {
-            experience = Experience.SimpleForm(createRequestDto);
-        } else if(createRequestDto.getFormType().equals(FormType.STAR_FORM)) {
-            experience = Experience.StarForm(createRequestDto);
-        } else throw new CustomException(ErrorCode.INVALID_FORMTYPE);
+        // enum타입이 될 string 필드 검증 로직 (INVALID한 값이 들어오면 CustomException발생)
+        Status.validateStatus(createRequestDto.getStatus());
+        FormType.validateFormType(createRequestDto.getFormType());
+        ExperienceType.validateExperienceType(createRequestDto.getExperienceType());
+
+        Experience experience = switch (FormType.valueOf(createRequestDto.getFormType())) {
+            case SIMPLE_FORM -> Experience.SimpleForm(createRequestDto);
+            case STAR_FORM -> Experience.StarForm(createRequestDto);
+        };
 
         // member-entity간 설정
         experience.addMember(member);
         experienceRepository.save(experience);
 
-        /*
-            경험 저장 후 openai로 요약본 생성 요청 보냄
-            => 이때 경험 저장은 동기 요청
-            => openai 요청은 비동기 요청
-            => 대시보드의 필요한 데이터들이 비동기로 도착하므로 대시보드 조회 요청도 비동기적으로 다뤄야함
-        */
-        // TODO : openAI에서 요약정보 받아옴 (create)
-        if(createRequestDto.getStatus().equals(Status.SAVE))
+        if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE))
             openAiService.summarizeContentOfExperience(experience);
     }
 
