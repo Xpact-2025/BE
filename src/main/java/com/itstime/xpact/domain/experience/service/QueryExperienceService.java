@@ -43,7 +43,7 @@ public class QueryExperienceService {
         } else if(order.equals(OLDEST)) {
             sort = Sort.by(Sort.Direction.ASC, MODIFIED);
         } else {
-            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw CustomException.of(ErrorCode.INVALID_ORDER);
         }
 
         if(types.get(0).equalsIgnoreCase("all")) {
