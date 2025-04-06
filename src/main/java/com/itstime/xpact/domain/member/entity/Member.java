@@ -5,7 +5,7 @@ import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
-import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
+import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.scrap.entity.Scrap;
 import jakarta.persistence.*;
@@ -57,8 +57,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "education")
-    private String education;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Education> educations;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id")
@@ -78,5 +78,14 @@ public class Member extends BaseEntity {
         this.birthDate = birthDate;
         this.type = type;
         this.role = role;
+    }
+
+    public MemberInfoResponseDto toMemberInfoResponseDto(Member member) {
+        return MemberInfoResponseDto.builder()
+                .name(member.getName())
+                .imgurl(member.getImgurl())
+                .education(member.getEducations().toString())
+                .recruit(member.getRecruit().getName())
+                .build();
     }
 }
