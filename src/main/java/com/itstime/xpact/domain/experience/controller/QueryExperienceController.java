@@ -43,7 +43,7 @@ public class QueryExperienceController {
             ))
     })
     @Operation(summary = "사용자의 모든 경험 조회", description = "사용자가 작성한 모든 경험을 조회 (임시저장, 저장 모두 조회), (페이지 처리 X), (상세 조회 X)")
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> readAllExperience(
             @RequestParam(value = "type", defaultValue = "ALL") List<String> types,
             @RequestParam(value = "order", defaultValue = "latest") String order)
