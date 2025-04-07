@@ -20,7 +20,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     @Async
     public CompletableFuture<String> summarizeExperience(Experience experience) {
-        String message = String.format("역할, 내가 한 일, 성과(결과)가 드러나게 자세한 `~~했음`으로 끝나게 2줄로 요약해줘 : ", experience.toString());
+        String message = String.format("역할, 내가 한 일, 성과(결과)가 드러나게 자세한 `~~했음`으로 끝나게 2줄로 요약해줘 : %s", experience.toString());
         log.info(message);
 
         Prompt prompt = new Prompt(message);
