@@ -27,3 +27,8 @@ spring:
       redirect-uri: ${KAKAO_CALLBACK}
 
     # TODO: NAVER 설정 추가
+
+external:
+  api:
+    school:
+      service-key: ${SCHOOL_REST_API_KEY}
