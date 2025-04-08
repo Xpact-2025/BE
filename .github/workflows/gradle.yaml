@@ -63,9 +63,16 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: |
-            ./docker-compose.yaml
-            ./nginx/
+          source: ./docker-compose.yaml
+          target: /home/ubuntu/
+
+      - name: Transfer nginx directory file to ec2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ./nginx/
           target: /home/ubuntu/
 
 
