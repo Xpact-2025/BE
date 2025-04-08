@@ -17,6 +17,8 @@ public enum ErrorCode {
     STATUS_NOT_CONSISTENCY(HttpStatus.BAD_REQUEST, "EXP004", "Status Not Consistency"),
     NOT_YOUR_EXPERIENCE(HttpStatus.BAD_REQUEST, "EXP005", "본인의 Experience가 아닙니다."),
     INVALID_ORDER(HttpStatus.BAD_REQUEST, "EXP006", "잘못된 order입니다."),
+    INVALID_EXPERIENCE_TYPE(HttpStatus.BAD_REQUEST, "EXP007", "잘못된 ExperienceType입니다."),
+    INVALID_SAVE(HttpStatus.BAD_REQUEST, "EXP008", "저장된 경험은 임시저장될 수 없습니다."),
 
     // token
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "TE001", "토큰이 존재하지 않습니다."),

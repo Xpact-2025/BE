@@ -31,14 +31,24 @@ public class ExperienceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "경험 생성 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
                     examples = {
-                            @ExampleObject(name = "INVALID_FORMTYPE",
-                                    value = """
-                            {
+                        @ExampleObject(name = "INVALID_FORMTYPE", value = """
+                        {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "EXP002",
-                              "error": "INVALID_FORMTYPE",
-                              "message": "FormType이 올바르지 않습니다."
-                            }
-                        """)
+                              "message": "잘못된 FormType입니다."
+                        }"""),
+                        @ExampleObject(name = "INVALID_STATUS", value = """
+                        {
+                              "httpStatus": "BAD_REQUEST",
+                              "code": "EXP003",
+                              "message": "잘못된 Status입니다."
+                        }"""),
+                        @ExampleObject(name = "INVALID_EXPERIENCE_TYPE", value = """
+                        {
+                              "httpStatus": "BAD_REQUEST",
+                              "code": "EXP007",
+                              "message": "잘못된 ExperienceType입니다."
+                        }"""),
                     }
             ))
     })
@@ -55,30 +65,46 @@ public class ExperienceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "경험 수정 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
                     examples = {
-                        @ExampleObject(name = "EXPERIENCE_NOT_EXISTS",
-                                value = """
+                        @ExampleObject(name = "INVALID_FORMTYPE", value = """
+                        {
+                              "httpStatus": "BAD_REQUEST",
+                              "code": "EXP002",
+                              "message": "잘못된 FormType입니다."
+                        }"""),
+                        @ExampleObject(name = "INVALID_STATUS", value = """
+                        {
+                              "httpStatus": "BAD_REQUEST",
+                              "code": "EXP003",
+                              "message": "잘못된 Status입니다."
+                        }"""),
+                        @ExampleObject(name = "INVALID_EXPERIENCE_TYPE", value = """
+                        {
+                              "httpStatus": "BAD_REQUEST",
+                              "code": "EXP007",
+                              "message": "잘못된 ExperienceType입니다."
+                        }"""),
+
+                        @ExampleObject(name = "EXPERIENCE_NOT_EXISTS", value = """
                             {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "EXP001",
-                              "error": "EXPERIENCE_NOT_EXISTS",
                               "message": "해당 경험이 존재하지 않습니다."
                             }
                         """),
-                        @ExampleObject(name = "NOT_YOUR_EXPERIENCE",
-                                value = """
+                        @ExampleObject(name = "NOT_YOUR_EXPERIENCE", value = """
                             {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "EXP005",
-                              "error": "NOT_YOUR_EXPERIENCE",
                               "message": "본인의 Experience가 아닙니다."
                             }
                         """),
-                        @ExampleObject(name = "INVALID_FORMTYPE",
-                                value = """
+                        @ExampleObject(name = "INVALID_SAVE", value = """
                             {
-                              "code": "EXP002",
-                              "error": "INVALID_FORMTYPE",
-                              "message": "FormType이 올바르지 않습니다."
+                              "httpStatus": "BAD_REQUEST",
+                              "code": "EXP008",
+                              "message": "저장된 경험은 임시저장될 수 없습니다."
                             }
-                        """)
+                        """),
                     }
             ))
     })

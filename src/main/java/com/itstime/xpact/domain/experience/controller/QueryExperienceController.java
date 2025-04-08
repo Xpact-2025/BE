@@ -31,14 +31,12 @@ public class QueryExperienceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "모든 경험 조회 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
                     examples = {
-                            @ExampleObject(name = "MEMBER_NOT_EXISTS",
-                                    value = """
+                            @ExampleObject(name = "MEMBER_NOT_EXISTS", value = """
                             {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "MEMBER001",
-                              "error": "MEMBER_NOT_EXISTS",
                               "message": "존재하지 않는 회원입니다."
-                            }
-                        """)
+                            }""")
                     }
             ))
     })
@@ -55,22 +53,18 @@ public class QueryExperienceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "경험 조회 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
                     examples = {
-                            @ExampleObject(name = "EXPERIENCE_NOT_EXISTS",
-                                    value = """
+                            @ExampleObject(name = "EXPERIENCE_NOT_EXISTS", value = """
                             {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "EXP001",
-                              "error": "EXPERIENCE_NOT_EXISTS",
                               "message": "해당 경험이 존재하지 않습니다."
-                            }
-                        """),
-                            @ExampleObject(name = "NOT_YOUR_EXPERIENCE",
-                                    value = """
+                            }"""),
+                            @ExampleObject(name = "NOT_YOUR_EXPERIENCE", value = """
                             {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "EXP005",
-                              "error": "NOT_YOUR_EXPERIENCE",
                               "message": "본인의 Experience가 아닙니다."
-                            }
-                        """)
+                            }""")
                     }
             ))
     })
