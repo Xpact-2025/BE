@@ -46,7 +46,8 @@ public class Experience extends BaseEntity {
     @Column(name = "end_date")
     protected LocalDate endDate;
 
-    @Column(name = "summary")
+    @Lob
+    @Column(name = "summary", columnDefinition = "TEXT")
     protected String summary;
 
     @Column(name = "keyword")
@@ -89,14 +90,14 @@ public class Experience extends BaseEntity {
 
     public static Experience StarForm(ExperienceCreateRequestDto createRequestDto) {
         return Experience.builder()
-                .status(createRequestDto.getStatus())
-                .formType(createRequestDto.getFormType())
+                .status(Status.valueOf(createRequestDto.getStatus()))
+                .formType(FormType.valueOf(createRequestDto.getFormType()))
                 .title(createRequestDto.getTitle())
                 .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
                 .keyword(createRequestDto.getKeyword())
-                .experienceType(createRequestDto.getExperienceType())
+                .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType()))
                 .situation(createRequestDto.getSituation())
                 .task(createRequestDto.getTask())
                 .action(createRequestDto.getAction())
@@ -108,14 +109,14 @@ public class Experience extends BaseEntity {
 
     public static Experience SimpleForm(ExperienceCreateRequestDto createRequestDto) {
         return Experience.builder()
-                .status(createRequestDto.getStatus())
-                .formType(createRequestDto.getFormType())
+                .status(Status.valueOf(createRequestDto.getStatus()))
+                .formType(FormType.valueOf(createRequestDto.getFormType()))
                 .title(createRequestDto.getTitle())
                 .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
                 .keyword(createRequestDto.getKeyword())
-                .experienceType(createRequestDto.getExperienceType())
+                .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType()))
                 .situation(null)
                 .task(null)
                 .action(null)
@@ -131,14 +132,14 @@ public class Experience extends BaseEntity {
     }
 
     public void updateToSimpleForm(ExperienceUpdateRequestDto updateRequestDto) {
-        this.status = updateRequestDto.getStatus();
-        this.formType = updateRequestDto.getFormType();
+        this.status = Status.valueOf(updateRequestDto.getStatus());
+        this.formType = FormType.valueOf(updateRequestDto.getFormType());
         this.title = updateRequestDto.getTitle();
         this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
         this.startDate = updateRequestDto.getStartDate();
         this.endDate = updateRequestDto.getEndDate();
         this.keyword = updateRequestDto.getKeyword();
-        this.experienceType = updateRequestDto.getExperienceType();
+        this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
         this.situation = null;
         this.task = null;
         this.action = null;
@@ -148,14 +149,14 @@ public class Experience extends BaseEntity {
     }
 
     public void updateToStarForm(ExperienceUpdateRequestDto updateRequestDto) {
-        this.status = updateRequestDto.getStatus();
-        this.formType = updateRequestDto.getFormType();
+        this.status = Status.valueOf(updateRequestDto.getStatus());
+        this.formType = FormType.valueOf(updateRequestDto.getFormType());
         this.title = updateRequestDto.getTitle();
         this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
         this.startDate = updateRequestDto.getStartDate();
         this.endDate = updateRequestDto.getEndDate();
         this.keyword = updateRequestDto.getKeyword();
-        this.experienceType = updateRequestDto.getExperienceType();
+        this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
         this.situation = updateRequestDto.getSituation();
         this.task = updateRequestDto.getTask();
         this.action = updateRequestDto.getAction();
