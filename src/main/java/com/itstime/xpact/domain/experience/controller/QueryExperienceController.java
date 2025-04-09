@@ -15,10 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,44 +30,40 @@ public class QueryExperienceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "모든 경험 조회 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
                     examples = {
-                            @ExampleObject(name = "MEMBER_NOT_EXISTS",
-                                    value = """
+                            @ExampleObject(name = "MEMBER_NOT_EXISTS", value = """
                             {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "MEMBER001",
-                              "error": "MEMBER_NOT_EXISTS",
                               "message": "존재하지 않는 회원입니다."
-                            }
-                        """)
+                            }""")
                     }
             ))
     })
     @Operation(summary = "사용자의 모든 경험 조회", description = "사용자가 작성한 모든 경험을 조회 (임시저장, 저장 모두 조회), (페이지 처리 X), (상세 조회 X)")
-    @GetMapping("/")
-    public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> readAllExperience()
+    @GetMapping("")
+    public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> readAllExperience(
+            @RequestParam(value = "type", defaultValue = "ALL") List<String> types,
+            @RequestParam(value = "order", defaultValue = "latest") String order)
     throws CustomException {
 
-        return ResponseEntity.ok(RestResponse.ok(queryExperienceService.readAll()));
+        return ResponseEntity.ok(RestResponse.ok(queryExperienceService.readAll(types, order.toUpperCase())));
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "경험 조회 시 발생하는 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
                     examples = {
-                            @ExampleObject(name = "EXPERIENCE_NOT_EXISTS",
-                                    value = """
+                            @ExampleObject(name = "EXPERIENCE_NOT_EXISTS", value = """
                             {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "EXP001",
-                              "error": "EXPERIENCE_NOT_EXISTS",
                               "message": "해당 경험이 존재하지 않습니다."
-                            }
-                        """),
-                            @ExampleObject(name = "NOT_YOUR_EXPERIENCE",
-                                    value = """
+                            }"""),
+                            @ExampleObject(name = "NOT_YOUR_EXPERIENCE", value = """
                             {
+                              "httpStatus": "BAD_REQUEST",
                               "code": "EXP005",
-                              "error": "NOT_YOUR_EXPERIENCE",
                               "message": "본인의 Experience가 아닙니다."
-                            }
-                        """)
+                            }""")
                     }
             ))
     })

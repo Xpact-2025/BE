@@ -14,17 +14,17 @@ public class ExperienceUpdateRequestDto {
 
     // common (공통 부분)
     @Schema(description = "경험 저장 방식 지정 (임시저장 or 저장)", example = "SAVE", allowableValues = {"STASH", "SAVE"})
-    private Status status;
+    private String status;
 
     @Schema(description = "경험 유형 지정",
             example = "PROJECT",
             allowableValues = {"INTERN", "EXTERNAL_ACTIVITIES", "CONTEST",
                     "PROJECT", "CERTIFICATES", "ACADEMIC_CLUB", "EDUCATION",
                     "VOLUNTEER_WORK", "STUDY_ABROAD", "ETC"})
-    private ExperienceType experienceType;
+    private String experienceType;
 
     @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식", example = "SIMPLE_FORM")
-    private FormType formType;
+    private String formType;
 
     @Schema(description = "경험 제목", example = "경험 제목")
     private String title;
