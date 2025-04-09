@@ -19,12 +19,11 @@ public class MemberController {
     // 마이페이지 조회
     @GetMapping
     public ResponseEntity<RestResponse<?>> mypage(
-            @RequestHeader("Authorizatin") String authToken
+            @RequestHeader("Authorization") String authToken
     ) {
-       String token = authToken.startsWith("Bearer ") ? authToken.substring(7) : authToken;
        return ResponseEntity.ok(
                RestResponse.ok(
-                       memberService.getMyinfo(token)
+                       memberService.getMyinfo()
                )
        );
     }
