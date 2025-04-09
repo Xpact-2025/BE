@@ -4,6 +4,7 @@ import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
+import com.itstime.xpact.domain.member.common.SchoolStatus;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
@@ -19,6 +20,7 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "member")
 public class Member extends BaseEntity {
 
@@ -57,8 +59,12 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Education> educations;
+    @Column(name = "education")
+    private String education;
+
+    @Column(name = "school_status")
+    @Enumerated(EnumType.STRING)
+    private SchoolStatus schoolStatus;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id")
@@ -80,11 +86,13 @@ public class Member extends BaseEntity {
         this.role = role;
     }
 
+    // 프로필 설정에 사용될 메소드
     public MemberInfoResponseDto toMemberInfoResponseDto(Member member) {
         return MemberInfoResponseDto.builder()
                 .name(member.getName())
                 .imgurl(member.getImgurl())
-                .education(member.getEducations().toString())
+                .school(member.getEducation())
+                .schoolStatus(member.getSchoolStatus().name())
                 .recruit(member.getRecruit().getName())
                 .build();
     }
