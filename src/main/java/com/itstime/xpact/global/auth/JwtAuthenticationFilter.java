@@ -71,7 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 MemberAuthentication authentication = MemberAuthentication.createMemberAuthentication(member);
 
-                // TODO : 소셜 로그인 도입 후 UserDetails 클래스로 처리 고민
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
