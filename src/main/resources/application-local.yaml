@@ -31,3 +31,8 @@ spring:
   ai:
     openai:
       api-key: ${LOCAL_OPENAI_API_KEY}
+
+external:
+  api:
+    school:
+      service-key: ${SCHOOL_REST_API_KEY}

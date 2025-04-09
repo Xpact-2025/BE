@@ -71,7 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 MemberAuthentication authentication = MemberAuthentication.createMemberAuthentication(member);
 
-                // TODO : 소셜 로그인 도입 후 UserDetails 클래스로 처리 고민
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -84,7 +83,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
             Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", errorCode.name());
+
+            errorBody.put("httpStatus", errorCode.getHttpStatus());
             errorBody.put("code", errorCode.getCode());
             errorBody.put("message", e.getMessage());
 
