@@ -4,6 +4,7 @@ import com.itstime.xpact.domain.member.dto.request.SchoolInfoRequestDto;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
+import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.auth.TokenProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
@@ -16,22 +17,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final TokenProvider tokenProvider;
+    private final SecurityProvider securityProvider;
 
     // 마이페이지 조회하기
     @Transactional(readOnly = true)
-    public MemberInfoResponseDto getMyinfo(String token) throws CustomException {
+    public MemberInfoResponseDto getMyinfo() throws CustomException {
 
-        Member member = getMemberFromToken(token);
+        // Member 조회
+        Long memberId = securityProvider.getCurrentMemberId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         return member.toMemberInfoResponseDto(member);
     }
 
     // 프로필 정보 등록하기
     @Transactional
-    public MemberInfoResponseDto saveMyinfo(String token) throws CustomException {
+    public MemberInfoResponseDto saveMyinfo() throws CustomException {
 
-        Member member = getMemberFromToken(token);
+        // Member 조회
+        Long memberId = securityProvider.getCurrentMemberId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         return null;
     }
@@ -43,15 +50,6 @@ public class MemberService {
 
         // 학력에 대한 정보를 얻지 못하였다면 직접 입력 로직
         return null;
-    }
-
-
-    // getMemberFromToke 메소드 생성
-    private Member getMemberFromToken(String token) throws CustomException {
-        Long memberId = tokenProvider.getMemberIdFromToken(token);
-
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.FAILED_JWT_INFO));
     }
 
     public Member findMember(Long memberId) {
