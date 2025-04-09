@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.member.service;
 
+import com.itstime.xpact.domain.member.dto.request.SchoolInfoRequestDto;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
@@ -26,7 +27,7 @@ public class MemberService {
         return member.toMemberInfoResponseDto(member);
     }
 
-    // 회원 정보 수정하기
+    // 프로필 정보 등록하기
     @Transactional
     public MemberInfoResponseDto saveMyinfo(String token) throws CustomException {
 
@@ -36,7 +37,13 @@ public class MemberService {
     }
 
     // 학력에 대한 조회
+    private String toEducation(SchoolInfoRequestDto schoolInfo) {
 
+        // 학력에 대한 정보를 얻어왔다면 그대로 가져와서 변환하도록 설정
+
+        // 학력에 대한 정보를 얻지 못하였다면 직접 입력 로직
+        return null;
+    }
 
 
     // getMemberFromToke 메소드 생성
