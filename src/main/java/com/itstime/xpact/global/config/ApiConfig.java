@@ -17,16 +17,8 @@ public class ApiConfig {
         return new PatriciaTrie<String>();
     }
 
-    // Encode 모드로 설정
     @Bean
-    public DefaultUriBuilderFactory builderFactory() {
-        DefaultUriBuilderFactory builderFactory = new DefaultUriBuilderFactory();
-        builderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
-        return builderFactory;
-    }
-
-    @Bean
-    public WebClient.Builder webClient() {
+    public WebClient.Builder webClientBuilder() {
 
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
