@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.experience.dto;
+package com.itstime.xpact.domain.experience.dto.request;
 
 import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Schema(description = "경험 수정 요청 DTO")
@@ -17,7 +16,7 @@ public class ExperienceUpdateRequestDto {
     @Schema(description = "경험 저장 방식 지정 (임시저장 or 저장)", example = "SAVE", allowableValues = {"STASH", "SAVE"})
     private String status;
 
-    @Schema(description = "경험 유형 지정 (중복 가능)",
+    @Schema(description = "경험 유형 지정",
             example = "PROJECT",
             allowableValues = {"INTERN", "EXTERNAL_ACTIVITIES", "CONTEST",
                     "PROJECT", "CERTIFICATES", "ACADEMIC_CLUB", "EDUCATION",

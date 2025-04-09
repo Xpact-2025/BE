@@ -1,8 +1,8 @@
 package com.itstime.xpact.domain.experience.service;
 
 import com.itstime.xpact.domain.experience.common.ExperienceType;
-import com.itstime.xpact.domain.experience.dto.DetailExperienceReadResponseDto;
-import com.itstime.xpact.domain.experience.dto.ThumbnailExperienceReadResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.DetailExperienceReadResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;

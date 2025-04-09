@@ -3,8 +3,8 @@ package com.itstime.xpact.domain.experience.service;
 import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
-import com.itstime.xpact.domain.experience.dto.ExperienceCreateRequestDto;
-import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
@@ -14,10 +14,12 @@ import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -48,7 +50,7 @@ public class ExperienceService {
         experienceRepository.save(experience);
 
         if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE))
-            openAiService.summarizeContentOfExperience(experience);
+            openAiService.summarizeExperience(experience);
     }
 
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
@@ -80,7 +82,7 @@ public class ExperienceService {
         experienceRepository.save(experience);
 
         if(Status.valueOf(updateRequestDto.getStatus()).equals(Status.SAVE))
-            openAiService.summarizeContentOfExperience(experience);
+            openAiService.summarizeExperience(experience);
     }
 
     public void delete(Long experienceId) {

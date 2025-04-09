@@ -4,8 +4,8 @@ import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
-import com.itstime.xpact.domain.experience.dto.ExperienceCreateRequestDto;
-import com.itstime.xpact.domain.experience.dto.ExperienceUpdateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import jakarta.persistence.*;
@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @Getter
 @Entity
 @Table(name = "experience")
+@ToString(of = {"title", "keyword", "situation", "task", "action", "result", "role", "perform"})
 @SuperBuilder
 @NoArgsConstructor
 public class Experience extends BaseEntity {
@@ -47,6 +48,7 @@ public class Experience extends BaseEntity {
     protected LocalDate endDate;
 
     @Lob
+    @Setter
     @Column(name = "summary", columnDefinition = "TEXT")
     protected String summary;
 

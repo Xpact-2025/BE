@@ -1,12 +1,10 @@
-package com.itstime.xpact.domain.experience.dto;
+package com.itstime.xpact.domain.experience.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @Builder

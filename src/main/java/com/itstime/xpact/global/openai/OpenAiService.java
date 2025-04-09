@@ -1,14 +1,13 @@
 package com.itstime.xpact.global.openai;
 
 import com.itstime.xpact.domain.experience.entity.Experience;
-import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
 
-@Service
-public class OpenAiService {
+import java.util.concurrent.CompletableFuture;
 
+public interface OpenAiService {
 
-    // TODO OpenAIService의 경험요약을 처리하는 summarizeContentOfExperience 개발
-    public void summarizeContentOfExperience(Experience experience) {
+    @Async("taskExecutor")
+    CompletableFuture<String> summarizeExperience(Experience experience);
 
-    }
 }

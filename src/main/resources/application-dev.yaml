@@ -16,6 +16,10 @@ spring:
       hibernate:
         highlight_sql: true # 색상 부여
 
+  output:
+    ansi:
+      enabled: always # 서버에서 색상 부여
+
   data:
     redis:
       host: ${DEV_REDIS_HOST}

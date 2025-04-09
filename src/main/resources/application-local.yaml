@@ -28,6 +28,10 @@ spring:
 
     # TODO: NAVER 설정 추가
 
+  ai:
+    openai:
+      api-key: ${LOCAL_OPENAI_API_KEY}
+
 external:
   api:
     school:

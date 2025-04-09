@@ -65,6 +65,9 @@ dependencies {
     // WebClient
     implementation('org.springframework.boot:spring-boot-starter-webflux')
 
+    // openai
+    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6'
+
     // querydsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
