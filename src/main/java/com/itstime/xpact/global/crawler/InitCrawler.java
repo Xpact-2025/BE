@@ -15,7 +15,7 @@ public class InitCrawler implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if(!crawlingService.dataExists()) {
+        if(crawlingService.dataExists()) {
             log.info("Data Exists");
             return;
         }

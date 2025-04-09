@@ -23,7 +23,7 @@ public class CrawlingService {
     private final DetailRecruitRepository detailRecruitRepository;
 
     public boolean dataExists() {
-        return !(recruitRepository.count() > 0 && detailRecruitRepository.count() > 0);
+        return recruitRepository.count() > 0 && detailRecruitRepository.count() > 0;
     }
 
     public void saveRecruitData() {
