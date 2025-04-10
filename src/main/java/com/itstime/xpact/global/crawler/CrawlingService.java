@@ -22,11 +22,16 @@ public class CrawlingService {
     private final RecruitRepository recruitRepository;
     private final DetailRecruitRepository detailRecruitRepository;
 
-    public boolean dataExists() {
-        return recruitRepository.count() > 0 && detailRecruitRepository.count() > 0;
+    public boolean recruitExists() {
+        return recruitRepository.count() > 0;
+    }
+
+    public boolean detailRecruitExists() {
+        return detailRecruitRepository.count() > 0;
     }
 
     public void saveRecruitData() {
+
         List<String> recruits = crawler.getRecruits();
 
         List<Recruit> recruitList = recruits.stream()
@@ -45,7 +50,7 @@ public class CrawlingService {
                 .map(detailRecruitDto -> {
                     String recruitName = detailRecruitDto.getRecruitName();
                     Recruit recruit = recruitRepository.findByName(recruitName)
-                            .orElseThrow(() -> new CustomException(ErrorCode.CRAWLING_ERROR));
+                            .orElseThrow();
 
                     return DetailRecruit.builder()
                             .recruit(recruit)
