@@ -1,9 +1,11 @@
 package com.itstime.xpact.domain.member.entity;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
 @Entity
 @Table(name = "school")
+@Setter
 public class School {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
