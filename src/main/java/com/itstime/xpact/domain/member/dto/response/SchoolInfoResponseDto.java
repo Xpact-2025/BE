@@ -1,15 +1,47 @@
 package com.itstime.xpact.domain.member.dto.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import lombok.Data;
 
-@Schema(description = "회원 학력 저장에 사용되는 DTO")
-public record SchoolInfoResponseDto (
-        @Schema(description = "학교 이름",
-                example = "잇타대학교")
-        String name,
+import java.util.List;
 
-        @Schema(description = "학과 이름",
-                example = "잇타학과")
-        String major
-) {
+@Data
+@JacksonXmlRootElement(localName = "response")
+public class SchoolInfoResponseDto {
+
+    private Header header;
+    private Body body;
+
+    @Data
+    public static class Header {
+
+        @JacksonXmlProperty(localName = "resultCode")
+        private String resultCode;
+        @JacksonXmlProperty(localName = "resultMsg")
+        private String resultMessage;
+    }
+
+    @Data
+    public static class Body {
+        private Items items;
+        @JacksonXmlProperty(localName = "totalCount")
+        private int totalCount;
+    }
+
+    @Data
+    public static class Items {
+        @JacksonXmlElementWrapper(useWrapping = false)
+        @JacksonXmlProperty(localName = "item")
+        private List<Item> itemList;
+    }
+
+    @Data
+    public static class Item {
+        @JacksonXmlProperty(localName = "schlNm")
+        private String schoolName;
+        @JacksonXmlProperty(localName = "korMjrNm")
+        private String major;
+    }
 }
