@@ -77,9 +77,6 @@ dependencies {
     // Trie 구조 사용
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 
-    //jsoup
-    implementation 'org.jsoup:jsoup:1.19.1'
-
     // jackson
     implementation 'com.fasterxml.jackson.core:jackson-core'
 }
