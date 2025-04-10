@@ -76,6 +76,9 @@ dependencies {
 
     // Trie 구조 사용
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+
+    // XML 파싱 추가
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.0'
 }
 
 def queryDslSrcDir = 'build/generated/querydsl/'
