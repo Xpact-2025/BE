@@ -25,9 +25,6 @@ public class Recruit extends BaseEntity {
     @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL)
     private List<DetailRecruit> detailRecruits = new ArrayList<>();
 
-    @OneToOne(mappedBy = "recruit")
-    private Member member;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "core_skill_id")
     private CoreSkill coreSkill;
