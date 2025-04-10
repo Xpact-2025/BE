@@ -2,7 +2,7 @@ package com.itstime.xpact.domain.member.service;
 
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
 import com.itstime.xpact.domain.member.util.TrieUtil;
-import com.itstime.xpact.global.auth.TokenProvider;
+import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +15,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SchoolService {
 
-    private final TokenProvider tokenProvider;
+    private final SecurityProvider securityProvider;
     private final TrieUtil trieUtil;
     private final SchoolCustomRepositoryImpl schoolRepository;
 
     @Transactional(readOnly = true)
-    public List<String> autocompleteName(
-            String token, String term) throws CustomException {
+    public List<String> autocompleteName(String term) throws CustomException {
 
         try {
-            tokenProvider.validationToken(token);
+            securityProvider.getCurrentMemberId();
 
             trieUtil.addAutocompleteKeyword(term);
 
@@ -42,7 +41,9 @@ public class SchoolService {
     }
 
     // 학교를 기반으로 학과 필터링하기
-    public List<String> searchMajor(String token, String schoolName) throws CustomException {
+    public List<String> searchMajor(String schoolName) throws CustomException {
+
+        securityProvider.getCurrentMemberId();
 
         return schoolRepository.findMajorBySchoolName(schoolName);
     }
