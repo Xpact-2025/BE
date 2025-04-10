@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.member.repository;
 
 import com.itstime.xpact.domain.member.entity.QSchool;
+import com.itstime.xpact.domain.member.entity.School;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,8 @@ import java.util.List;
 public class SchoolCustomRepositoryImpl implements SchoolCustomRepository {
 
     private final JPAQueryFactory queryFactory;
+
+    private final SchoolRepository schoolRepository;
 
     @Override
     public List<String> findAllSchoolNames() {
@@ -32,5 +35,22 @@ public class SchoolCustomRepositoryImpl implements SchoolCustomRepository {
                 .from(school)
                 .where(school.schoolName.eq(schoolName))
                 .fetch();
+    }
+
+    @Override
+    public void saveIfNotExist(String schoolName) {
+        QSchool school = QSchool.school;
+
+        boolean isExists = queryFactory
+                .selectOne()
+                .from(school)
+                .where(school.schoolName.eq(schoolName))
+                .fetchFirst() != null;
+
+        if (!isExists) {
+            School newSchool = new School();
+            newSchool.setSchoolName(schoolName);
+            schoolRepository.save(newSchool);
+        }
     }
 }
