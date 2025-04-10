@@ -11,16 +11,16 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InitCrawler implements ApplicationRunner {
 
-    private final CrawlingService crawlingService;
+    private final CrawlerService crawlerService;
 
     @Override
     public void run(ApplicationArguments args) {
-        if(crawlingService.recruitExists() && crawlingService.detailRecruitExists()) {
+        if(crawlerService.recruitExists() && crawlerService.detailRecruitExists()) {
             log.info("Data Exists");
             return;
         }
 
-        if(!crawlingService.recruitExists()) crawlingService.saveRecruitData();
-        if(!crawlingService.detailRecruitExists()) crawlingService.saveDetailRecruitData();
+        if(!crawlerService.recruitExists()) crawlerService.saveRecruitData();
+        if(!crawlerService.detailRecruitExists()) crawlerService.saveDetailRecruitData();
     }
 }

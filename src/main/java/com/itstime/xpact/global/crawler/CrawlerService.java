@@ -5,8 +5,6 @@ import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CrawlingService {
+public class CrawlerService {
 
     private final Crawler crawler;
     private final RecruitRepository recruitRepository;
