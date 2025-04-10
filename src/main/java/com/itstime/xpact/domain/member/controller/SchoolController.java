@@ -34,7 +34,7 @@ public class SchoolController {
 
         return ResponseEntity.ok(
                 RestResponse.ok(
-                        schoolService.autocompleteName(token, keyword)
+                        schoolService.autocompleteName(keyword)
                 )
         );
     }
@@ -53,11 +53,9 @@ public class SchoolController {
             @RequestParam String schoolName
     ) {
 
-        String token = authToken.startsWith("Bearer ") ? authToken.substring(7) : authToken;
-
         return ResponseEntity.ok(
                 RestResponse.ok(
-                    schoolService.searchMajor(token, schoolName)
+                    schoolService.searchMajor(schoolName)
                 )
         );
     }
