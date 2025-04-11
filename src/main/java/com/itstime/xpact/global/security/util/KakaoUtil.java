@@ -4,8 +4,8 @@ import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.security.dto.response.KakaoInfoResponseDto;
 import com.itstime.xpact.global.security.dto.response.KakaoTokenDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -15,9 +15,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class KakaoUtil {
 
-    private final WebClient.Builder webClientBuilder;
     // 일단 kakao utils에 필요한 것들만 선언
     @Value("${spring.security.kakao.client-id}")
     private String clientId;
@@ -28,9 +28,6 @@ public class KakaoUtil {
     private static final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com"; // 카카오 인증 URI
     private static final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com"; // 카카오 사용자 정보 요청 URI
 
-    public KakaoUtil(@Qualifier("webClientBuilder") WebClient.Builder webClientBuilder) {
-        this.webClientBuilder = webClientBuilder;
-    }
 
     // 인증코드 URL
     public String buildLoginUrl() {
@@ -44,9 +41,7 @@ public class KakaoUtil {
     public KakaoTokenDto requestAccessToken(String authorizationCode) {
 
         try {
-            return webClientBuilder
-                    .baseUrl(KAUTH_TOKEN_URL_HOST)
-                    .build()
+            return createWebClient(KAUTH_TOKEN_URL_HOST)
                     .post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/oauth/token")
@@ -67,9 +62,7 @@ public class KakaoUtil {
     // 카카오로부터 Profile 얻어오기
     public KakaoInfoResponseDto requestProfile(String token) {
         try {
-            return webClientBuilder
-                    .baseUrl(KAUTH_USER_URL_HOST)
-                    .build()
+            return createWebClient(KAUTH_USER_URL_HOST)
                     .get()
                     .uri("/v2/user/me")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -80,6 +73,15 @@ public class KakaoUtil {
             log.error("카카오로부터 사용자 Info 요청 중 오류 : {} ", e.getResponseBodyAsString());
             throw CustomException.of(ErrorCode.ACCESS_TOKEN_REQUEST_FAILED);
         }
+    }
+
+    // WebClient를 이용한 요청
+    private WebClient createWebClient(String baseUrl) {
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                // KAKAO open API 필수 Header
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
+                .build();
     }
 
     // KAKAO로부터 얻어온 token의 정보 콘솔 로그 출력
