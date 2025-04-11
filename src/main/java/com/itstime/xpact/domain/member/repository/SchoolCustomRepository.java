@@ -6,5 +6,5 @@ public interface SchoolCustomRepository {
 
     List<String> findAllSchoolNames();
     List<String> findMajorBySchoolName(String schoolName);
-    void saveIfNotExist(String schoolName);
+    void saveIfNotExist(String schoolName, String major);
 }

@@ -38,7 +38,7 @@ public class SchoolCustomRepositoryImpl implements SchoolCustomRepository {
     }
 
     @Override
-    public void saveIfNotExist(String schoolName) {
+    public void saveIfNotExist(String schoolName, String major) {
         QSchool school = QSchool.school;
 
         boolean isExists = queryFactory
@@ -50,6 +50,7 @@ public class SchoolCustomRepositoryImpl implements SchoolCustomRepository {
         if (!isExists) {
             School newSchool = new School();
             newSchool.setSchoolName(schoolName);
+            newSchool.setMajor(major);
             schoolRepository.save(newSchool);
         }
     }
