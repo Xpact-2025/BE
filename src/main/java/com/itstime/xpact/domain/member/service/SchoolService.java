@@ -1,5 +1,7 @@
 package com.itstime.xpact.domain.member.service;
 
+import com.itstime.xpact.domain.member.common.SchoolStatus;
+import com.itstime.xpact.domain.member.dto.request.SchoolSaveRequestDto;
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
 import com.itstime.xpact.domain.member.util.TrieUtil;
 import com.itstime.xpact.global.auth.SecurityProvider;
@@ -41,10 +43,33 @@ public class SchoolService {
     }
 
     // 학교를 기반으로 학과 필터링하기
+    @Transactional(readOnly = true)
     public List<String> searchMajor(String schoolName) throws CustomException {
 
         securityProvider.getCurrentMemberId();
 
         return schoolRepository.findMajorBySchoolName(schoolName);
+    }
+
+    @Transactional
+    public String saveSchoolInfo(SchoolSaveRequestDto requestDto) throws CustomException {
+
+        try {
+            securityProvider.getCurrentMemberId();
+
+            String education = requestDto.name() + requestDto.major();
+            String status = "";
+
+            if (requestDto.schoolStatus().equals(SchoolStatus.CURRENT)) {
+                status = "재학";
+            } else if (requestDto.schoolStatus().equals(SchoolStatus.GRADUATION)) {
+                status = "졸업";
+            } else if (requestDto.schoolStatus().equals(SchoolStatus.SUSPENDED)) {
+                status = "휴학";
+            }
+            return education + status;
+        } catch (Exception e) {
+            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 }

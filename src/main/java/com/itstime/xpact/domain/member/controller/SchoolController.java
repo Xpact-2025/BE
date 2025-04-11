@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.member.controller;
 
+import com.itstime.xpact.domain.member.dto.request.SchoolSaveRequestDto;
 import com.itstime.xpact.domain.member.service.SchoolService;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,18 +48,29 @@ public class SchoolController {
                 여기서 선택한 정보는 회원 정보의 학력으로 저장됩니다.<br>
                 만약 학과가 존재하지 않을 경우 직접 입력하도록 처리해주세요.
                 """)
-    @GetMapping("/major")
+    @GetMapping("/{name}/major")
     public ResponseEntity<RestResponse<?>> searchMajors(
             @RequestHeader("Authorization") String authToken,
-            @RequestParam String schoolName
+            @PathVariable String name
     ) {
 
         return ResponseEntity.ok(
                 RestResponse.ok(
-                    schoolService.searchMajor(schoolName)
+                    schoolService.searchMajor(name)
                 )
         );
     }
 
-    // 조회한 것들을 바탕으로 회원 정보 저장
+    // 학력 정보 저장
+    @PostMapping("")
+    public ResponseEntity<RestResponse<?>> saveSchoolInfo(
+            @RequestHeader("Authorization") String authToken,
+            @RequestBody SchoolSaveRequestDto requestDto
+            ) {
+        return ResponseEntity.ok(
+                RestResponse.ok(
+                        schoolService.saveSchoolInfo(requestDto)
+                )
+        );
+    }
 }
