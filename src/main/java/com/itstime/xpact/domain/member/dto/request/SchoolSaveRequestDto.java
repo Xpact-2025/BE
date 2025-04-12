@@ -15,7 +15,8 @@ public record SchoolSaveRequestDto(
         String major,
 
         @Schema(description = "현재 상태",
-        example = "재학 중")
+        example = "CURRENT",
+        allowableValues = {"CURRENT", "GRADUATION", "SUSPENDED"})
         SchoolStatus schoolStatus
 ) {
 }
