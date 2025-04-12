@@ -6,6 +6,7 @@ import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.SchoolStatus;
 import com.itstime.xpact.domain.member.common.Type;
+import com.itstime.xpact.domain.member.dto.request.MemberInfoRequestDto;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.scrap.entity.Scrap;
@@ -46,7 +47,7 @@ public class Member extends BaseEntity {
     private LocalDate birthDate;
 
     @Column(name = "age", nullable = true)
-    private int age;
+    private Integer age;
 
     @Column(name = "imgurl")
     private String imgurl;
@@ -80,7 +81,7 @@ public class Member extends BaseEntity {
     private List<Scrap> scraps = new ArrayList<>();
 
     @Builder
-    public Member(String name, String email, String password, LocalDate birthDate, Type type, Role role) {
+    public Member(String name, String email, String password, LocalDate birthDate, Integer age, Type type, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -95,6 +96,7 @@ public class Member extends BaseEntity {
                 .name(member.getName())
                 .imgurl(member.getImgurl())
                 .school(member.getEducation())
+                .age(member.getAge())
                 .schoolStatus(member.getSchoolStatus().name())
                 .recruit(member.getRecruit().getName())
                 .build();

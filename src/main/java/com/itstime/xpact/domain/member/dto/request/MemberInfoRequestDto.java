@@ -13,7 +13,7 @@ public record MemberInfoRequestDto(
         String imgurl,
 
         @Schema(description = "회원 나이")
-        int age,
+        Integer age,
 
         @Schema(description = "회원 학력 이름",
                 example = "잇타대학교 경영학과 재학")
