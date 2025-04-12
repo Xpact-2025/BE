@@ -51,13 +51,12 @@ public class SchoolService {
         return schoolRepository.findMajorBySchoolName(schoolName);
     }
 
-    @Transactional
     public String saveSchoolInfo(SchoolSaveRequestDto requestDto) throws CustomException {
 
         try {
             securityProvider.getCurrentMemberId();
 
-            String education = requestDto.name() + requestDto.major();
+            String education = requestDto.name() + " " + requestDto.major() + " ";
             String status = "";
 
             if (requestDto.schoolStatus().equals(SchoolStatus.CURRENT)) {
@@ -69,7 +68,7 @@ public class SchoolService {
             }
             return education + status;
         } catch (Exception e) {
-            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw CustomException.of(ErrorCode.INVALID_SCHOOL_TYPE);
         }
     }
 }

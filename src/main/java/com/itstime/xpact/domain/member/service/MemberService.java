@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.member.service;
 
+import com.itstime.xpact.domain.member.dto.request.MemberInfoRequestDto;
 import com.itstime.xpact.domain.member.dto.request.SchoolSaveRequestDto;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
 import com.itstime.xpact.domain.member.entity.Member;
@@ -32,13 +33,22 @@ public class MemberService {
 
     // 프로필 정보 등록하기
     @Transactional
-    public MemberInfoResponseDto saveMyinfo() throws CustomException {
+    public MemberInfoResponseDto saveMyinfo(
+            MemberInfoRequestDto requestDto
+    ) throws CustomException {
 
         // Member 조회
         Long memberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
+        member.builder()
+                .name(requestDto.name())
+                .imgurl(requestDto.imgurl())
+                .age(requestDto.age())
+                .education(requestDto.schoolInfo())
+                .recruit(requestDto.recruit())
+                .build();
         return null;
     }
 
