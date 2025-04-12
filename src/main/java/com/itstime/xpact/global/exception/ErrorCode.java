@@ -46,6 +46,9 @@ public enum ErrorCode {
     // parsing
     PARSING_ERROR(HttpStatus.BAD_REQUEST, "PE001", "파싱 중 오류가 발생하였습니다."),
 
+    // school
+    INVALID_SCHOOL_TYPE(HttpStatus.BAD_REQUEST, "SCE001", "올바른 타입을 입력해주세요."),
+
     // server
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SE001", "Internal Server Error"),
 
