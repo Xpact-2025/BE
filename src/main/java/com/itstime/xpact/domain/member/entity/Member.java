@@ -45,6 +45,9 @@ public class Member extends BaseEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+    @Column(name = "age", nullable = true)
+    private int age;
+
     @Column(name = "imgurl")
     private String imgurl;
 
