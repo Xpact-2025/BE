@@ -96,9 +96,17 @@ public class Member extends BaseEntity {
                 .name(member.getName())
                 .imgurl(member.getImgurl())
                 .school(member.getEducation())
-                .age(member.getAge())
-                .schoolStatus(member.getSchoolStatus().name())
-                .recruit(member.getRecruit().getName())
+                .age(member.getAge() != null ? member.getAge() : 0)
+                .schoolStatus(member.getSchoolStatus() != null ? member.getSchoolStatus().name() : null)
+                .recruit(member.getRecruit() != null ? member.getRecruit().getName() : null)
                 .build();
+    }
+
+    public void updateMemberInfo(MemberInfoRequestDto requestDto) {
+        if (requestDto.name() != null) this.name = requestDto.name();
+        if (requestDto.age() != null) this.age = requestDto.age();
+        if (requestDto.imgurl() != null) this.imgurl = requestDto.imgurl();
+        //if (requestDto.schoolInfo() != null) this.education = requestDto.schoolInfo();
+        if (requestDto.recruit() != null) this.recruit = requestDto.recruit();
     }
 }
