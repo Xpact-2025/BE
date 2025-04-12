@@ -9,10 +9,12 @@ import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MemberService {
 
@@ -28,37 +30,21 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
+        log.info("{} : 회원의 정보 조회 시작 ... ", member.getEmail());
         return member.toMemberInfoResponseDto(member);
     }
 
     // 프로필 정보 등록하기
     @Transactional
-    public MemberInfoResponseDto saveMyinfo(
-            MemberInfoRequestDto requestDto
-    ) throws CustomException {
+    public MemberInfoResponseDto saveMyinfo(MemberInfoRequestDto requestDto) throws CustomException {
 
         // Member 조회
         Long memberId = securityProvider.getCurrentMemberId();
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
-        member.builder()
-                .name(requestDto.name())
-                .imgurl(requestDto.imgurl())
-                .age(requestDto.age())
-                .education(requestDto.schoolInfo())
-                .recruit(requestDto.recruit())
-                .build();
-        return null;
-    }
-
-    // 학력에 대한 조회
-    private String toEducation(SchoolSaveRequestDto schoolInfo) {
-
-        // 학력에 대한 정보를 얻어왔다면 그대로 가져와서 변환하도록 설정
-
-        // 학력에 대한 정보를 얻지 못하였다면 직접 입력 로직
-        return null;
+        member.updateMemberInfo(requestDto);
+        return member.toMemberInfoResponseDto(member);
     }
 
     public Member findMember(Long memberId) {
