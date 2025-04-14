@@ -17,12 +17,8 @@ public record MemberInfoResponseDto (
         int age,
 
         @Schema(description = "회원 학력 이름",
-        example = "잇타대학교 잇타학과")
-        String school,
-
-        @Schema(description = "회원 학력 현상황",
-        example = "재학 중")
-        String schoolStatus,
+        example = "잇타대학교 잇타학과 재학")
+        String education,
 
         @Schema(description = "희망 직무",
         example = "회계사")

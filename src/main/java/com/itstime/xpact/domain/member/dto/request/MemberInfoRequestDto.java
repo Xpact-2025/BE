@@ -15,7 +15,7 @@ public record MemberInfoRequestDto(
         @Schema(description = "회원 나이")
         Integer age,
 
-        @Schema(description = "회원 학력 이름",
+        @Schema(description = "회원 학력 이름, Education에서 입력한 학력 정보의 String을 사용합니다.",
                 example = "잇타대학교 경영학과 재학")
         String schoolInfo,
 
