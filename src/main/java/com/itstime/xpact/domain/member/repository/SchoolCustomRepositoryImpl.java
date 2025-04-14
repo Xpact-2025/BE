@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -38,20 +39,27 @@ public class SchoolCustomRepositoryImpl implements SchoolCustomRepository {
     }
 
     @Override
-    public void saveIfNotExist(String schoolName, String major) {
+    public School saveIfNotExist(String schoolName, String major) {
+
+        return findBySchoolNameAndMajor(schoolName, major)
+                .orElseGet(() -> schoolRepository.save(
+                        School.builder()
+                                .schoolName(schoolName)
+                                .major(major)
+                                .build()
+                ));
+    }
+
+    @Override
+    public Optional<School> findBySchoolNameAndMajor(String schoolName, String major) {
         QSchool school = QSchool.school;
 
-        boolean isExists = queryFactory
-                .selectOne()
-                .from(school)
-                .where(school.schoolName.eq(schoolName))
-                .fetchFirst() != null;
-
-        if (!isExists) {
-            School newSchool = new School();
-            newSchool.setSchoolName(schoolName);
-            newSchool.setMajor(major);
-            schoolRepository.save(newSchool);
-        }
+        School result = queryFactory
+                .selectFrom(school)
+                .where(
+                        school.schoolName.eq(schoolName),
+                        school.major.eq(major))
+                .fetchOne();
+        return Optional.ofNullable(result);
     }
 }
