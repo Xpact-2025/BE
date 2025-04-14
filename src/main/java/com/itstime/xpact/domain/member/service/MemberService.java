@@ -1,7 +1,6 @@
 package com.itstime.xpact.domain.member.service;
 
 import com.itstime.xpact.domain.member.dto.request.MemberInfoRequestDto;
-import com.itstime.xpact.domain.member.dto.request.SchoolSaveRequestDto;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
@@ -39,9 +38,7 @@ public class MemberService {
     public MemberInfoResponseDto saveMyinfo(MemberInfoRequestDto requestDto) throws CustomException {
 
         // Member 조회
-        Long memberId = securityProvider.getCurrentMemberId();
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+       Member member = securityProvider.getCurrentMember();
 
         member.updateMemberInfo(requestDto);
         return member.toMemberInfoResponseDto(member);
