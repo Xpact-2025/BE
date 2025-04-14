@@ -4,7 +4,6 @@ import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
-import com.itstime.xpact.domain.member.common.SchoolStatus;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.dto.request.MemberInfoRequestDto;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
@@ -63,12 +62,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "education")
-    private String education;
-
-    @Column(name = "school_status")
-    @Enumerated(EnumType.STRING)
-    private SchoolStatus schoolStatus;
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Education education;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id")
@@ -95,9 +90,8 @@ public class Member extends BaseEntity {
         return MemberInfoResponseDto.builder()
                 .name(member.getName())
                 .imgurl(member.getImgurl())
-                .school(member.getEducation())
+                .education(member.getEducation().getEducationName())
                 .age(member.getAge() != null ? member.getAge() : 0)
-                .schoolStatus(member.getSchoolStatus() != null ? member.getSchoolStatus().name() : null)
                 .recruit(member.getRecruit() != null ? member.getRecruit().getName() : null)
                 .build();
     }
@@ -108,5 +102,10 @@ public class Member extends BaseEntity {
         if (requestDto.imgurl() != null) this.imgurl = requestDto.imgurl();
         //if (requestDto.schoolInfo() != null) this.education = requestDto.schoolInfo();
         if (requestDto.recruit() != null) this.recruit = requestDto.recruit();
+    }
+
+    public void setEducation(Education education) {
+        this.education = education;
+        education.setMember(this);
     }
 }

@@ -1,11 +1,16 @@
 package com.itstime.xpact.domain.member.entity;
 
 import jakarta.persistence.*;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
-@Table(name = "school")
-@Setter
+@Table(name = "school",
+    uniqueConstraints = @UniqueConstraint(columnNames =  {"school_name", "major"}))
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class School {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,4 +22,7 @@ public class School {
 
     @Column(name = "major")
     private String major;
+
+    @OneToMany(mappedBy = "school")
+    private List<Education> educations;
 }
