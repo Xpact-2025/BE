@@ -43,9 +43,4 @@ public class MemberService {
         member.updateMemberInfo(requestDto);
         return member.toMemberInfoResponseDto(member);
     }
-
-    public Member findMember(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
-    }
 }
