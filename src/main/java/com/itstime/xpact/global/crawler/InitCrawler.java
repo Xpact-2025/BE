@@ -15,12 +15,19 @@ public class InitCrawler implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if(crawlerService.recruitExists() && crawlerService.detailRecruitExists()) {
-            log.info("Data Exists");
-            return;
-        }
+        if(!checkRecruitData()) crawlerService.saveRecruitData();
+        else log.info("Recruit Column has already been initialized");
 
-        if(!crawlerService.recruitExists()) crawlerService.saveRecruitData();
-        if(!crawlerService.detailRecruitExists()) crawlerService.saveDetailRecruitData();
+        if(!checkDetailRecruitData()) crawlerService.saveDetailRecruitData();
+        else log.info("DetailRecruit Column has already been initialized");
+
+    }
+
+    private boolean checkRecruitData() {
+        return crawlerService.recruitExists();
+    }
+
+    private boolean checkDetailRecruitData() {
+        return crawlerService.detailRecruitExists();
     }
 }
