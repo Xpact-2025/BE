@@ -1,16 +1,13 @@
 package com.itstime.xpact.global.crawler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.recruit.dto.DetailRecruitDto;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,37 +15,81 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Crawler {
 
-    private static final String RECRUIT_JSON = "src/main/resources/static/recruit.json";
-    private static final String DETAIL_RECRUIT_JSON = "src/main/resources/static/detailRecruit.json";
-    private final ObjectMapper objectMapper;
+    private static final String URL = "https://job.incruit.com/jobdb_list/searchjob.asp?cate=occu";
 
-    // 직무 데이터
-    public List<String> getRecruits() {
-        List<String> recruits = new ArrayList<>();
-        try {
-            JsonNode jsonNodes = objectMapper.readTree(new File(RECRUIT_JSON));
-            for (JsonNode jsonNode : jsonNodes) {
-                recruits.add(jsonNode.get("recruit").asText());
-            }
-        } catch (IOException e) {
-            throw CustomException.of(ErrorCode.TEST);
+    private WebDriver initWebDriver() {
+        WebDriver driver = CrawlerUtil.getWebDriver();
+        driver.get(URL);
+
+        WebElement banner = driver.findElement(By.className("rubaner-close"));
+        banner.click();
+
+        List<WebElement> depth1List = driver.findElements(By.name("occ1_list"));
+        for (WebElement depth1 : depth1List) {
+            refresh(driver);
+            depth1.click();
         }
-
-        return recruits;
+        return driver;
     }
 
-    public List<DetailRecruitDto> getDetailRecruits() {
-        List<DetailRecruitDto> detailRecruits = new ArrayList<>();
-        try {
-            JsonNode jsonNodes = objectMapper.readTree(new File(DETAIL_RECRUIT_JSON));
-            for (JsonNode jsonNode : jsonNodes) {
-                DetailRecruitDto detailRecruitDto = objectMapper.treeToValue(jsonNode, DetailRecruitDto.class);
-                detailRecruits.add(detailRecruitDto);
-            }
-        } catch (IOException e) {
-            throw CustomException.of(ErrorCode.TEST);
+    private static void refresh(WebDriver driver) {
+        WebElement refreshBtn = driver.findElement(By.className("shb-btn-ref"));
+        refreshBtn.click();
+    }
+
+    public List<String> crawlRecruits() {
+        WebDriver driver = initWebDriver();
+
+        // depth2 조회
+        List<WebElement> depth2List = driver.findElements(By.name("occ2_list"));
+        List<String> depth2NameList = new ArrayList<>();
+        for (WebElement depth2 : depth2List) {
+            String name = depth2.getAttribute("data-item-name");
+            depth2NameList.add(name);
         }
 
-        return detailRecruits;
+        return depth2NameList;
+    }
+
+    public List<DetailRecruitDto> crawlDetailRecruits() {
+        WebDriver driver = initWebDriver();
+
+        // depth2 조회
+        List<WebElement> depth2List = driver.findElements(By.name("occ2_list"));
+        List<String> depth2IdList = new ArrayList<>();
+
+        for (WebElement depth2 : depth2List) {
+            String id = depth2.getAttribute("id");
+
+            assert id != null;
+            String newId = id.replace("occ2_list", "occ1_list").substring(0, id.lastIndexOf("_"));
+            driver.findElement(By.id(newId)).click();
+            refresh(driver);
+
+            WebElement container = driver.findElement(By.id("occ2_div"));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollTop = arguments[1].offsetTop;", container, depth2);
+            depth2.click();
+            depth2IdList.add(id);
+        }
+        depth2List.clear();
+
+        List<String> depth3NameList = depth2IdList.stream()
+                .map(id -> id.substring(0, 3) + "3" + id.substring(4))
+                .toList();
+
+        depth2IdList.clear();
+
+        List<DetailRecruitDto> detailRecruitDtos = new ArrayList<>();
+        for (String name : depth3NameList) {
+            List<WebElement> depth3List = driver.findElements(By.name(name));
+
+            for (WebElement depth3 : depth3List) {
+                String recruit = depth3.getAttribute("data-item-upstr");
+                String detailRecruit = depth3.getAttribute("data-item-name");
+                detailRecruitDtos.add(new DetailRecruitDto(recruit, detailRecruit));
+            }
+            depth3List.clear();
+        }
+        return detailRecruitDtos;
     }
 }
