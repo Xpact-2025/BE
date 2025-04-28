@@ -79,6 +79,8 @@ dependencies {
 
     // jackson
     implementation 'com.fasterxml.jackson.core:jackson-core'
+
+    implementation 'org.seleniumhq.selenium:selenium-java:4.31.0'
 }
 
 def queryDslSrcDir = 'build/generated/querydsl/'
