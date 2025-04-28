@@ -29,8 +29,7 @@ public class CrawlerService {
     }
 
     public void saveRecruitData() {
-
-        List<String> recruits = crawler.getRecruits();
+        List<String> recruits = crawler.crawlRecruits();
 
         List<Recruit> recruitList = recruits.stream()
                 .map(recruit -> Recruit.builder()
@@ -38,11 +37,11 @@ public class CrawlerService {
                 .toList();
 
         recruitRepository.saveAll(recruitList);
-        log.info("Save recruits");
+        log.info("Saved {} rows of recruits", recruitList.size());
     }
 
     public void saveDetailRecruitData() {
-        List<DetailRecruitDto> detailRecruits = crawler.getDetailRecruits();
+        List<DetailRecruitDto> detailRecruits = crawler.crawlDetailRecruits();
 
         List<DetailRecruit> detailRecruitList = detailRecruits.stream()
                 .map(detailRecruitDto -> {
@@ -57,6 +56,6 @@ public class CrawlerService {
                 }).toList();
 
         detailRecruitRepository.saveAll(detailRecruitList);
-        log.info("Save detail recruits");
+        log.info("Saved {} rows of detailRecruits", detailRecruitList.size());
     }
 }
