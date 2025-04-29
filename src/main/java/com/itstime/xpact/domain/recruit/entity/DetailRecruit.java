@@ -5,9 +5,11 @@ import com.itstime.xpact.domain.experience.entity.Experience;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "detail_recruit")
 @NoArgsConstructor
 @AllArgsConstructor
