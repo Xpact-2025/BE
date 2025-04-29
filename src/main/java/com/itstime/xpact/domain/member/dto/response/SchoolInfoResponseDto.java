@@ -2,13 +2,13 @@ package com.itstime.xpact.domain.member.dto.response;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@JacksonXmlRootElement(localName = "response")
+@XmlRootElement(name = "response")
 public class SchoolInfoResponseDto {
 
     private Header header;
