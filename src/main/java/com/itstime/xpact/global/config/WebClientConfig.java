@@ -1,18 +1,17 @@
 package com.itstime.xpact.global.config;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.Trie;
-import org.apache.commons.collections4.trie.PatriciaTrie;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.codec.xml.Jaxb2XmlDecoder;
-import org.springframework.http.codec.xml.Jaxb2XmlEncoder;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.http.codec.xml.Jaxb2XmlDecoder;
+import org.springframework.http.codec.xml.Jaxb2XmlEncoder;
 
 @Configuration
 @Slf4j
@@ -21,33 +20,26 @@ public class WebClientConfig {
     @Value("${external.api.school.base-url}")
     private String baseUrl;
 
-    // Trie Config
-    @Bean
-    public Trie<String, String> trie() {
-        return new PatriciaTrie<String>();
-    }
-
     // TODO : WebClient Bean 생성
     @Bean
-    @Qualifier("xmlWebClient")
-    public WebClient xmlWebClient() {
-        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
-        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
+    public WebClient schoolWebClient() {
 
+        XmlMapper xmlMapper = new XmlMapper();
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
                 .codecs(clientCodecConfigurer -> {
-                    clientCodecConfigurer.defaultCodecs()
-                            .jaxb2Encoder(new Jaxb2XmlEncoder());
-                    clientCodecConfigurer.defaultCodecs()
-                            .jaxb2Decoder(new Jaxb2XmlDecoder());
+                    clientCodecConfigurer.defaultCodecs().jaxb2Decoder(new Jaxb2XmlDecoder());
+                    clientCodecConfigurer.defaultCodecs().jaxb2Encoder(new Jaxb2XmlEncoder());
                 })
                 .build();
 
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(baseUrl);
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
+
         return WebClient.builder()
-                .baseUrl(baseUrl)
                 .filter(logRequest())
                 .uriBuilderFactory(factory)
                 .exchangeStrategies(exchangeStrategies)
+                .defaultHeader("Accept", MediaType.APPLICATION_XML_VALUE)
                 .build();
     }
 
