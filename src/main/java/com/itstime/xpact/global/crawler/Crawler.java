@@ -15,10 +15,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Crawler {
 
+    private final CrawlerUtil crawlerUtil;
     private static final String URL = "https://job.incruit.com/jobdb_list/searchjob.asp?cate=occu";
 
     private WebDriver initWebDriver() {
-        WebDriver driver = CrawlerUtil.getWebDriver();
+        WebDriver driver = crawlerUtil.getWebDriver();
         driver.get(URL);
 
         WebElement banner = driver.findElement(By.className("rubaner-close"));
