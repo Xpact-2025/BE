@@ -10,8 +10,9 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
 @Table(name = "recruit")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Recruit extends BaseEntity {
 
     @Id
