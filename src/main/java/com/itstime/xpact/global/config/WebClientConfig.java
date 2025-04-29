@@ -16,7 +16,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Configuration
 @Slf4j
-public class ApiConfig {
+public class WebClientConfig {
 
     @Value("${external.api.school.base-url}")
     private String baseUrl;
