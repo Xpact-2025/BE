@@ -134,14 +134,7 @@ public class Experience extends BaseEntity {
     }
 
     public void updateToSimpleForm(ExperienceUpdateRequestDto updateRequestDto) {
-        this.status = Status.valueOf(updateRequestDto.getStatus());
-        this.formType = FormType.valueOf(updateRequestDto.getFormType());
-        this.title = updateRequestDto.getTitle();
-        this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
-        this.startDate = updateRequestDto.getStartDate();
-        this.endDate = updateRequestDto.getEndDate();
-        this.keyword = updateRequestDto.getKeyword();
-        this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
+        updateCommonFields(updateRequestDto);
         this.situation = null;
         this.task = null;
         this.action = null;
@@ -151,6 +144,16 @@ public class Experience extends BaseEntity {
     }
 
     public void updateToStarForm(ExperienceUpdateRequestDto updateRequestDto) {
+        updateCommonFields(updateRequestDto);
+        this.situation = updateRequestDto.getSituation();
+        this.task = updateRequestDto.getTask();
+        this.action = updateRequestDto.getAction();
+        this.result = updateRequestDto.getResult();
+        this.role = null;
+        this.perform = null;
+    }
+
+    private void updateCommonFields(ExperienceUpdateRequestDto updateRequestDto) {
         this.status = Status.valueOf(updateRequestDto.getStatus());
         this.formType = FormType.valueOf(updateRequestDto.getFormType());
         this.title = updateRequestDto.getTitle();
@@ -159,11 +162,5 @@ public class Experience extends BaseEntity {
         this.endDate = updateRequestDto.getEndDate();
         this.keyword = updateRequestDto.getKeyword();
         this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
-        this.situation = updateRequestDto.getSituation();
-        this.task = updateRequestDto.getTask();
-        this.action = updateRequestDto.getAction();
-        this.result = updateRequestDto.getResult();
-        this.role = null;
-        this.perform = null;
     }
 }

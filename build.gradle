@@ -79,6 +79,11 @@ dependencies {
 
     // XML 파싱 추가
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.0'
+
+    // jackson
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+
+    implementation 'org.seleniumhq.selenium:selenium-java:4.31.0'
 }
 
 def queryDslSrcDir = 'build/generated/querydsl/'

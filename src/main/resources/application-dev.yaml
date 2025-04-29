@@ -31,3 +31,7 @@ spring:
       redirect-uri: ${KAKAO_CALLBACK}
 
     # TODO: NAVER 설정 추가
+
+
+crawler:
+  web-driver-path: ${WEB_DRIVER_PATH:}

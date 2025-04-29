@@ -55,6 +55,8 @@ public enum ErrorCode {
     // openai
     OPENAI_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "OPENAI001", "OpenAI Error"),
 
+    // crawling
+    CRAWLING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CRAWL001", "Crawling Error"),
     ;
 
     private final HttpStatus httpStatus;
