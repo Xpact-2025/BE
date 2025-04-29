@@ -6,7 +6,6 @@ import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,15 +15,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class SchoolUtil {
 
+    private final WebClient schoolWebClient;
     private final SchoolCustomRepositoryImpl schoolCustomRepository;
-
-    @Qualifier("xmlWebClient")
-    private final WebClient xmlWebClient;
 
     @Value("${external.api.school.service-key}")
     private String serviceKey;
 
-    private static final String BASE_URL = "http://openapi.academyinfo.go.kr";
     private static final String SCHOOL_OPEN_API_URL = "/openapi/service/rest/SchoolMajorInfoService/getSchoolMajorInfo";
 
 
@@ -36,41 +32,40 @@ public class SchoolUtil {
         do {
             try {
 
-                SchoolInfoResponseDto responseDto = xmlWebClient
-                        .get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path(SCHOOL_OPEN_API_URL)
-                                .queryParam("serviceKey", serviceKey)
-                                .queryParam("svyYr", 2024)
-                                .queryParam("pageNo", 1)
-                                .queryParam("numOfRows", numOfRows)
-                                .build())
-                        .retrieve()
-                        .bodyToMono(SchoolInfoResponseDto.class)
-                        .block();
+                SchoolInfoResponseDto responseDto = fetchSchoolInfo(page, numOfRows);
 
-                if (responseDto == null ||
-                        responseDto.getBody() == null ||
+                if (responseDto == null || responseDto.getBody() == null ||
                         responseDto.getBody().getItems() == null ||
                         responseDto.getBody().getItems().getItemList() == null) {
-                    log.warn("응답이 비어있거나 항목이 없습니다.");
+                    log.warn("학교 동기화: 응답이 비어있거나 항목이 없습니다. page={}", page);
                     break;
                 }
 
                 totalCount = responseDto.getBody().getTotalCount();
-                log.info("{} 개 중 page {} 수신 완료", totalCount, page);
+                log.info("학교 동기화: 총 {}개 중 page {} 완료", totalCount, page);
 
-                responseDto.getBody().getItems().getItemList().forEach(item -> {
-                    String schoolName = item.getSchoolName();
-                    String majorName = item.getMajor();
-                    schoolCustomRepository.saveIfNotExist(schoolName, majorName);
-                });
+                responseDto.getBody().getItems().getItemList()
+                        .forEach(item -> schoolCustomRepository.saveIfNotExist(item.getSchoolName(), item.getMajor()));
 
-                page++; // 페이지 증가 필수
+                page++;
             } catch (Exception e) {
-                log.error("학교 정보 동기화 중 오류 발생: {}", e.getMessage(), e);
-                throw CustomException.of(ErrorCode.PARSING_ERROR);
+                log.error("학교 동기화 실패: {}", e.getMessage(), e);
+                throw new CustomException(ErrorCode.PARSING_ERROR);
             }
         } while ((page - 1) * numOfRows < totalCount);
+    }
+
+    private SchoolInfoResponseDto fetchSchoolInfo(int page, int numOfRows) {
+        return schoolWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SCHOOL_OPEN_API_URL)
+                        .queryParam("serviceKey", serviceKey)
+                        .queryParam("svyYr", 2024)
+                        .queryParam("pageNo", page)
+                        .queryParam("numOfRows", numOfRows)
+                        .build())
+                .retrieve()
+                .bodyToMono(SchoolInfoResponseDto.class)
+                .block();
     }
 }
