@@ -1,4 +1,7 @@
 package com.itstime.xpact.domain.member.repository;
 
-public interface SchoolRepository {
+import com.itstime.xpact.domain.member.entity.School;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SchoolRepository extends JpaRepository<School, Long> {
 }

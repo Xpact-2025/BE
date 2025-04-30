@@ -4,8 +4,8 @@ import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
-import com.itstime.xpact.domain.member.common.SchoolStatus;
 import com.itstime.xpact.domain.member.common.Type;
+import com.itstime.xpact.domain.member.dto.request.MemberInfoRequestDto;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.scrap.entity.Scrap;
@@ -45,6 +45,9 @@ public class Member extends BaseEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+    @Column(name = "age", nullable = true)
+    private Integer age;
+
     @Column(name = "imgurl")
     private String imgurl;
 
@@ -59,12 +62,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "education")
-    private String education;
-
-    @Column(name = "school_status")
-    @Enumerated(EnumType.STRING)
-    private SchoolStatus schoolStatus;
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Education education;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id")
@@ -77,7 +76,7 @@ public class Member extends BaseEntity {
     private List<Scrap> scraps = new ArrayList<>();
 
     @Builder
-    public Member(String name, String email, String password, LocalDate birthDate, Type type, Role role) {
+    public Member(String name, String email, String password, LocalDate birthDate, Integer age, Type type, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -91,9 +90,22 @@ public class Member extends BaseEntity {
         return MemberInfoResponseDto.builder()
                 .name(member.getName())
                 .imgurl(member.getImgurl())
-                .school(member.getEducation())
-                .schoolStatus(member.getSchoolStatus().name())
-                .recruit(member.getRecruit().getName())
+                .education(member.getEducation().getEducationName())
+                .age(member.getAge() != null ? member.getAge() : 0)
+                .recruit(member.getRecruit() != null ? member.getRecruit().getName() : null)
                 .build();
+    }
+
+    public void updateMemberInfo(MemberInfoRequestDto requestDto) {
+        if (requestDto.name() != null) this.name = requestDto.name();
+        if (requestDto.age() != null) this.age = requestDto.age();
+        if (requestDto.imgurl() != null) this.imgurl = requestDto.imgurl();
+        //if (requestDto.schoolInfo() != null) this.education = requestDto.schoolInfo();
+        if (requestDto.recruit() != null) this.recruit = requestDto.recruit();
+    }
+
+    public void setEducation(Education education) {
+        this.education = education;
+        education.setMember(this);
     }
 }
