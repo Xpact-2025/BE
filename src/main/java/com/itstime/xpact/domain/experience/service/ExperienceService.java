@@ -26,14 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExperienceService {
 
     private final ExperienceRepository experienceRepository;
-    private final MemberService memberService;
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
 
     public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
         // member 조회
-        Long currentMemberId = securityProvider.getCurrentMemberId();
-        Member member = memberService.findMember(currentMemberId);
+        Member member = securityProvider.getCurrentMember();
 
         // enum타입이 될 string 필드 검증 로직 (INVALID한 값이 들어오면 CustomException발생)
         Status.validateStatus(createRequestDto.getStatus());
