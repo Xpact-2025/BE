@@ -37,4 +37,4 @@ external:
   api:
     school:
       service-key: ${SCHOOL_REST_API_KEY}
-      base-url: "https://openapi.academyinfo.go.kr"
+      base-url: "http://openapi.academyinfo.go.kr"
