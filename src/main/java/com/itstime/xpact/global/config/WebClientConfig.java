@@ -27,6 +27,7 @@ public class WebClientConfig {
                 .codecs(clientCodecConfigurer -> {
                     clientCodecConfigurer.defaultCodecs().jaxb2Decoder(new Jaxb2XmlDecoder());
                     clientCodecConfigurer.defaultCodecs().jaxb2Encoder(new Jaxb2XmlEncoder());
+                    clientCodecConfigurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024);
                 })
                 .build();
 
