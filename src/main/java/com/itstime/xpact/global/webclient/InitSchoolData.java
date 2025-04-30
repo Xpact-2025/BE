@@ -1,7 +1,6 @@
-package com.itstime.xpact.domain.member;
+package com.itstime.xpact.global.webclient;
 
 import com.itstime.xpact.domain.member.repository.SchoolRepository;
-import com.itstime.xpact.domain.member.util.SchoolUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -12,9 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class SchoolInitRunner {
+public class InitSchoolData {
 
-    private final SchoolUtil schoolUtil;
+    private final SchoolApiClient schoolApiClient;
     private final SchoolRepository schoolRepository;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -23,7 +22,7 @@ public class SchoolInitRunner {
             long schoolCount = schoolRepository.count();
             if (schoolCount == 0 ) {
                 log.info("School 데이터가 비어있습니다. 파싱 시작...");
-                schoolUtil.syncAllSchools();
+                schoolApiClient.syncAllSchools();
                 log.info("School 데이터 저장 완료");
             } else {
                 log.info("School 데이터가 이미 존재합니다.");
