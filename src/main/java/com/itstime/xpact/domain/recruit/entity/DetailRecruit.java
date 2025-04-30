@@ -27,9 +27,6 @@ public class DetailRecruit extends BaseEntity {
     @JoinColumn(name = "recruit_id", nullable = false)
     private Recruit recruit;
 
-    @OneToOne(mappedBy = "detailRecruit")
-    private Experience experience;
-
     @Builder
     public DetailRecruit(Recruit recruit, String name) {
         this.recruit = recruit;

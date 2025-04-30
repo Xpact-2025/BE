@@ -86,7 +86,7 @@ public class Experience extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne()
     @JoinColumn(name = "detail_recruit_id")
     private DetailRecruit detailRecruit;
 
