@@ -15,13 +15,15 @@ public class Education {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id")
-    private School school;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Column(name = "school_name")
+    private String schoolName;
+
+    @Column(name = "major")
+    private String major;
 
     @Column(name = "school_status")
     @Enumerated(EnumType.STRING)
