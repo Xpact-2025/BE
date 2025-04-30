@@ -22,7 +22,4 @@ public class School {
 
     @Column(name = "major")
     private String major;
-
-    @OneToMany(mappedBy = "school")
-    private List<Education> educations;
 }
