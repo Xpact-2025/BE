@@ -4,6 +4,8 @@ import com.itstime.xpact.domain.member.common.SchoolStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "education")
 @Builder
@@ -29,11 +31,14 @@ public class Education {
     @Enumerated(EnumType.STRING)
     private SchoolStatus schoolStatus;
 
-    @Column(name ="is_verified")
-    private boolean isVerified;
-
     @Column(name = "education_name")
     private String educationName;
+
+    @Column(name = "started_at")
+    private LocalDate startedAt;
+
+    @Column(name = "ended_at")
+    private LocalDate endedAt;
 
     public void setMember(Member member) {
         this.member = member;
