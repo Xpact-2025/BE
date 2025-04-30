@@ -77,13 +77,14 @@ dependencies {
     // Trie 구조 사용
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 
-    // XML 파싱 추가
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.0'
-
     // jackson
     implementation 'com.fasterxml.jackson.core:jackson-core'
 
     implementation 'org.seleniumhq.selenium:selenium-java:4.31.0'
+
+    // Jaxb2XmlDecoder
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.3'
 }
 
 def queryDslSrcDir = 'build/generated/querydsl/'
