@@ -35,4 +35,15 @@ public record EducationSaveResponseDto(
         example = "잇타대학교 잇타학과 재학")
         String educationName
 ) {
+
+        public static EducationSaveResponseDto toDto(Education education) {
+                return EducationSaveResponseDto.builder()
+                        .name(education.getSchoolName())
+                        .major(education.getMajor())
+                        .schoolStatus(education.getSchoolStatus())
+                        .startedAt(education.getStartedAt())
+                        .endedAt(education.getEndedAt())
+                        .educationName(education.getEducationName())
+                        .build();
+        }
 }
