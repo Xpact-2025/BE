@@ -4,6 +4,8 @@ import com.itstime.xpact.domain.member.dto.request.EducationSaveRequestDto;
 import com.itstime.xpact.domain.member.service.EducationService;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -97,7 +99,14 @@ public class EducationController {
             입력 및 선택 정보를 통해 회원의 정보에 저장합니다.
             """)
     @PostMapping("")
-    public ResponseEntity<RestResponse<?>> saveSchoolInfo(
+    public ResponseEntity<RestResponse<?>> saveEducationInfo(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "학력 정보 저장 DTO",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = EducationSaveRequestDto.class)
+                    )
+            )
             @RequestHeader("Authorization") String token,
             @RequestBody EducationSaveRequestDto requestDto
             ) {
