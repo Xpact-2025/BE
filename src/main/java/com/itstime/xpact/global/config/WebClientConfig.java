@@ -1,10 +1,10 @@
 package com.itstime.xpact.global.config;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -18,13 +18,11 @@ import org.springframework.http.codec.xml.Jaxb2XmlEncoder;
 public class WebClientConfig {
 
     @Value("${external.api.school.base-url}")
-    private String baseUrl;
+    private String schoolBaseUrl;
 
-    // TODO : WebClient Bean 생성
     @Bean
     public WebClient schoolWebClient() {
 
-        XmlMapper xmlMapper = new XmlMapper();
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
                 .codecs(clientCodecConfigurer -> {
                     clientCodecConfigurer.defaultCodecs().jaxb2Decoder(new Jaxb2XmlDecoder());
@@ -32,7 +30,7 @@ public class WebClientConfig {
                 })
                 .build();
 
-        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(baseUrl);
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(schoolBaseUrl);
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
 
         return WebClient.builder()
@@ -43,6 +41,16 @@ public class WebClientConfig {
                 .build();
     }
 
+    // Kakao
+    public WebClient buildKakaoWebClient(String baseUrl) {
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                // KAKAO open API 필수 Header
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
+                .build();
+    }
+
+    // WebClient 요청에서의 log
     private ExchangeFilterFunction logRequest() {
         return (clientRequest, next) -> {
             log.info("Request: {} {}", clientRequest.method(), clientRequest.url());

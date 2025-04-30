@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.member.util;
+package com.itstime.xpact.global.webclient;
 
 import com.itstime.xpact.domain.member.dto.response.SchoolInfoResponseDto;
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class SchoolUtil {
+public class SchoolApiClient {
 
     private final WebClient schoolWebClient;
     private final SchoolCustomRepositoryImpl schoolCustomRepository;
