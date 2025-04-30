@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Table(name = "education")
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Education {

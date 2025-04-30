@@ -57,6 +57,9 @@ public enum ErrorCode {
 
     // crawling
     CRAWLING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CRAWL001", "Crawling Error"),
+
+    // education
+    EDUCATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "EE001", "저장된 학력 사항이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
