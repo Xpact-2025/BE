@@ -81,7 +81,7 @@ public class EducationService {
             // Trie의 keyword에 검색어 넣기
             trieUtil.addAutocompleteKeyword(term);
 
-            // DB에 있는 School name 전체 load
+            // DB에 있는 해당 schoolName의 학과명 전체 load
             List<String> majorNames = schoolCustomRepository.findMajorBySchoolName(schoolName);
             trieUtil.loadDatasIntoTrie(majorNames);
 
@@ -102,7 +102,7 @@ public class EducationService {
         Member member = securityProvider.getCurrentMember();
 
         // 학교명과 학과명 입력하기
-        String educationName = createEducation(requestDto);
+        String educationName = createEducationName(requestDto);
 
         Education education = Education.builder()
                 .member(member)
@@ -120,7 +120,48 @@ public class EducationService {
         return EducationSaveResponseDto.toDto(education);
     }
 
-    private String createEducation(EducationSaveRequestDto requestDto) {
+    @Transactional
+    public EducationSaveResponseDto updateEducationInfo(EducationSaveRequestDto requestDto) {
+
+        Member member = securityProvider.getCurrentMember();
+
+        Education education = educationRepository.findByMemberId(member.getId())
+                .orElseThrow(() -> CustomException.of(ErrorCode.EDUCATION_NOT_FOUND));
+
+        // 값이 존재할 경우에만 업데이트
+        if (requestDto.name() != null) {
+            education.setSchoolName(requestDto.name());
+        }
+
+        if (requestDto.major() != null) {
+            education.setMajor(requestDto.major());
+        }
+
+        if (requestDto.schoolStatus() != null) {
+            education.setSchoolStatus(requestDto.schoolStatus());
+        }
+
+        if (requestDto.startedAt() != null) {
+            education.setStartedAt(requestDto.startedAt());
+        }
+
+        if (requestDto.endedAt() != null) {
+            education.setEndedAt(requestDto.endedAt());
+        }
+
+        // 학교명 또는 전공이 변경되었으면 educationName 재생성
+        if (requestDto.name() != null || requestDto.major() != null) {
+            String educationName = createEducationName(EducationSaveRequestDto.of(
+                    requestDto.name() != null ? requestDto.name() : education.getSchoolName(),
+                    requestDto.major() != null ? requestDto.major() : education.getMajor()
+            ));
+            education.setEducationName(educationName);
+        }
+
+        return EducationSaveResponseDto.toDto(education);
+    }
+
+    private String createEducationName(EducationSaveRequestDto requestDto) {
 
         String statusName = requestDto.schoolStatus().getDisplayName();
         return String.format("%s %s (%s)",

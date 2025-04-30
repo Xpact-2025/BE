@@ -116,4 +116,25 @@ public class EducationController {
                 )
         );
     }
+
+    // 최종학력 수정
+    @Operation(summary = "학력 정보 업데이트", description = "최종 학력을 업데이트하는 API")
+    @PatchMapping("")
+    public ResponseEntity<RestResponse<?>> updateEducationInfo(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "학력 정보 저장 DTO",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = EducationSaveRequestDto.class)
+                    )
+            )
+            @RequestHeader("Authorization") String token,
+            @RequestBody EducationSaveRequestDto requestDto
+    ) {
+        return ResponseEntity.ok(
+                RestResponse.ok(
+                        educationService.updateEducationInfo(requestDto)
+                )
+        );
+    }
 }
