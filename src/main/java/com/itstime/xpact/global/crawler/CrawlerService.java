@@ -5,6 +5,7 @@ import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
+import com.itstime.xpact.global.crawler.dto.RecruitResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,18 +42,18 @@ public class CrawlerService {
     }
 
     public void saveDetailRecruitData() {
-        List<DetailRecruitDto> detailRecruits = crawler.crawlDetailRecruits();
+        List<RecruitResponseDto> recruitResponseDtos = crawler.crawlDetailRecruits();
 
-        List<DetailRecruit> detailRecruitList = detailRecruits.stream()
-                .map(detailRecruitDto -> {
-                    String recruitName = detailRecruitDto.getRecruitName();
-                    Recruit recruit = recruitRepository.findByName(recruitName)
-                            .orElseThrow();
+        List<DetailRecruit> detailRecruitList = recruitResponseDtos.stream()
+                .flatMap(recruitResponseDto -> {
+                    String recruitName = recruitResponseDto.getGroupName();
+                    Recruit recruit = recruitRepository.findByName(recruitName).orElseThrow();
 
-                    return DetailRecruit.builder()
-                            .recruit(recruit)
-                            .name(detailRecruitDto.getDetailRecruitName())
-                            .build();
+                    return recruitResponseDto.getSubList().stream()
+                            .map(sub -> DetailRecruit.builder()
+                                    .recruit(recruit)
+                                    .name(sub.getSubName())
+                                    .build());
                 }).toList();
 
         detailRecruitRepository.saveAll(detailRecruitList);
