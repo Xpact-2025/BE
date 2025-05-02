@@ -22,7 +22,7 @@ public class SchoolCustomRepositoryImpl implements SchoolCustomRepository {
         QSchool school = QSchool.school;
 
         return queryFactory
-                .select(school.schoolName)
+                .select(school.schoolName).distinct()
                 .from(school)
                 .fetch();
     }
@@ -32,7 +32,7 @@ public class SchoolCustomRepositoryImpl implements SchoolCustomRepository {
         QSchool school = QSchool.school;
 
         return queryFactory
-                .select(school.major)
+                .select(school.major).distinct()
                 .from(school)
                 .where(school.schoolName.eq(schoolName))
                 .fetch();
