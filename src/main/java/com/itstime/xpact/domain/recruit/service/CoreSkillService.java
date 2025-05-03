@@ -41,9 +41,9 @@ public class CoreSkillService {
             CoreSkill coreSkill = new CoreSkill(coreSkillList);
             coreSkills.add(coreSkill);
             recruit.setCoreSkill(coreSkill);
-            coreSkillRepository.save(coreSkill);
         }
 
+        coreSkillRepository.saveAll(coreSkills);
         log.info("Successfully Save CoreSkill Data");
         log.info("Successfully Set CoreSkill relationships to Recruits");
     }
