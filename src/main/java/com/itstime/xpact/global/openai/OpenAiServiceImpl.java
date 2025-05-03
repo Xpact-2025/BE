@@ -44,6 +44,7 @@ public class OpenAiServiceImpl implements OpenAiService {
                 "%s", joinedRecruits);
 
         Prompt prompt = new Prompt(message);
+        log.info("Requesting core skill extraction from OpenAI...");
         ChatResponse response = openAiChatModel.call(prompt);
         String result = response.getResult().getOutput().getText();
 
