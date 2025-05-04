@@ -65,9 +65,8 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Education education;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recruit_id")
-    private Recruit recruit;
+    @Column(name = "desired_recruit")
+    private String desiredRecruit;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Experience> experiences = new ArrayList<>();
@@ -92,7 +91,7 @@ public class Member extends BaseEntity {
                 .imgurl(member.getImgurl())
                 .education(member.getEducation().getEducationName())
                 .age(member.getAge() != null ? member.getAge() : 0)
-                .recruit(member.getRecruit() != null ? member.getRecruit().getName() : null)
+                .desiredDetailRecruit(member.getDesiredRecruit() != null ? member.getDesiredRecruit() : null)
                 .build();
     }
 
@@ -100,12 +99,16 @@ public class Member extends BaseEntity {
         if (requestDto.name() != null) this.name = requestDto.name();
         if (requestDto.age() != null) this.age = requestDto.age();
         if (requestDto.imgurl() != null) this.imgurl = requestDto.imgurl();
-        //if (requestDto.schoolInfo() != null) this.education = requestDto.schoolInfo();
-        if (requestDto.recruit() != null) this.recruit = requestDto.recruit();
     }
 
+    // 최종학력만 저장
     public void setEducation(Education education) {
         this.education = education;
         education.setMember(this);
+    }
+
+    // 희망직무 저장
+    public void setDesiredRecruit(String desiredRecruit) {
+        this.desiredRecruit = desiredRecruit;
     }
 }
