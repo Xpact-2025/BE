@@ -23,8 +23,8 @@ public record MemberInfoResponseDto (
         String education,
 
         @Schema(description = "희망 직무",
-        example = "회계사")
-        String recruit,
+        example = "서비스 기획자")
+        String desiredDetailRecruit,
 
         @Schema(description = "입학 날짜",
                 example = "2025-03-02")
