@@ -60,6 +60,9 @@ public enum ErrorCode {
 
     // education
     EDUCATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "EE001", "저장된 학력 사항이 없습니다."),
+
+    // recruit
+    RECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "RE001", "해당 직무가 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
