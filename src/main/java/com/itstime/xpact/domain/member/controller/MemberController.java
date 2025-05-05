@@ -31,10 +31,14 @@ public class MemberController {
     }
 
     // 회원 정보 입력
-    @Operation(summary = "회원 정보 입력 API")
-    @PostMapping("")
+    @Operation(summary = "회원 정보 입력 API", description = """
+            회원 프로필의 정보를 등록합니다.<br>
+            이름, 사진, 나이에 대한 정보에 대한 등록입니다.<br>
+            학력 및 희망 직무에 대한 저장은 다른 요청을 보내주세요.<br>
+            """)
     @PatchMapping("")
     public ResponseEntity<RestResponse<?>> saveMyInfo(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "회원 정보 등록 DTO", required = true)
             @RequestHeader("Authorization") String authToken,
             @RequestBody MemberInfoRequestDto requestDto
             ) {
