@@ -14,6 +14,6 @@ public interface DetailRecruitRepository extends JpaRepository<DetailRecruit, Lo
     @Query("SELECT d.name FROM DetailRecruit d WHERE d.recruit.id = :recruitId")
     List<String> findAllByRecruitId(@Param("recruitId") Long recruitId);
 
-    @Query("SELECT d.name FROM DetailRecruit d WHERE d.recruit.id = :recuruitId")
+    @Query("SELECT d.name FROM DetailRecruit d WHERE d.recruit.id = :recruitId")
     List<String> findDetailRecruitNamesByRecruitId(@Param("recruitId") Long recruitId);
 }
