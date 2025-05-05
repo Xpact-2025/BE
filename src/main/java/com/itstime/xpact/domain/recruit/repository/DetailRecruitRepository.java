@@ -11,6 +11,9 @@ import java.util.List;
 @Repository
 public interface DetailRecruitRepository extends JpaRepository<DetailRecruit, Long> {
 
+    @Query("SELECT dr FROM DetailRecruit dr JOIN FETCH dr.recruit")
+    List<DetailRecruit> findAllWithRecruit();
+
     @Query("SELECT d.name FROM DetailRecruit d WHERE d.recruit.id = :recruitId")
     List<String> findAllByRecruitId(@Param("recruitId") Long recruitId);
 

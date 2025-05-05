@@ -28,7 +28,7 @@ public class CrawlDataController {
 
     @GetMapping("/crawler/detail-recruit")
     public ResponseEntity<RestResponse<List<String>>> getDetailRecruits() {
-        List<String> detailRecruits = detailRecruitRepository.findAll()
+        List<String> detailRecruits = detailRecruitRepository.findAllWithRecruit()
                 .stream()
                 .map(detailRecruit ->
                         detailRecruit.getName() + "(" + detailRecruit.getRecruit().getName() + ")")
