@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.recruit.service;
 
 import com.itstime.xpact.domain.member.entity.Member;
+import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.domain.member.util.TrieUtil;
 import com.itstime.xpact.domain.recruit.dto.request.DesiredRecruitRequestDto;
 import com.itstime.xpact.domain.recruit.dto.response.DesiredRecruitResponseDto;
@@ -28,6 +29,7 @@ public class RecruitService {
 
     private final RecruitRepository recruitRepository;
     private final DetailRecruitRepository detailRecruitRepository;
+    private final MemberRepository memberRepository;
 
 
     // 산업 전체 조회
@@ -56,6 +58,7 @@ public class RecruitService {
             // 일치 반환
             return trieUtil.autocomplete(term);
         } catch (Exception e) {
+            log.error("autocompleteName error: {}", e.getMessage());
             throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         } finally {
             trieUtil.deleteAutocompleteKeyword(term);
@@ -92,6 +95,7 @@ public class RecruitService {
 
             return trieUtil.autocomplete(term);
         } catch (Exception e) {
+            log.error("autocompleteDetail error: {}", e.getMessage());
             throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         } finally {
             trieUtil.deleteAutocompleteKeyword(term);
@@ -100,12 +104,19 @@ public class RecruitService {
 
     // 희망 직군 저장
     @Transactional
-    public DesiredRecruitResponseDto saveDesiredRecruit(DesiredRecruitRequestDto requestDto) throws CustomException {
+    public DesiredRecruitResponseDto updateDesiredRecruit(DesiredRecruitRequestDto requestDto) throws CustomException {
 
-        Member member = securityProvider.getCurrentMember();
+        Long memberId = securityProvider.getCurrentMemberId();
 
-        String desireRecruit = requestDto.detailRecruitName();
-        member.setDesiredRecruit(desireRecruit);
+        // 실제 DB에서 영속 상태의 Member 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXISTS));
+
+        if (requestDto.detailRecruitName() == null || requestDto.detailRecruitName().isBlank()) {
+            throw new CustomException(ErrorCode.EMPTY_DESIRED_RECRUIT);
+        }
+
+        member.setDesiredRecruit(requestDto.detailRecruitName());
 
         return DesiredRecruitResponseDto.builder()
                 .recruitName(requestDto.recruitName())

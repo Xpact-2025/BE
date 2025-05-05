@@ -5,6 +5,7 @@ import com.itstime.xpact.domain.member.dto.response.EducationSaveResponseDto;
 import com.itstime.xpact.domain.member.entity.Education;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.EducationRepository;
+import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
 import com.itstime.xpact.domain.member.util.TrieUtil;
 import com.itstime.xpact.global.auth.SecurityProvider;
@@ -27,6 +28,7 @@ public class EducationService {
 
     private final SchoolCustomRepositoryImpl schoolCustomRepository;
     private final EducationRepository educationRepository;
+    private final MemberRepository memberRepository;
 
 
     // 학교 전체 조회
@@ -99,7 +101,12 @@ public class EducationService {
     @Transactional
     public EducationSaveResponseDto saveEducationInfo(EducationSaveRequestDto requestDto) {
 
-        Member member = securityProvider.getCurrentMember();
+        Long memberId = securityProvider.getCurrentMemberId();
+
+        // 실제 DB에서 영속 상태의 Member 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXISTS));
+
 
         // 학교명과 학과명 입력하기
         String educationName = createEducationName(requestDto);
@@ -123,7 +130,11 @@ public class EducationService {
     @Transactional
     public EducationSaveResponseDto updateEducationInfo(EducationSaveRequestDto requestDto) {
 
-        Member member = securityProvider.getCurrentMember();
+        Long memberId = securityProvider.getCurrentMemberId();
+
+        // 실제 DB에서 영속 상태의 Member 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXISTS));
 
         Education education = educationRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> CustomException.of(ErrorCode.EDUCATION_NOT_FOUND));
@@ -153,7 +164,8 @@ public class EducationService {
         if (requestDto.name() != null || requestDto.major() != null) {
             String educationName = createEducationName(EducationSaveRequestDto.of(
                     requestDto.name() != null ? requestDto.name() : education.getSchoolName(),
-                    requestDto.major() != null ? requestDto.major() : education.getMajor()
+                    requestDto.major() != null ? requestDto.major() : education.getMajor(),
+                    requestDto.schoolStatus() != null ? requestDto.schoolStatus() : education.getSchoolStatus()
             ));
             education.setEducationName(educationName);
         }
@@ -162,6 +174,10 @@ public class EducationService {
     }
 
     private String createEducationName(EducationSaveRequestDto requestDto) {
+
+        if (requestDto.schoolStatus() == null) {
+            throw new CustomException(ErrorCode.EMPTY_SCHOOL_STATUS);
+        }
 
         String statusName = requestDto.schoolStatus().getDisplayName();
         return String.format("%s %s (%s)",
