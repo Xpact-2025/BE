@@ -3,6 +3,7 @@ package com.itstime.xpact.domain.recruit.controller;
 import com.itstime.xpact.domain.recruit.dto.request.DesiredRecruitRequestDto;
 import com.itstime.xpact.domain.recruit.service.RecruitService;
 import com.itstime.xpact.global.response.RestResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,10 @@ public class RecruitController {
 
     private final RecruitService recruitService;
 
+    @Operation(summary = "산업 별 전체 조회 API", description = """
+    직무 전체 산업 부문을 반환합니다.<br>
+    Header에 accessToken 값을 넣어주세요.
+    """)
     @GetMapping("/name")
     public ResponseEntity<RestResponse<?>> findAllName(
             @RequestHeader("Authorization") String token) {
@@ -27,6 +32,10 @@ public class RecruitController {
         );
     }
 
+    @Operation(summary = "산업 별 검색 자동완성 API", description = """
+    산업 부문 중 검색과 일치하는 부문에 대하여 반환합니다.<br>
+    Header에 accessToken 값을 넣어주세요.
+    """)
     @GetMapping("/name/search")
     public ResponseEntity<RestResponse<?>> searchRecruit(
             @RequestHeader("Authorization") String token,
@@ -39,6 +48,10 @@ public class RecruitController {
         );
     }
 
+    @Operation(summary = "상세 직무 전체 조회 API", description = """
+    희망 산업을 선택 후, 그 산업에 해당되는 직무들을 반환합니다.<br>
+    Header에 accessToken 값을 넣어주세요.
+    """)
     @GetMapping("/{name}/detail")
     public ResponseEntity<RestResponse<?>> findAllDetailRecruit(
             @RequestHeader("Authorization") String token,
@@ -49,6 +62,10 @@ public class RecruitController {
         );
     }
 
+    @Operation(summary = "상세 직무 검색 자동완성 API", description = """
+    희망 산업을 선택 후, 상세 직무 검색 시 검색어와 일치하는 상세직무들을 반환합니다.<br>
+    Header에 accessToken 값을 넣어주세요.
+    """)
     @GetMapping("/{name}/detail/search")
     public ResponseEntity<RestResponse<?>> searchDetailRecruit(
             @RequestHeader("Authorization") String token,
@@ -62,8 +79,13 @@ public class RecruitController {
         );
     }
 
+    @Operation(summary = "회원 희망 직무 저장 API", description = """
+    회원이 여태 선택한 것을 바탕으로 희망 직무 정보를 저장합니다.<br>
+    Header에 accessToken 값을 넣어주세요.
+    """)
     @PatchMapping
     public ResponseEntity<RestResponse<?>> updateDesiredRecruit(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "희망 직무 요청 DTO", required = true)
             @RequestHeader("Authorization") String token,
             @RequestBody DesiredRecruitRequestDto requestDto
     ) {
