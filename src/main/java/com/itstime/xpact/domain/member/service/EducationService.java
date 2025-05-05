@@ -136,39 +136,13 @@ public class EducationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXISTS));
 
+        // 최초 저장과 수정의 경우 구분
         Education education = educationRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> CustomException.of(ErrorCode.EDUCATION_NOT_FOUND));
 
-        // 값이 존재할 경우에만 업데이트
-        if (requestDto.name() != null) {
-            education.setSchoolName(requestDto.name());
-        }
-
-        if (requestDto.major() != null) {
-            education.setMajor(requestDto.major());
-        }
-
-        if (requestDto.schoolStatus() != null) {
-            education.setSchoolStatus(requestDto.schoolStatus());
-        }
-
-        if (requestDto.startedAt() != null) {
-            education.setStartedAt(requestDto.startedAt());
-        }
-
-        if (requestDto.endedAt() != null) {
-            education.setEndedAt(requestDto.endedAt());
-        }
-
-        // 학교명 또는 전공이 변경되었으면 educationName 재생성
-        if (requestDto.name() != null || requestDto.major() != null) {
-            String educationName = createEducationName(EducationSaveRequestDto.of(
-                    requestDto.name() != null ? requestDto.name() : education.getSchoolName(),
-                    requestDto.major() != null ? requestDto.major() : education.getMajor(),
-                    requestDto.schoolStatus() != null ? requestDto.schoolStatus() : education.getSchoolStatus()
-            ));
-            education.setEducationName(educationName);
-        }
+        education.updateEducation(requestDto);
+        String educationName = createEducationName(requestDto);
+        education.setEducationName(educationName);
 
         return EducationSaveResponseDto.toDto(education);
     }
