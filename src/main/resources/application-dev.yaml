@@ -39,3 +39,9 @@ spring:
 
 crawler:
   web-driver-path: ${DEV_WEB_DRIVER_PATH:}
+
+external:
+  api:
+    school:
+      service-key: ${SCHOOL_REST_API_KEY}
+      base-url: "http://openapi.academyinfo.go.kr"

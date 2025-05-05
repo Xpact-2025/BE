@@ -38,7 +38,9 @@ public class MemberService {
     public MemberInfoResponseDto saveMyinfo(MemberInfoRequestDto requestDto) throws CustomException {
 
         // Member 조회
-       Member member = securityProvider.getCurrentMember();
+       Long memberId = securityProvider.getCurrentMemberId();
+       Member member = memberRepository.findById(memberId)
+                       .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         member.updateMemberInfo(requestDto);
         return member.toMemberInfoResponseDto(member);

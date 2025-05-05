@@ -2,10 +2,6 @@ package com.itstime.xpact.domain.member.dto.request;
 
 import com.itstime.xpact.domain.member.common.SchoolStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -34,8 +30,8 @@ public record EducationSaveRequestDto(
         LocalDate endedAt
 ) {
 
-        public static EducationSaveRequestDto of(String name, String major) {
-                return new EducationSaveRequestDto(name, major, null, null, null);
+        public static EducationSaveRequestDto of(String name, String major, SchoolStatus schoolStatus) {
+                return new EducationSaveRequestDto(name, major, schoolStatus, null, null);
         }
 
         public static EducationSaveRequestDto of(String name, String major, SchoolStatus status, LocalDate startedAt, LocalDate endedAt) {

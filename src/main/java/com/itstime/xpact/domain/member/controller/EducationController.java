@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/api/educations")
 @RequiredArgsConstructor
-@Tag(name = "Educations API Controller", description = "학력사항 저장을 위한 API")
+@Tag(name = "학력 API Controller", description = "학력사항 저장을 위한 API")
 public class EducationController {
 
     private final EducationService educationService;

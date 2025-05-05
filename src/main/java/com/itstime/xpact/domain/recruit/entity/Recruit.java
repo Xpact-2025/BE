@@ -1,7 +1,6 @@
 package com.itstime.xpact.domain.recruit.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
-import com.itstime.xpact.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
