@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/recruits")
 @RequiredArgsConstructor
-@Tag(name = "직무 저장 API Controller", description = "희망직무 저장을 위한 API 입니다.")
+@Tag(name = "희망 직무 저장 API Controller", description = "희망 직무 저장을 위한 API 입니다.")
 public class RecruitController {
 
     private final RecruitService recruitService;
@@ -62,14 +62,14 @@ public class RecruitController {
         );
     }
 
-    @PostMapping
-    public ResponseEntity<RestResponse<?>> saveDesiredRecruit(
+    @PatchMapping
+    public ResponseEntity<RestResponse<?>> updateDesiredRecruit(
             @RequestHeader("Authorization") String token,
             @RequestBody DesiredRecruitRequestDto requestDto
-            ) {
+    ) {
         return ResponseEntity.ok(
                 RestResponse.ok(
-                        recruitService.saveDesiredRecruit(requestDto)
+                        recruitService.updateDesiredRecruit(requestDto)
                 )
         );
     }
