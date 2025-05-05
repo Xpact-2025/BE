@@ -33,6 +33,7 @@ public class MemberController {
     // 회원 정보 입력
     @Operation(summary = "회원 정보 입력 API")
     @PostMapping("")
+    @PatchMapping("")
     public ResponseEntity<RestResponse<?>> saveMyInfo(
             @RequestHeader("Authorization") String authToken,
             @RequestBody MemberInfoRequestDto requestDto
