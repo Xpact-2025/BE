@@ -2,11 +2,9 @@ package com.itstime.xpact.domain.member.dto.request;
 
 import com.itstime.xpact.domain.member.common.SchoolStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 
 import java.time.LocalDate;
 
-@Builder
 @Schema(description = "회원이 학력을 저장할 때 사용하는 DTO")
 public record EducationSaveRequestDto(
 
@@ -31,4 +29,12 @@ public record EducationSaveRequestDto(
         example = "2025-03-02")
         LocalDate endedAt
 ) {
+
+        public static EducationSaveRequestDto of(String name, String major, SchoolStatus schoolStatus) {
+                return new EducationSaveRequestDto(name, major, schoolStatus, null, null);
+        }
+
+        public static EducationSaveRequestDto of(String name, String major, SchoolStatus status, LocalDate startedAt, LocalDate endedAt) {
+                return new EducationSaveRequestDto(name, major, status, startedAt, endedAt);
+        }
 }

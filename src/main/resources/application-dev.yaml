@@ -32,6 +32,16 @@ spring:
 
     # TODO: NAVER 설정 추가
 
+  ai:
+    openai:
+      api-key: ${DEV_OPENAI_API_KEY}
+
 
 crawler:
-  web-driver-path: ${WEB_DRIVER_PATH:}
+  web-driver-path: ${DEV_WEB_DRIVER_PATH:}
+
+external:
+  api:
+    school:
+      service-key: ${SCHOOL_REST_API_KEY}
+      base-url: "http://openapi.academyinfo.go.kr"

@@ -1,6 +1,5 @@
 package com.itstime.xpact.global.webclient;
 
-import com.itstime.xpact.domain.member.dto.response.SchoolInfoResponseDto;
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;

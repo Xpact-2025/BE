@@ -1,9 +1,8 @@
 package com.itstime.xpact.domain.member.entity;
 
+import com.itstime.xpact.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @Entity
 @Table(name = "school",
@@ -11,7 +10,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class School {
+public class School extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "school_id", nullable = false)

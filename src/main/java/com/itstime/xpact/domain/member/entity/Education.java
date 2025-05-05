@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.member.entity;
 
 import com.itstime.xpact.domain.member.common.SchoolStatus;
+import com.itstime.xpact.domain.member.dto.request.EducationSaveRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 @Table(name = "education")
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Education {
@@ -42,5 +44,13 @@ public class Education {
 
     public void setMember(Member member) {
         this.member = member;
+    }
+
+    public void updateEducation(EducationSaveRequestDto requestDto) {
+        this.educationName = requestDto.name();
+        this.major = requestDto.major();
+        this.schoolStatus = requestDto.schoolStatus();
+        this.startedAt = requestDto.startedAt();
+        this.endedAt = requestDto.endedAt() != null ? requestDto.endedAt() : null;
     }
 }

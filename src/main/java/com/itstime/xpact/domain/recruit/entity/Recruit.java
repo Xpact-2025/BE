@@ -1,7 +1,6 @@
 package com.itstime.xpact.domain.recruit.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
-import com.itstime.xpact.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +25,7 @@ public class Recruit extends BaseEntity {
     @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL)
     private List<DetailRecruit> detailRecruits = new ArrayList<>();
 
+    @Setter
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "core_skill_id")
     private CoreSkill coreSkill;

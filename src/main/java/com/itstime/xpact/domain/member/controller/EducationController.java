@@ -4,6 +4,8 @@ import com.itstime.xpact.domain.member.dto.request.EducationSaveRequestDto;
 import com.itstime.xpact.domain.member.service.EducationService;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/api/educations")
 @RequiredArgsConstructor
-@Tag(name = "Educations API Controller", description = "학력사항 저장을 위한 API")
+@Tag(name = "학력 API Controller", description = "학력사항 저장을 위한 API")
 public class EducationController {
 
     private final EducationService educationService;
@@ -97,13 +99,41 @@ public class EducationController {
             입력 및 선택 정보를 통해 회원의 정보에 저장합니다.
             """)
     @PostMapping("")
-    public ResponseEntity<RestResponse<?>> saveSchoolInfo(
+    public ResponseEntity<RestResponse<?>> saveEducationInfo(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "학력 정보 저장 DTO",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = EducationSaveRequestDto.class)
+                    )
+            )
             @RequestHeader("Authorization") String token,
             @RequestBody EducationSaveRequestDto requestDto
             ) {
         return ResponseEntity.ok(
                 RestResponse.ok(
                         educationService.saveEducationInfo(requestDto)
+                )
+        );
+    }
+
+    // 최종학력 수정
+    @Operation(summary = "학력 정보 업데이트", description = "최종 학력을 업데이트하는 API")
+    @PatchMapping("")
+    public ResponseEntity<RestResponse<?>> updateEducationInfo(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "학력 정보 저장 DTO",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = EducationSaveRequestDto.class)
+                    )
+            )
+            @RequestHeader("Authorization") String token,
+            @RequestBody EducationSaveRequestDto requestDto
+    ) {
+        return ResponseEntity.ok(
+                RestResponse.ok(
+                        educationService.updateEducationInfo(requestDto)
                 )
         );
     }
