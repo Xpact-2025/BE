@@ -7,7 +7,6 @@ import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.dto.request.MemberInfoRequestDto;
 import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
-import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.scrap.entity.Scrap;
 import jakarta.persistence.*;
 import lombok.*;
@@ -92,6 +91,8 @@ public class Member extends BaseEntity {
                 .education(member.getEducation().getEducationName())
                 .age(member.getAge() != null ? member.getAge() : 0)
                 .desiredDetailRecruit(member.getDesiredRecruit() != null ? member.getDesiredRecruit() : null)
+                .startedAt(member.getEducation().getStartedAt() != null ? member.getEducation().getStartedAt() : null)
+                .endedAt(member.getEducation().getEndedAt() != null ? member.getEducation().getEndedAt() : null)
                 .build();
     }
 
