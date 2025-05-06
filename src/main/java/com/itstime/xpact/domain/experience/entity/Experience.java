@@ -13,13 +13,15 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Entity
 @Table(name = "experience")
-@ToString(of = {"title", "keyword", "situation", "task", "action", "result", "role", "perform"})
-@SuperBuilder
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString(of = {"title", "situation", "task", "action", "result", "role", "perform"})
 public class Experience extends BaseEntity {
 
     @Id
@@ -52,13 +54,9 @@ public class Experience extends BaseEntity {
     @Column(name = "summary", columnDefinition = "TEXT")
     private String summary;
 
-    @Column(name = "keyword")
-    private String keyword;
-
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private ExperienceType experienceType;
-
 
     // STAR_FORM
     @Column(name = "situation")
@@ -81,12 +79,14 @@ public class Experience extends BaseEntity {
     @Column(name = "perform")
     private String perform;
 
+    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Keyword> keywords;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne()
+    @OneToOne
     @JoinColumn(name = "detail_recruit_id")
     private DetailRecruit detailRecruit;
 
