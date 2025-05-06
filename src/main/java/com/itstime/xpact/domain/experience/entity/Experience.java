@@ -29,35 +29,35 @@ public class Experience extends BaseEntity {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    protected Status status;
+    private Status status;
 
     @Column(name = "form_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    protected FormType formType;
+    private FormType formType;
 
     @Column(name = "title", nullable = false)
-    protected String title;
+    private String title;
 
     @Column(name = "is_ended", nullable = false)
-    protected Boolean isEnded;
+    private Boolean isEnded;
 
     @Column(name = "start_date")
-    protected LocalDate startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    protected LocalDate endDate;
+    private LocalDate endDate;
 
     @Lob
     @Setter
     @Column(name = "summary", columnDefinition = "TEXT")
-    protected String summary;
+    private String summary;
 
     @Column(name = "keyword")
-    protected String keyword;
+    private String keyword;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    protected ExperienceType experienceType;
+    private ExperienceType experienceType;
 
 
     // STAR_FORM
