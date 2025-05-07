@@ -24,8 +24,6 @@ public class TokenProvider {
     private final RedisTemplate<String, String> redisTemplate;
 
     private static final String KEY_ROLES = "roles";
-    private final MemberRepository memberRepository;
-    private final CustomExceptionHandler customExceptionHandler;
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
@@ -81,8 +79,7 @@ public class TokenProvider {
         String memberId = claims.getSubject();
 
         if(!StringUtils.hasText(memberId)) {
-            // TODO: Custom Exception 생성
-            throw new RuntimeException();
+            throw CustomException.of(ErrorCode.FAILED_JWT_INFO);
         }
         return Long.parseLong(memberId);
     }

@@ -65,11 +65,26 @@ dependencies {
     // WebClient
     implementation('org.springframework.boot:spring-boot-starter-webflux')
 
+    // openai
+    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6'
+
     // querydsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.1.0'
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+
+    // Trie 구조 사용
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+
+    // jackson
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+
+    implementation 'org.seleniumhq.selenium:selenium-java:4.31.0'
+
+    // Jaxb2XmlDecoder
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.3'
 }
 
 def queryDslSrcDir = 'build/generated/querydsl/'

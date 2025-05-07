@@ -16,6 +16,10 @@ spring:
       hibernate:
         highlight_sql: true # 색상 부여
 
+  output:
+    ansi:
+      enabled: always # 서버에서 색상 부여
+
   data:
     redis:
       host: ${DEV_REDIS_HOST}
@@ -27,3 +31,17 @@ spring:
       redirect-uri: ${KAKAO_CALLBACK}
 
     # TODO: NAVER 설정 추가
+
+  ai:
+    openai:
+      api-key: ${DEV_OPENAI_API_KEY}
+
+
+crawler:
+  web-driver-path: ${DEV_WEB_DRIVER_PATH:}
+
+external:
+  api:
+    school:
+      service-key: ${SCHOOL_REST_API_KEY}
+      base-url: "http://openapi.academyinfo.go.kr"

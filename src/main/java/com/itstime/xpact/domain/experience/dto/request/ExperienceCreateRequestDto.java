@@ -1,33 +1,32 @@
-package com.itstime.xpact.domain.experience.dto;
+package com.itstime.xpact.domain.experience.dto.request;
 
-import com.itstime.xpact.domain.experience.common.ExperienceType;
-import com.itstime.xpact.domain.experience.common.FormType;
-import com.itstime.xpact.domain.experience.common.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@Schema(description = "경험 수정 요청 DTO")
-public class ExperienceUpdateRequestDto {
+@AllArgsConstructor
+@Schema(description = "경험 생성 요청 DTO")
+public class ExperienceCreateRequestDto {
 
     // common (공통 부분)
-    @Schema(description = "경험 저장 방식 지정 (임시저장 or 저장)", example = "SAVE", allowableValues = {"STASH", "SAVE"})
+    @Schema(description = "경험 저장 방식 지정 (임시저장 or 저장)", example = "SAVE", allowableValues = {"SAVE", "DRAFT"})
     private String status;
 
-    @Schema(description = "경험 유형 지정 (중복 가능)",
-            example = "PROJECT",
+    @Schema(description = "경험 유형 지정",
+            example = "INTERN",
             allowableValues = {"INTERN", "EXTERNAL_ACTIVITIES", "CONTEST",
                     "PROJECT", "CERTIFICATES", "ACADEMIC_CLUB", "EDUCATION",
-                    "VOLUNTEER_WORK", "STUDY_ABROAD", "ETC"})
+                    "PRIZE", "VOLUNTEER_WORK", "STUDY_ABROAD", "ETC"})
     private String experienceType;
 
-    @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식", example = "SIMPLE_FORM")
+    @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식)", example = "STAR_FORM")
     private String formType;
 
-    @Schema(description = "경험 제목", example = "경험 제목")
+    @Schema(description = "경험 제목", example = "제목을 입력하세요")
     private String title;
 
     @Schema(description = "시작 일시", example = "2025-03-27")
@@ -36,8 +35,7 @@ public class ExperienceUpdateRequestDto {
     @Schema(description = "종료 일시", example = "2025-03-27")
     private LocalDate endDate;
 
-    @Schema(description = "키워드", example = "키워드를 입력하세요")
-    private String keyword;
+    private List<String> keywords;
 
     // STAR_FORM
     @Schema(description = "상황", example = "상황을 입력하세요")

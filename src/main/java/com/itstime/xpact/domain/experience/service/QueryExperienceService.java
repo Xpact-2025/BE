@@ -1,8 +1,8 @@
 package com.itstime.xpact.domain.experience.service;
 
 import com.itstime.xpact.domain.experience.common.ExperienceType;
-import com.itstime.xpact.domain.experience.dto.DetailExperienceReadResponseDto;
-import com.itstime.xpact.domain.experience.dto.ThumbnailExperienceReadResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.DetailExperienceReadResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
@@ -23,8 +23,8 @@ import java.util.List;
 public class QueryExperienceService {
 
     private final ExperienceRepository experienceRepository;
-    private final MemberRepository memberRepository;
     private final SecurityProvider securityProvider;
+    private final MemberRepository memberRepository;
 
     private static final String LATEST = "LATEST";
     private static final String OLDEST = "OLDEST";
@@ -33,9 +33,8 @@ public class QueryExperienceService {
     public List<ThumbnailExperienceReadResponseDto> readAll(List<String> types, String order) throws CustomException {
 
         // member 조회
-        Long currentMemberId = securityProvider.getCurrentMemberId();
-        Member member = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+        Member member = memberRepository.findById(securityProvider.getCurrentMemberId()).orElseThrow(() ->
+                CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         Sort sort;
         if(order.equals(LATEST)) {

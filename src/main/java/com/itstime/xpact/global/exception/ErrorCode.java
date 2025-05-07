@@ -26,6 +26,7 @@ public enum ErrorCode {
     INVALID_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "TE003", "유효하지 않은 토큰입니다."),
     EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "TE004", "토큰의 기한이 만료되었습니다."),
     UNSUPPORTED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "TE005", "지원하지 않는 토큰 형식입니다."),
+    FAILED_JWT_INFO(HttpStatus.UNAUTHORIZED, "TE006", "토큰으로부터 회원의 정보를 얻을 수 없습니다."),
 
     // login
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "권한이 존재하지 않습니다"),
@@ -42,8 +43,33 @@ public enum ErrorCode {
     MEMBER_NOT_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER001", "Member Not Exists"),
     MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER002", "이미 존재하는 회원입니다."),
 
+    // parsing
+    PARSING_ERROR(HttpStatus.BAD_REQUEST, "PE001", "파싱 중 오류가 발생하였습니다."),
+
+    // school
+    INVALID_SCHOOL_TYPE(HttpStatus.BAD_REQUEST, "SCE001", "올바른 타입을 입력해주세요."),
+
     // server
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SE001", "Internal Server Error"),;
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SE001", "Internal Server Error"),
+
+    // openai
+    OPENAI_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "OPENAI001", "OpenAI Error"),
+
+    // crawling
+    CRAWLING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CRAWL001", "Crawling Error"),
+
+    // education
+    EDUCATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "EE001", "저장된 학력 사항이 없습니다."),
+    EMPTY_SCHOOL_STATUS(HttpStatus.BAD_REQUEST, "EE002", "학력의 최종 상태를 입력하지 않았습니다."),
+
+    // recruit
+    RECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "RE001", "해당 직무가 존재하지 않습니다."),
+    EMPTY_DESIRED_RECRUIT(HttpStatus.BAD_REQUEST, "RE002", "희망 직무가 선택되지 않았습니다."),
+
+    // keyword
+    KEYWORD_EXCEEDED(HttpStatus.BAD_REQUEST, "EXP009", "키워드는 5개를 넘길 수 없습니다."),
+    KEYWORD_TOO_LONG(HttpStatus.BAD_REQUEST, "EXP010", "키워드는 10글자를 넘길 수 없습니다."),
+    ;
 
     private final HttpStatus httpStatus;
     private final String code;

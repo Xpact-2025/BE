@@ -25,5 +25,16 @@ spring:
     kakao:
       client-id: ${KAKAO_REST_API_KEY}
       redirect-uri: ${KAKAO_CALLBACK}
+      base-url: "https://kauth.kakao.com"
 
     # TODO: NAVER 설정 추가
+
+  ai:
+    openai:
+      api-key: ${LOCAL_OPENAI_API_KEY}
+
+external:
+  api:
+    school:
+      service-key: ${SCHOOL_REST_API_KEY}
+      base-url: "http://openapi.academyinfo.go.kr"

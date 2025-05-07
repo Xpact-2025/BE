@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.experience.dto;
+package com.itstime.xpact.domain.experience.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.itstime.xpact.domain.experience.common.ExperienceType;
@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -26,6 +28,7 @@ public class DetailExperienceReadResponseDto {
     private LocalDate endDate;
     private FormType formType;
     private ExperienceType experienceType;
+    private List<String> keywords;
 
     // STAR 양식 부분
     private String situation;
@@ -53,6 +56,9 @@ public class DetailExperienceReadResponseDto {
                     .isEnded(experience.getIsEnded())
                     .startDate(experience.getStartDate())
                     .endDate(experience.getEndDate())
+                    .keywords(experience.getKeywords().stream()
+                            .map(Keyword::getName)
+                            .collect(Collectors.toList()))
                     .situation(null)
                     .task(null)
                     .action(null)
@@ -71,6 +77,9 @@ public class DetailExperienceReadResponseDto {
                     .isEnded(experience.getIsEnded())
                     .startDate(experience.getStartDate())
                     .endDate(experience.getEndDate())
+                    .keywords(experience.getKeywords().stream()
+                            .map(Keyword::getName)
+                            .collect(Collectors.toList()))
                     .situation(experience.getSituation())
                     .task(experience.getTask())
                     .action(experience.getAction())
