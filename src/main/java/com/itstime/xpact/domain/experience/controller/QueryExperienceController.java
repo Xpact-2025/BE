@@ -76,9 +76,9 @@ public class QueryExperienceController {
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.read(experienceId)));
     }
 
-    @GetMapping("/search/{query}")
+    @GetMapping("/search")
     public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> queryExperience(
-            @PathVariable("query") String query) {
+            @RequestParam("query") String query) {
 
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.query(query)));
     }
