@@ -16,11 +16,11 @@ public class CrawlerUtil {
 
     private final Environment environment;
 
+    @Value("${crawler.chrome-driver-path}")
+    private String chromeDriverPath;
+
     public WebDriver getWebDriver() {
-        String profile = Arrays.stream(environment.getActiveProfiles()).toList().get(0);
-        if(profile.equals("dev")) {
-            System.setProperty("webdriver.chrome.driver", "/home/ubuntu/chromedriver-linux64/chromedriver");
-        }
+        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");

@@ -36,6 +36,8 @@ spring:
     openai:
       api-key: ${DEV_OPENAI_API_KEY}
 
+crawler:
+  chrome-driver-path: /home/ubuntu/chromedriver-linux64/chromedriver
 
 external:
   api:
