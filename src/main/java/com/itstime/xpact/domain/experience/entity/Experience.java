@@ -13,7 +13,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -80,7 +82,7 @@ public class Experience extends BaseEntity {
     private String perform;
 
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Keyword> keywords;
+    private List<Keyword> keywords = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -98,7 +100,6 @@ public class Experience extends BaseEntity {
                 .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
-                .keyword(createRequestDto.getKeyword())
                 .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType()))
                 .situation(createRequestDto.getSituation())
                 .task(createRequestDto.getTask())
@@ -117,7 +118,6 @@ public class Experience extends BaseEntity {
                 .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
-                .keyword(createRequestDto.getKeyword())
                 .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType()))
                 .situation(null)
                 .task(null)
@@ -160,7 +160,17 @@ public class Experience extends BaseEntity {
         this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
         this.startDate = updateRequestDto.getStartDate();
         this.endDate = updateRequestDto.getEndDate();
-        this.keyword = updateRequestDto.getKeyword();
+        this.keywords.clear();
+        this.keywords.addAll(updateRequestDto.getKeywords().stream()
+                .map(keywordStr -> Keyword.builder()
+                        .name(keywordStr)
+                        .experience(this)
+                        .build()).toList());
+
         this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
+    }
+
+    public void setKeyword(List<Keyword> keywords) {
+        this.keywords = keywords;
     }
 }
