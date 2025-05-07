@@ -10,6 +10,17 @@ services:
       - mynetwork
     depends_on:
       - redis
+      - selenium
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium
+    ports:
+      - "4444:4444"
+    shm_size: 512mb
+    networks:
+      - mynetwork
+    restart: no
 
   nginx:
     image: nginx:1.27.4
