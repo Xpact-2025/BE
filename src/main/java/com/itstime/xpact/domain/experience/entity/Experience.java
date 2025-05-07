@@ -13,13 +13,17 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
 @Table(name = "experience")
-@ToString(of = {"title", "keyword", "situation", "task", "action", "result", "role", "perform"})
-@SuperBuilder
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString(of = {"title", "situation", "task", "action", "result", "role", "perform"})
 public class Experience extends BaseEntity {
 
     @Id
@@ -29,36 +33,32 @@ public class Experience extends BaseEntity {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    protected Status status;
+    private Status status;
 
     @Column(name = "form_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    protected FormType formType;
+    private FormType formType;
 
     @Column(name = "title", nullable = false)
-    protected String title;
+    private String title;
 
     @Column(name = "is_ended", nullable = false)
-    protected Boolean isEnded;
+    private Boolean isEnded;
 
     @Column(name = "start_date")
-    protected LocalDate startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    protected LocalDate endDate;
+    private LocalDate endDate;
 
     @Lob
     @Setter
     @Column(name = "summary", columnDefinition = "TEXT")
-    protected String summary;
-
-    @Column(name = "keyword")
-    protected String keyword;
+    private String summary;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    protected ExperienceType experienceType;
-
+    private ExperienceType experienceType;
 
     // STAR_FORM
     @Column(name = "situation")
@@ -81,12 +81,14 @@ public class Experience extends BaseEntity {
     @Column(name = "perform")
     private String perform;
 
+    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Keyword> keywords = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne()
+    @OneToOne
     @JoinColumn(name = "detail_recruit_id")
     private DetailRecruit detailRecruit;
 
@@ -98,7 +100,6 @@ public class Experience extends BaseEntity {
                 .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
-                .keyword(createRequestDto.getKeyword())
                 .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType()))
                 .situation(createRequestDto.getSituation())
                 .task(createRequestDto.getTask())
@@ -117,7 +118,6 @@ public class Experience extends BaseEntity {
                 .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
-                .keyword(createRequestDto.getKeyword())
                 .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType()))
                 .situation(null)
                 .task(null)
@@ -160,7 +160,17 @@ public class Experience extends BaseEntity {
         this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
         this.startDate = updateRequestDto.getStartDate();
         this.endDate = updateRequestDto.getEndDate();
-        this.keyword = updateRequestDto.getKeyword();
+        this.keywords.clear();
+        this.keywords.addAll(updateRequestDto.getKeywords().stream()
+                .map(keywordStr -> Keyword.builder()
+                        .name(keywordStr)
+                        .experience(this)
+                        .build()).toList());
+
         this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
+    }
+
+    public void setKeyword(List<Keyword> keywords) {
+        this.keywords = keywords;
     }
 }
