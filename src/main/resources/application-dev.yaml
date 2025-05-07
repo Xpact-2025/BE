@@ -44,3 +44,5 @@ external:
     school:
       service-key: ${SCHOOL_REST_API_KEY}
       base-url: "http://openapi.academyinfo.go.kr"
+
+selenium-url: "http://selenium:4444/wd/hub"
