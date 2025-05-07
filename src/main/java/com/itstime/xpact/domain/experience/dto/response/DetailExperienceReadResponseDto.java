@@ -72,6 +72,7 @@ public class DetailExperienceReadResponseDto {
                     .id(experience.getId())
                     .status(experience.getStatus())
                     .formType(experience.getFormType())
+                    .experienceType(experience.getExperienceType())
                     .title(experience.getTitle())
                     .isEnded(experience.getIsEnded())
                     .startDate(experience.getStartDate())
