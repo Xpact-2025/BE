@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -34,8 +35,7 @@ public class ExperienceCreateRequestDto {
     @Schema(description = "종료 일시", example = "2025-03-27")
     private LocalDate endDate;
 
-    @Schema(description = "키워드", example = "키워드를 입력하세요")
-    private String keyword;
+    private List<String> keywords;
 
     // STAR_FORM
     @Schema(description = "상황", example = "상황을 입력하세요")
