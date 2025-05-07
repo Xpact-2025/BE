@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
@@ -16,11 +14,8 @@ public class CrawlerUtil {
 
     private final Environment environment;
 
-    @Value("${crawler.chrome-driver-path}")
-    private String chromeDriverPath;
-
     public WebDriver getWebDriver() {
-        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        System.setProperty("webdriver.chrome.driver", "/home/ubuntu/chromedriver-linux64/chromedriver");
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
