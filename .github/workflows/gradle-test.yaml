@@ -3,7 +3,7 @@ name: Build and Deploy Xpact Application
 on:
   push:
     branches:
-      - main
+      - fix/#68/web-driver
 
 jobs:
   build:
@@ -60,18 +60,18 @@ jobs:
       - name: Transfer docker-compose.yaml file to ec2
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.REMOTE_HOST }}
+          host: ${{ secrets.REMOTE_HOST_TEST }}
           username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_TEST }}
           source: ./docker-compose.yaml
           target: /home/ubuntu/
 
       - name: Transfer nginx directory file to ec2
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.REMOTE_HOST }}
+          host: ${{ secrets.REMOTE_HOST_TEST }}
           username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_TEST }}
           source: ./nginx/
           target: /home/ubuntu/
 
@@ -84,9 +84,9 @@ jobs:
       - name: SSH into server and deploy
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.REMOTE_HOST }}
+          host: ${{ secrets.REMOTE_HOST_TEST }}
           username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_TEST }}
           port: 22
           script: |
             # 1. cd ~/xpact-api
