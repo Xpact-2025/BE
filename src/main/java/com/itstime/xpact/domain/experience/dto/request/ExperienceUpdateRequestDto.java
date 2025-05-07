@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Schema(description = "경험 수정 요청 DTO")
@@ -35,8 +36,8 @@ public class ExperienceUpdateRequestDto {
     @Schema(description = "종료 일시", example = "2025-03-27")
     private LocalDate endDate;
 
-    @Schema(description = "키워드", example = "키워드를 입력하세요")
-    private String keyword;
+    @Schema(description = "키워드")
+    private List<String> keywords;
 
     // STAR_FORM
     @Schema(description = "상황", example = "상황을 입력하세요")
