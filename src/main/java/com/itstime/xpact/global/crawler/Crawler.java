@@ -1,13 +1,12 @@
 package com.itstime.xpact.global.crawler;
 
-import com.itstime.xpact.domain.recruit.dto.DetailRecruitDto;
 import com.itstime.xpact.global.crawler.dto.RecruitResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 public class Crawler {
 
