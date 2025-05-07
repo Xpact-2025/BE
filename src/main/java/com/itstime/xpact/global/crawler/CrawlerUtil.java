@@ -17,9 +17,6 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class CrawlerUtil {
 
-    @Value("${selenium-url}")
-    private String seleniumUrl;
-
     private final Environment environment;
 
     public WebDriver getWebDriver() {
@@ -33,6 +30,8 @@ public class CrawlerUtil {
 
         if(Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
             try {
+                String seleniumUrl = environment.getProperty("selenium-url");
+                assert seleniumUrl != null;
                 return new RemoteWebDriver(new URL(seleniumUrl), options);
             } catch (Exception e) {
                 throw new RuntimeException("failed to connect to remotewebdriver", e);
