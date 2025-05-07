@@ -45,10 +45,18 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
         QExperience experience = QExperience.experience;
         QKeyword keyword = QKeyword.keyword;
 
+        BooleanBuilder condition = new BooleanBuilder();
+
+        if(query != null) {
+            condition.and(
+                    experience.title.containsIgnoreCase(query)
+                            .or(keyword.name.containsIgnoreCase(query))
+            );
+        }
+
         return queryFactory.selectFrom(experience)
                 .leftJoin(experience.keywords, keyword).fetchJoin()
-                .where(experience.title.containsIgnoreCase(query)
-                        .or(keyword.experience.id.eq(experience.id).and(keyword.name.containsIgnoreCase(query))))
+                .where(condition)
                 .distinct()
                 .fetch();
     }

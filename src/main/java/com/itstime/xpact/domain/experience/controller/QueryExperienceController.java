@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -78,7 +79,7 @@ public class QueryExperienceController {
 
     @GetMapping("/search")
     public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> queryExperience(
-            @RequestParam("query") String query) {
+            @RequestParam("query") @Nullable String query) {
 
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.query(query)));
     }
