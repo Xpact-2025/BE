@@ -8,14 +8,15 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class CrawlerUtil {
 
     private final Environment environment;
 
     public WebDriver getWebDriver() {
-        System.setProperty("webdriver.chrome.driver", "/home/ubuntu/chromedriver-linux64/chromedriver");
+        if(environment.getActiveProfiles()[0].equals("dev"))
+            System.setProperty("webdriver.chrome.driver", "/home/ubuntu/chromedriver-linux64/chromedriver");
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
