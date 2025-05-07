@@ -14,15 +14,12 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class CrawlerUtil {
 
-    @Value("${crawler.web-driver-path}")
-    private static String WEB_DRIVER_PATH;
-
     private final Environment environment;
 
     public WebDriver getWebDriver() {
         String profile = Arrays.stream(environment.getActiveProfiles()).toList().get(0);
         if(profile.equals("dev")) {
-            System.setProperty("webdriver.chrome.driver", WEB_DRIVER_PATH);
+            System.setProperty("webdriver.chrome.driver", "/home/ubuntu/chromedriver-linux64/chromedriver");
         }
 
         ChromeOptions options = new ChromeOptions();
