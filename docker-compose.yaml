@@ -10,6 +10,16 @@ services:
       - mynetwork
     depends_on:
       - redis
+      - selenium
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium
+    ports:
+      - "4444:4444"
+    networks:
+      - mynetwork
+    restart: unless-stopped
 
   nginx:
     image: nginx:1.27.4
