@@ -1,15 +1,6 @@
 package com.itstime.xpact.global.openai;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.experience.entity.Experience;
-import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
-import com.itstime.xpact.domain.member.service.MemberService;
-import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
-import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -23,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,8 +21,6 @@ import java.util.stream.Collectors;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
-    private final MemberRepository memberRepository;
-    private final SecurityProvider securityProvider;
 
     @Async
     public void summarizeExperience(Experience experience) {
@@ -47,12 +35,12 @@ public class OpenAiServiceImpl implements OpenAiService {
         CompletableFuture.completedFuture(result);
     }
 
-    public Map<String, String> getCoreSkill(List<String> recruits) {
-        Map<String, String> coreSkillOfRecruit = new HashMap<>();
-        String joinedRecruits = String.join(",", recruits);
+    public Map<String, String> getCoreSkill(List<String> detailRecruits) {
+        Map<String, String> coreSkillOfDetailRecruit = new HashMap<>();
+        String joinedRecruits = String.join(",", detailRecruits);
 
-        String message = String.format("다음에 ','로 구분되어 주어질 일련의 직무에 대해 필수적으로 요하는 구체적인 핵심 스킬을 5가지 도출해줘 (전공자의 시선에서 이해할 수 잇도록)\n" +
-                "출력 예시는 다음과 같아 (숫자 붙이지 마) ex) {직무}-{키워드1}/{키워드2}/{키워드3}/{키워드4}/{키워드5}\n\n" +
+        String message = String.format("다음에 ','로 구분되어 주어질 일련의 직무에 대해 필수적으로 요하는 구체적인 핵심 스킬을 5가지 도출해줘 (전공자의 시선에서 이해할 수 있도록)\n" +
+                "출력 양식은 다음과 같아 (숫자 붙이지 마) {직무}-{키워드1}/{키워드2}/{키워드3}/{키워드4}/{키워드5}\n\n" +
                 "%s", joinedRecruits);
 
         Prompt prompt = new Prompt(message);
@@ -62,10 +50,10 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         Arrays.stream(result.split("\n")).forEach(string -> {
             String[] row = string.split("-");
-            coreSkillOfRecruit.put(row[0], row[1].trim());
+            coreSkillOfDetailRecruit.put(row[0], row[1].trim());
         });
 
-        return coreSkillOfRecruit;
+        return coreSkillOfDetailRecruit;
     }
 
     // 핵심 스킬들
