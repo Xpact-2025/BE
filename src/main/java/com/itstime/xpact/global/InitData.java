@@ -1,6 +1,8 @@
-package com.itstime.xpact.global.crawler;
+package com.itstime.xpact.global;
 
 import com.itstime.xpact.domain.recruit.service.CoreSkillService;
+import com.itstime.xpact.domain.recruit.service.DetailRecruitService;
+import com.itstime.xpact.domain.recruit.service.RecruitService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -8,19 +10,21 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-//@Component
+@Component
 @RequiredArgsConstructor
 public class InitData implements ApplicationRunner {
 
-    private final CrawlerService crawlerService;
+    private final RecruitService recruitService;
+    private final DetailRecruitService detailRecruitservice;
     private final CoreSkillService coreSkillService;
 
     @Override
     public void run(ApplicationArguments args) {
-        if(!checkRecruitData()) crawlerService.saveRecruitData();
+
+        if(!checkRecruitData()) recruitService.saveRecruit();
         else log.info("Recruit Column has already been initialized");
 
-        if(!checkDetailRecruitData()) crawlerService.saveDetailRecruitData();
+        if(!checkDetailRecruitData()) detailRecruitservice.saveDetailRecruit();
         else log.info("DetailRecruit Column has already been initialized");
 
         if(!checkCoreSkillData()) coreSkillService.saveCoreSkillData();
@@ -28,11 +32,11 @@ public class InitData implements ApplicationRunner {
     }
 
     private boolean checkRecruitData() {
-        return crawlerService.recruitExists();
+        return recruitService.recruitExists();
     }
 
     private boolean checkDetailRecruitData() {
-        return crawlerService.detailRecruitExists();
+        return detailRecruitservice.detailRecruitExists();
     }
 
     private boolean checkCoreSkillData() { return coreSkillService.coreSkillExists();}
