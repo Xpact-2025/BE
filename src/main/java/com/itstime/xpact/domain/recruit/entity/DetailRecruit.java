@@ -1,12 +1,8 @@
 package com.itstime.xpact.domain.recruit.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
-import com.itstime.xpact.domain.experience.entity.Experience;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -26,6 +22,11 @@ public class DetailRecruit extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id", nullable = false)
     private Recruit recruit;
+
+    @Setter
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "core_skill_id")
+    private CoreSkill coreSkill;
 
     @Builder
     public DetailRecruit(Recruit recruit, String name) {
