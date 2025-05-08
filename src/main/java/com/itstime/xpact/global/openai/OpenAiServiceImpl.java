@@ -72,47 +72,47 @@ public class OpenAiServiceImpl implements OpenAiService {
     //private static final List<String> coreSkills = List.of(DetailRecruit.getCoreSkills)
 
     // 점수를 매기는 메소드
-    public Map<String, Double> scoreSummary(String summary, List<String> coreSkills) {
-        Long memberId = securityProvider.getCurrentMemberId();
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
-
-        String keywordList = coreSkills.stream()
-                .map(skill -> "\"" + skill + "\"")
-                .collect(Collectors.joining(", "));
-
-        String message = """
-            다음은 사용자의 경험 요약입니다:
-            "%s"
-            
-            이 경험이 다음 핵심 스킬들과 얼마나 관련이 있는지를 0.0부터 10.0 사이 점수로 평가해줘.
-            점수는 소수점 한 자리까지 표시하고, JSON 형식으로 아래와 같이 반환해줘.
-            
-            {
-                "데이터 분석": 9.2,
-                "SQL": 7.5,
-                ...
-            }
-            
-            핵심 스킬 목록: [%s]
-            """.formatted(summary, keywordList);
-
-        Prompt prompt = new Prompt(message);
-        log.info("Requesting score about experiences from OpenAI...");
-        ChatResponse response = openAiChatModel.call(prompt);
-        String result = response.getResult().getOutput().getText();
-
-        // JSON 파싱
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Double> scoreMap = new HashMap<>();
-        try {
-            // OpenAI 응답이 JSON이라 가정
-            scoreMap = mapper.readValue(result, new TypeReference<>() {});
-        } catch (Exception e) {
-            log.error("OpenAI 응답 파싱 실패: {}", result);
-            coreSkills.forEach(skill -> scoreMap.put(skill, 0.0));
-        }
-
-        return scoreMap;
-    }
+//    public Map<String, Double> scoreSummary(String summary, List<String> coreSkills) {
+//        Long memberId = securityProvider.getCurrentMemberId();
+//        Member member = memberRepository.findById(memberId)
+//                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+//
+//        String keywordList = coreSkills.stream()
+//                .map(skill -> "\"" + skill + "\"")
+//                .collect(Collectors.joining(", "));
+//
+//        String message = """
+//            다음은 사용자의 경험 요약입니다:
+//            "%s"
+//
+//            이 경험이 다음 핵심 스킬들과 얼마나 관련이 있는지를 0.0부터 10.0 사이 점수로 평가해줘.
+//            점수는 소수점 한 자리까지 표시하고, JSON 형식으로 아래와 같이 반환해줘.
+//
+//            {
+//                "데이터 분석": 9.2,
+//                "SQL": 7.5,
+//                ...
+//            }
+//
+//            핵심 스킬 목록: [%s]
+//            """.formatted(summary, keywordList);
+//
+//        Prompt prompt = new Prompt(message);
+//        log.info("Requesting score about experiences from OpenAI...");
+//        ChatResponse response = openAiChatModel.call(prompt);
+//        String result = response.getResult().getOutput().getText();
+//
+//        // JSON 파싱
+//        ObjectMapper mapper = new ObjectMapper();
+//        Map<String, Double> scoreMap = new HashMap<>();
+//        try {
+//            // OpenAI 응답이 JSON이라 가정
+//            scoreMap = mapper.readValue(result, new TypeReference<>() {});
+//        } catch (Exception e) {
+//            log.error("OpenAI 응답 파싱 실패: {}", result);
+//            coreSkills.forEach(skill -> scoreMap.put(skill, 0.0));
+//        }
+//
+//        return scoreMap;
+//    }
 }
