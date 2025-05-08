@@ -1,6 +1,9 @@
 package com.itstime.xpact.global.openai;
 
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.member.entity.Member;
+import com.itstime.xpact.domain.member.service.MemberService;
+import com.itstime.xpact.global.auth.SecurityProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -21,6 +24,8 @@ import java.util.concurrent.CompletableFuture;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
+    private final MemberService memberService;
+    private final SecurityProvider securityProvider;
 
     @Async
     public void summarizeExperience(Experience experience) {
@@ -54,5 +59,13 @@ public class OpenAiServiceImpl implements OpenAiService {
         });
 
         return coreSkillOfRecruit;
+    }
+
+    // 점수를 매기는 메소드
+    public Map<String, Double> scoreSummary(String summary) {
+
+        Long memberId = securityProvider.getCurrentMemberId();
+        Member member;
+        return  null;
     }
 }
