@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.Arrays;
 
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class CrawlerUtil {
 
