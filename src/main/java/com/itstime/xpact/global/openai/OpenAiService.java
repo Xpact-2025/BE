@@ -12,4 +12,6 @@ public interface OpenAiService {
     void summarizeExperience(Experience experience);
 
     Map<String, String> getCoreSkill(List<String> recruits);
+
+    Map<String, String> getAllCoreSkillsInBatch(List<String> detailRecruits);
 }

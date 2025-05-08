@@ -31,7 +31,7 @@ public class CoreSkillService {
     @Transactional
     public void saveCoreSkillData() {
         List<DetailRecruit> detailRecruits = detailRecruitRepository.findAll();
-        Map<String, String> coreSkillsOfRecruit = openAiService.getCoreSkill(detailRecruits.stream().map(DetailRecruit::getName).toList());
+        Map<String, String> coreSkillsOfRecruit = openAiService.getAllCoreSkillsInBatch(detailRecruits.stream().map(DetailRecruit::getName).toList());
         List<CoreSkill> coreSkills = new ArrayList<>();
 
         // coreSkillsOfRecruit["서비스 기획자"] = 사용자 중심 사고/콘텐츠 기획력/커뮤니케이션/문제 해결력/데이터 분석

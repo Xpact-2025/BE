@@ -56,6 +56,31 @@ public class OpenAiServiceImpl implements OpenAiService {
         return coreSkillOfDetailRecruit;
     }
 
+    public Map<String, String> getAllCoreSkillsInBatch(List<String> detailRecruits) {
+        Map<String, String> totalCoreSkills = new HashMap<>();
+
+        int batchSize = 50;
+
+        for (int i = 0; i < detailRecruits.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, detailRecruits.size());
+            List<String> batch = detailRecruits.subList(i, end);
+
+            try {
+                Map<String, String> batchResult = getCoreSkill(batch);
+                totalCoreSkills.putAll(batchResult);
+            } catch (Exception e) {
+                log.error("OpenAI 호출 실패 ({} ~ {}): {}", i, end, e.getMessage());
+            }
+
+            // Optional: 과도한 요청 방지를 위한 딜레이
+            try {
+                Thread.sleep(500); // 0.5초 쉬기
+            } catch (InterruptedException ignored) {}
+        }
+
+        return totalCoreSkills;
+    }
+
     // 핵심 스킬들
     //private static final List<String> coreSkills = List.of(DetailRecruit.getCoreSkills)
 
