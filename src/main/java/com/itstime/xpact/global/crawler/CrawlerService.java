@@ -1,6 +1,5 @@
 package com.itstime.xpact.global.crawler;
 
-import com.itstime.xpact.domain.recruit.dto.DetailRecruitDto;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Slf4j
-//@Service
+@Service
 @RequiredArgsConstructor
 public class CrawlerService {
 
