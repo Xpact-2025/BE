@@ -29,10 +29,6 @@ public class CoreSkillService {
     private final DetailRecruitRepository detailRecruitRepository;
     private final RecruitRepository recruitRepository;
 
-    public boolean existsCoreSkill() {
-        return coreSkillRepository.count() > 0;
-    }
-
     @Transactional
     public void saveCoreSkillData() {
         List<String> recruitNames = recruitRepository.findAllNames();
@@ -71,5 +67,9 @@ public class CoreSkillService {
         log.info("Successfully Save CoreSkill Data");
         log.info("coreSkills size: {}", coreSkills.size());
         log.info("Successfully Set CoreSkill relationships to Recruits");
+    }
+
+    public boolean coreSkillExists() {
+        return coreSkillRepository.count() > 0;
     }
 }
