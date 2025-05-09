@@ -11,7 +11,5 @@ public interface OpenAiService {
     @Async("taskExecutor")
     void summarizeExperience(Experience experience);
 
-    Map<String, String> getCoreSkill(List<String> recruits);
-
-    Map<String, String> getAllCoreSkillsInBatch(List<String> detailRecruits);
+    Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames);
 }

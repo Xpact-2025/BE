@@ -1,6 +1,9 @@
 package com.itstime.xpact.global.openai;
 
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
+import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
+import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -9,11 +12,9 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
+    private final DetailRecruitRepository detailRecruitRepository;
 
     @Async
     public void summarizeExperience(Experience experience) {
@@ -35,97 +37,43 @@ public class OpenAiServiceImpl implements OpenAiService {
         CompletableFuture.completedFuture(result);
     }
 
-    public Map<String, String> getCoreSkill(List<String> detailRecruits) {
-        Map<String, String> coreSkillOfDetailRecruit = new HashMap<>();
-        String joinedRecruits = String.join(",", detailRecruits);
+    public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
+        Map<String, Map<String, String>> result = new LinkedHashMap<>();
 
-        String message = String.format("다음에 ','로 구분되어 주어질 일련의 직무에 대해 필수적으로 요하는 구체적인 핵심 스킬을 5가지 도출해줘 (전공자의 시선에서 이해할 수 있도록)\n" +
-                "출력 양식은 다음과 같아 (숫자 붙이지 마) {직무}-{키워드1}/{키워드2}/{키워드3}/{키워드4}/{키워드5}\n\n" +
-                "%s", joinedRecruits);
+        for (String recruitName : recruitNames) {
+            log.info("Requesting core skill extraction from OpenAI for recruit: {}", recruitName);
+            List<DetailRecruit> detailRecruits = detailRecruitRepository.findAllByRecruitName(recruitName);
 
-        Prompt prompt = new Prompt(message);
-        log.info("Requesting core skill extraction from OpenAI...");
-        ChatResponse response = openAiChatModel.call(prompt);
-        String result = response.getResult().getOutput().getText();
-
-        Arrays.stream(result.split("\n")).forEach(string -> {
-            String[] row = string.split("-");
-            coreSkillOfDetailRecruit.put(row[0], row[1].trim());
-        });
-
-        return coreSkillOfDetailRecruit;
-    }
-
-    public Map<String, String> getAllCoreSkillsInBatch(List<String> detailRecruits) {
-        Map<String, String> totalCoreSkills = new HashMap<>();
-
-        int batchSize = 50;
-
-        for (int i = 0; i < detailRecruits.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, detailRecruits.size());
-            List<String> batch = detailRecruits.subList(i, end);
-
-            try {
-                Map<String, String> batchResult = getCoreSkill(batch);
-                totalCoreSkills.putAll(batchResult);
-            } catch (Exception e) {
-                log.error("OpenAI 호출 실패 ({} ~ {}): {}", i, end, e.getMessage());
+            if (detailRecruits.isEmpty()) {
+                log.warn("{} : 해당되는 DetailRecruit 조회 불가", recruitName);
+                continue;
             }
 
-            // Optional: 과도한 요청 방지를 위한 딜레이
-            try {
-                Thread.sleep(500); // 0.5초 쉬기
-            } catch (InterruptedException ignored) {}
+            Map<String, String> coreSkillsForDetails = new LinkedHashMap<>();
+
+            String joinedDetailNames = detailRecruits.stream()
+                    .map(DetailRecruit::getName)
+                    .collect(Collectors.joining(","));
+
+            log.info("Requesting core skill extraction from OpenAI for detailRecruits: {}", joinedDetailNames);
+
+            String promptMessage = String.format(
+                    "다음 ','로 구분된 직무에 대해 반드시 요구되는 핵심 스킬 5가지를 도출해줘.(숫자 넣지 마)\n" +
+                            "출력 형식: {직무}-{핵심스킬1}/{핵심2}/{핵심스킬3}/{핵심스킬4}/{핵심스킬5}\n\n" +
+                            "출력 시 직무는 변형 없이 그대로 출력해라. -와 /는 필수이다.\n" +
+                            "%s", joinedDetailNames);
+
+            Prompt prompt = new Prompt(promptMessage);
+            ChatResponse response = openAiChatModel.call(prompt);
+            String responseText = response.getResult().getOutput().getText();
+
+            Arrays.stream(responseText.split("\n")).forEach(string -> {
+                String[] row = string.split("-");
+                coreSkillsForDetails.put(row[0], row[1].trim());
+            });
+            result.put(recruitName, coreSkillsForDetails);
         }
 
-        return totalCoreSkills;
+        return result;
     }
-
-    // 핵심 스킬들
-    //private static final List<String> coreSkills = List.of(DetailRecruit.getCoreSkills)
-
-    // 점수를 매기는 메소드
-//    public Map<String, Double> scoreSummary(String summary, List<String> coreSkills) {
-//        Long memberId = securityProvider.getCurrentMemberId();
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
-//
-//        String keywordList = coreSkills.stream()
-//                .map(skill -> "\"" + skill + "\"")
-//                .collect(Collectors.joining(", "));
-//
-//        String message = """
-//            다음은 사용자의 경험 요약입니다:
-//            "%s"
-//
-//            이 경험이 다음 핵심 스킬들과 얼마나 관련이 있는지를 0.0부터 10.0 사이 점수로 평가해줘.
-//            점수는 소수점 한 자리까지 표시하고, JSON 형식으로 아래와 같이 반환해줘.
-//
-//            {
-//                "데이터 분석": 9.2,
-//                "SQL": 7.5,
-//                ...
-//            }
-//
-//            핵심 스킬 목록: [%s]
-//            """.formatted(summary, keywordList);
-//
-//        Prompt prompt = new Prompt(message);
-//        log.info("Requesting score about experiences from OpenAI...");
-//        ChatResponse response = openAiChatModel.call(prompt);
-//        String result = response.getResult().getOutput().getText();
-//
-//        // JSON 파싱
-//        ObjectMapper mapper = new ObjectMapper();
-//        Map<String, Double> scoreMap = new HashMap<>();
-//        try {
-//            // OpenAI 응답이 JSON이라 가정
-//            scoreMap = mapper.readValue(result, new TypeReference<>() {});
-//        } catch (Exception e) {
-//            log.error("OpenAI 응답 파싱 실패: {}", result);
-//            coreSkills.forEach(skill -> scoreMap.put(skill, 0.0));
-//        }
-//
-//        return scoreMap;
-//    }
 }
