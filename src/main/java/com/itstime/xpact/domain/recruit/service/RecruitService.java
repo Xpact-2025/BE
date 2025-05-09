@@ -73,7 +73,7 @@ public class RecruitService {
                 .orElseThrow(() -> CustomException.of(ErrorCode.RECRUIT_NOT_FOUND));
         Long recruitId = recruit.getId();
 
-        return detailRecruitRepository.findAllByRecruitId(recruitId);
+        return detailRecruitRepository.findDetailRecruitNamesByRecruitId(recruitId);
     }
 
     // 희망 상세 직군 검색 자동완성
