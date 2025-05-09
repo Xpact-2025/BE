@@ -85,6 +85,9 @@ dependencies {
     // Jaxb2XmlDecoder
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.3'
+
+    // aws lambda
+    implementation 'software.amazon.awssdk:lambda:2.25.8'
 }
 
 def queryDslSrcDir = 'build/generated/querydsl/'
