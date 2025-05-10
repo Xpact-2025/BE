@@ -25,8 +25,11 @@ public class OpenAiServiceImpl implements OpenAiService {
     private final DetailRecruitRepository detailRecruitRepository;
 
     @Async
-    public void summarizeExperience(Experience experience) {
-        String message = String.format("역할, 내가 한 일, 성과(결과)가 드러나게 자세한 `~~했음`으로 끝나게 2줄로 요약해줘 : %s", experience.toString());
+    public CompletableFuture<String> summarizeExperience(Experience experience) {
+        String message = String.format("""
+                역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘\s
+                요약만 출력되도록 해줘\s
+                data : %s""", experience.toString());
         log.info(message);
 
         Prompt prompt = new Prompt(message);
@@ -34,7 +37,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
 
-        CompletableFuture.completedFuture(result);
+        return CompletableFuture.completedFuture(result);
     }
 
     public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {

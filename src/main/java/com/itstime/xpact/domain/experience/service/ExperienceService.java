@@ -69,7 +69,11 @@ public class ExperienceService {
         experienceRepository.save(experience);
 
         if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE))
-            openAiService.summarizeExperience(experience);
+            openAiService.summarizeExperience(experience)
+                    .thenAccept(summary -> {
+                        experience.setSummary(summary);
+                        experienceRepository.save(experience);
+                    });
     }
 
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
