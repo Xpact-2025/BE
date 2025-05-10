@@ -1,4 +1,4 @@
-package com.itstime.xpact.global.aws;
+package com.itstime.xpact.infra.lambda;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
