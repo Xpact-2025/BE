@@ -38,3 +38,8 @@ external:
     school:
       service-key: ${SCHOOL_REST_API_KEY}
       base-url: "http://openapi.academyinfo.go.kr"
+
+aws:
+  credentials:
+    access-key: ${LOCAL_AWS_ACCESS_KEY}
+    secret-key: ${LOCAL_AWS_SECRET_KEY}

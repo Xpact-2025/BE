@@ -1,6 +1,9 @@
 package com.itstime.xpact.global.openai;
 
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
+import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
+import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -9,11 +12,9 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,10 +22,14 @@ import java.util.concurrent.CompletableFuture;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
+    private final DetailRecruitRepository detailRecruitRepository;
 
     @Async
-    public void summarizeExperience(Experience experience) {
-        String message = String.format("역할, 내가 한 일, 성과(결과)가 드러나게 자세한 `~~했음`으로 끝나게 2줄로 요약해줘 : %s", experience.toString());
+    public CompletableFuture<String> summarizeExperience(Experience experience) {
+        String message = String.format("""
+                역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘\s
+                요약만 출력되도록 해줘\s
+                data : %s""", experience.toString());
         log.info(message);
 
         Prompt prompt = new Prompt(message);
@@ -32,27 +37,46 @@ public class OpenAiServiceImpl implements OpenAiService {
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
 
-        CompletableFuture.completedFuture(result);
+        return CompletableFuture.completedFuture(result);
     }
 
-    public Map<String, String> getCoreSkill(List<String> recruits) {
-        Map<String, String> coreSkillOfRecruit = new HashMap<>();
-        String joinedRecruits = String.join(",", recruits);
+    public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
+        Map<String, Map<String, String>> result = new LinkedHashMap<>();
 
-        String message = String.format("다음에 ','로 구분되어 주어질 일련의 직무에 대해 필수적으로 요하는 구체적인 핵심 스킬을 5가지 도출해줘 (전공자의 시선에서 이해할 수 잇도록)\n" +
-                "출력 예시는 다음과 같아 (숫자 붙이지 마) ex) {직무}-{키워드1}/{키워드2}/{키워드3}/{키워드4}/{키워드5}\n\n" +
-                "%s", joinedRecruits);
+        for (String recruitName : recruitNames) {
+            log.info("Requesting core skill extraction from OpenAI for recruit: {}", recruitName);
+            List<DetailRecruit> detailRecruits = detailRecruitRepository.findAllByRecruitName(recruitName);
 
-        Prompt prompt = new Prompt(message);
-        log.info("Requesting core skill extraction from OpenAI...");
-        ChatResponse response = openAiChatModel.call(prompt);
-        String result = response.getResult().getOutput().getText();
+            if (detailRecruits.isEmpty()) {
+                log.warn("{} : 해당되는 DetailRecruit 조회 불가", recruitName);
+                continue;
+            }
 
-        Arrays.stream(result.split("\n")).forEach(string -> {
-            String[] row = string.split("-");
-            coreSkillOfRecruit.put(row[0], row[1].trim());
-        });
+            Map<String, String> coreSkillsForDetails = new LinkedHashMap<>();
 
-        return coreSkillOfRecruit;
+            String joinedDetailNames = detailRecruits.stream()
+                    .map(DetailRecruit::getName)
+                    .collect(Collectors.joining(","));
+
+            log.info("Requesting core skill extraction from OpenAI for detailRecruits: {}", joinedDetailNames);
+
+            String promptMessage = String.format(
+                    "다음 ','로 구분된 직무에 대해 반드시 요구되는 핵심 스킬 5가지를 도출해줘.(숫자 넣지 마)\n" +
+                            "출력 형식: {직무}-{핵심스킬1}/{핵심2}/{핵심스킬3}/{핵심스킬4}/{핵심스킬5}\n\n" +
+                            "출력 시 직무는 변형 없이 그대로 출력해라. -와 /는 필수이다.\n" +
+                            "%s", joinedDetailNames);
+
+            Prompt prompt = new Prompt(promptMessage);
+            ChatResponse response = openAiChatModel.call(prompt);
+            String responseText = response.getResult().getOutput().getText();
+
+            Arrays.stream(responseText.split("\n")).forEach(string -> {
+                String[] row = string.split("-");
+                coreSkillsForDetails.put(row[0], row[1].trim());
+            });
+            result.put(recruitName, coreSkillsForDetails);
+        }
+
+        return result;
     }
 }
