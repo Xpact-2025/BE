@@ -20,6 +20,9 @@ public class WebClientConfig {
     @Value("${external.api.school.base-url}")
     private String schoolBaseUrl;
 
+    @Value("${spring.ai.openai.api-key}")
+    private String openAiKey;
+
     @Bean
     public WebClient schoolWebClient() {
 
@@ -58,5 +61,14 @@ public class WebClientConfig {
             clientRequest.headers().forEach((name, values) -> values.forEach(value -> log.info("{}={}", name, value)));
             return next.exchange(clientRequest);
         };
+    }
+
+    // open AI WebClient
+    @Bean
+    public WebClient openAiWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://api.openai.com/v1")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + openAiKey)
+                .build();
     }
 }
