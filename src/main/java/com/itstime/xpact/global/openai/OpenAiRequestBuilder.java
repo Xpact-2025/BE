@@ -1,63 +1,31 @@
 package com.itstime.xpact.global.openai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class OpenAiRequestBuilder {
 
-    public static String createFunction(
-            String modelName, String experiences, List<String> coreSkills, ObjectMapper mapper) throws CustomException {
+    public String buildScorePrompt(String experiences, List<String> coreSkills) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("다음은 나의 경험 요약본들을 모은 것이다.\n\n");
+        builder.append(experiences).append("\n");
+        builder.append("주어진 역량 키워드 각각에 대해 0.0 ~ 10.0의 점수를 부여해줘.\n");
+        builder.append("경험을 종합적으로 고려해, 각 역량이 어느 정도 드러나는지 판단해 객관적으로 점수를 부여해줘.\n");
 
-        String message = String.format("다음은 사용자 경험들 요약을 모은 내용이다.\n" +
-                "%s" +
-                "\n해당 경험들에 대하여 5가지 역량을 기준으로 점수를 0.0 ~ 10.0으로 JSON으로 평가해줘. 각 5가지 역량은 다음과 같다. \n",
-        experiences, coreSkills.toString());
-
-        Map<String, Object> prompt = Map.of(
-                "role", "user",
-                "content", message
-        );
-
-        Map<String, Object> properties = new LinkedHashMap<>();
-        for (String coreSkill : coreSkills) {
-            properties.put(coreSkill, Map.of(
-                    "type", "number",
-                    "description", coreSkill + "의 점수"
-            ));
+        for (int i = 0; i < coreSkills.size(); i++) {
+            builder.append(String.format("{core_skill_%d}/", i+1));
         }
+        return builder.toString();
+    }
 
-        Map<String, Object> parameters = Map.of(
-                "type", "object",
-                "properties", properties,
-                "required", properties.keySet()
-        );
-
-        Map<String, Object> functionSchema = Map.of(
-                "name", "score_experiences",
-                "description", "사용자의 경험을 기반으로 5가지 역량에 대한 점수를 평가합니다.",
-                "parameters", parameters
-        );
-
-        Map<String, Object> payload = Map.of(
-                "model", modelName,
-                "messages", List.of(prompt),
-                "functions", List.of(functionSchema),
-                "function_call", Map.of("name", "score_experiences")
-        );
-
-        try {
-            return mapper.writeValueAsString(payload);
-        } catch (JsonProcessingException e) {
-            log.warn("지정 함수 생성 중 오류... {}", e.getMessage());
-            throw CustomException.of(ErrorCode.FAILED_OPENAI_PARSING);
+    public Map<String, String> buildScoreVariables(String experiences, List<String> coreSkills) {
+        Map<String, String> variables = new HashMap<>();
+        variables.put("experiences", experiences);
+        for (int i = 0; i< coreSkills.size(); i++) {
+            variables.put("core_skill_"+ (i+1), coreSkills.get(i));
         }
+        return variables;
     }
 }
