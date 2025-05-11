@@ -13,4 +13,7 @@ public interface OpenAiService {
     CompletableFuture<String> summarizeExperience(Experience experience);
 
     Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames);
+
+    @Async
+    CompletableFuture<String> evaluateScore(String experiences, List<String> coreSkills);
 }

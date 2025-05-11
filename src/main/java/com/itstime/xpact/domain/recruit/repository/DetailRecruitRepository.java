@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.recruit.repository;
 
+import com.itstime.xpact.domain.recruit.entity.CoreSkill;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,9 @@ public interface DetailRecruitRepository extends JpaRepository<DetailRecruit, Lo
 
     @Query("SELECT d.name FROM DetailRecruit d WHERE d.recruit.id = :recruitId")
     List<String> findDetailRecruitNamesByRecruitId(@Param("recruitId") Long recruitId);
+
+    @Query("SELECT dr.coreSkill FROM DetailRecruit dr WHERE dr.id = :detailRecruitId")
+    Optional<CoreSkill> findCoreSkillById(@Param("detailRecruitId") Long detailRecruitId);
+
+
 }

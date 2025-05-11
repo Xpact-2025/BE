@@ -54,6 +54,8 @@ public enum ErrorCode {
 
     // openai
     OPENAI_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "OPENAI001", "OpenAI Error"),
+    FAILED_OPENAI_PARSING(HttpStatus.BAD_REQUEST, "OPENAI002", "OpenAI의 응답을 파싱할 수 없습니다."),
+    FILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "OPENAI003", "업로드할 파일이 존재하지 않습니다."),
 
     // crawling
     CRAWLING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CRAWL001", "Crawling Error"),

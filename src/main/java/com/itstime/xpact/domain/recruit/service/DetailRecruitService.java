@@ -4,7 +4,7 @@ import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
-import com.itstime.xpact.global.aws.LambdaUtil;
+import com.itstime.xpact.infra.lambda.LambdaUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

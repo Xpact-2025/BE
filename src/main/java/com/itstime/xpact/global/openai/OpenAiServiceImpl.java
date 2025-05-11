@@ -3,11 +3,15 @@ package com.itstime.xpact.global.openai;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
-import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
+import com.itstime.xpact.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
+
     private final DetailRecruitRepository detailRecruitRepository;
 
     @Async
@@ -78,5 +83,33 @@ public class OpenAiServiceImpl implements OpenAiService {
         }
 
         return result;
+    }
+
+    @Async
+    public CompletableFuture<String> evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
+
+        OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
+
+        PromptTemplate template = new PromptTemplate(builder.buildScorePrompt(experiences, coreSkills));
+        builder.buildScoreVariables(experiences, coreSkills).forEach(
+                template::add
+        );
+        String message = template.render();
+
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage(buildSystemInstruction(coreSkills));
+
+        String response = openAiChatModel.call(userMessage, systemMessage);
+        return CompletableFuture.completedFuture(response);
+    }
+
+    private String buildSystemInstruction(List<String> coreSkills) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Explain Korean. Follow the format below.\n{\n");
+        for (String coreSkill : coreSkills) {
+            builder.append(coreSkill).append(": {score},\n");
+        }
+        builder.append("}");
+        return builder.toString();
     }
 }

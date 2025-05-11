@@ -1,6 +1,5 @@
 package com.itstime.xpact.global.security.util;
 
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.TokenProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
