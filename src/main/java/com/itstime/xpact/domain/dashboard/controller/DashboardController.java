@@ -26,4 +26,18 @@ public class DashboardController {
         return ResponseEntity.accepted()
                 .body("Request Accepted.");
     }
+
+    @PostMapping("/{memberId}")
+    public ResponseEntity<?> getScoreResult(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long memberId) throws CustomException {
+
+        String result = scoreResultStore.get(memberId);
+        if (result == null) {
+            return ResponseEntity.status(HttpStatus.PROCESSING).body("Request Processing");
+        }
+        return ResponseEntity.ok(
+                RestResponse.ok(result)
+        );
+    }
 }
