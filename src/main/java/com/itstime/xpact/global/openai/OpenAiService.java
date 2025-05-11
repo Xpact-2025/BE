@@ -6,11 +6,12 @@ import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public interface OpenAiService {
 
     @Async("taskExecutor")
-    void summarizeExperience(Experience experience);
+    CompletableFuture<String> summarizeExperience(Experience experience);
 
     Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames);
 
