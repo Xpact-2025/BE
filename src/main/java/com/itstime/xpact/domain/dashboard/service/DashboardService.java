@@ -33,7 +33,7 @@ public class DashboardService {
 
 
     @Transactional(readOnly = true)
-    public JsonNode coreSkillMap() throws CustomException {
+    public String coreSkillMap() throws CustomException {
 
         Long memberId = securityProvider.getCurrentMemberId();
         log.info("{} 회원 조회 시작...", memberId);
@@ -53,6 +53,6 @@ public class DashboardService {
                 .collect(Collectors.joining("\n"));
 
         List<String> coreSkillList = coreSkill.getCoreSKills();
-        return openAiService.evaluateExperience(experiences, coreSkillList);
+        return openAiService.evaluateScore(experiences, coreSkillList);
     }
 }

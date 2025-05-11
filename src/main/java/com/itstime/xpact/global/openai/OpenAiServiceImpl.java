@@ -1,23 +1,20 @@
 package com.itstime.xpact.global.openai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.net.HttpHeaders;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -28,13 +25,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OpenAiServiceImpl implements OpenAiService {
 
-    @Value("${spring.ai.openai.model}")
-    private String modelName;
-
     private final OpenAiChatModel openAiChatModel;
-    private final WebClient openAiWebClient;
 
-    private final ObjectMapper objectMapper;
     private final DetailRecruitRepository detailRecruitRepository;
 
     @Async
@@ -90,33 +82,20 @@ public class OpenAiServiceImpl implements OpenAiService {
         return result;
     }
 
-    // 점수 함수 메소드 (생성 함수를 이용)
-    public JsonNode evaluateExperience(String experiences, List<String> coreSkills) throws CustomException {
+    public String evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
 
-        try {
-            String reqeustBody = OpenAiRequestBuilder.createFunction(modelName, experiences, coreSkills, objectMapper);
+        OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
 
-            String response = openAiWebClient.post()
-                    .uri("/chat/completions")
-                    .bodyValue(reqeustBody)
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
+        PromptTemplate template = new PromptTemplate(builder.buildScorePrompt(experiences, coreSkills));
+        builder.buildScoreVariables(experiences, coreSkills).forEach(
+                template::add
+        );
+        String message = template.render();
 
-            JsonNode fullResponse = objectMapper.readTree(response);
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage(buildSystemInstruction(coreSkills));
 
-            String argumentsStr = fullResponse.get("choices")
-                    .get(0)
-                    .get("message")
-                    .get("function_call")
-                    .get("arguments")
-                    .asText();
-
-            return objectMapper.readTree(argumentsStr);
-        } catch (JsonProcessingException e) {
-            log.warn("함수 요청 중 문제 발생... {} ", e.getMessage());
-            throw CustomException.of(ErrorCode.OPENAI_ERROR);
-        }
+        return openAiChatModel.call(userMessage, systemMessage);
     }
 
     private String buildSystemInstruction(List<String> coreSkills) {

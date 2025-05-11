@@ -14,5 +14,5 @@ public interface OpenAiService {
 
     Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames);
 
-    JsonNode evaluateExperience(String experiences, List<String> coreSkills);
+    String evaluateScore(String experiences, List<String> coreSkills);
 }
