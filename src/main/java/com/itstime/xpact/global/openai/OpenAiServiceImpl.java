@@ -85,7 +85,8 @@ public class OpenAiServiceImpl implements OpenAiService {
         return result;
     }
 
-    public String evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
+    @Async
+    public CompletableFuture<String> evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
 
         OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
 
@@ -98,7 +99,8 @@ public class OpenAiServiceImpl implements OpenAiService {
         Message userMessage = new UserMessage(message);
         Message systemMessage = new SystemMessage(buildSystemInstruction(coreSkills));
 
-        return openAiChatModel.call(userMessage, systemMessage);
+        String response = openAiChatModel.call(userMessage, systemMessage);
+        return CompletableFuture.completedFuture(response);
     }
 
     private String buildSystemInstruction(List<String> coreSkills) {

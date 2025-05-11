@@ -1,6 +1,5 @@
 package com.itstime.xpact.global.openai;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import org.springframework.scheduling.annotation.Async;
 
@@ -15,5 +14,6 @@ public interface OpenAiService {
 
     Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames);
 
-    String evaluateScore(String experiences, List<String> coreSkills);
+    @Async
+    CompletableFuture<String> evaluateScore(String experiences, List<String> coreSkills);
 }
