@@ -68,6 +68,9 @@ public enum ErrorCode {
     RECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "RE001", "해당 직무가 존재하지 않습니다."),
     EMPTY_DESIRED_RECRUIT(HttpStatus.BAD_REQUEST, "RE002", "희망 직무가 선택되지 않았습니다."),
 
+    // detail recruit
+    DETAIL_RECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "DR001", "해당 상세직무가 존재하지 않습니다."),
+
     // keyword
     KEYWORD_EXCEEDED(HttpStatus.BAD_REQUEST, "EXP009", "키워드는 5개를 넘길 수 없습니다."),
     KEYWORD_TOO_LONG(HttpStatus.BAD_REQUEST, "EXP010", "키워드는 10글자를 넘길 수 없습니다."),
