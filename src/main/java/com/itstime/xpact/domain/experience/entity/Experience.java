@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(of = {"title", "situation", "task", "action", "result", "role", "perform"})
+@ToString(exclude = {"member", "detailRecruit"})
 public class Experience extends BaseEntity {
 
     @Id
@@ -88,7 +88,8 @@ public class Experience extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_recruit_id")
     private DetailRecruit detailRecruit;
 
