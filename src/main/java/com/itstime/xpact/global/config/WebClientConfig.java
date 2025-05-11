@@ -68,6 +68,7 @@ public class WebClientConfig {
     public WebClient openAiWebClient() {
         return WebClient.builder()
                 .baseUrl("https://api.openai.com/v1")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + openAiKey)
                 .build();
     }
