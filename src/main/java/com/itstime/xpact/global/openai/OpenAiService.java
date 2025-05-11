@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 public interface OpenAiService {
 
     @Async("taskExecutor")
-    CompletableFuture<Void> summarizeExperience(Experience experience);
+    void summarizeExperience(Experience experience);
 
     Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames);
 
@@ -18,5 +18,5 @@ public interface OpenAiService {
     CompletableFuture<String> evaluateScore(String experiences, List<String> coreSkills);
 
     @Async("taskExecutor")
-    CompletableFuture<Void> getDetailRecruitFromExperience(Experience experience);
+    void getDetailRecruitFromExperience(Experience experience);
 }

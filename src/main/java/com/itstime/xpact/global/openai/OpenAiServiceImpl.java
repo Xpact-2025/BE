@@ -32,7 +32,7 @@ public class OpenAiServiceImpl implements OpenAiService {
     private final ExperienceRepository experienceRepository;
 
     @Async
-    public CompletableFuture<Void> summarizeExperience(Experience experience) {
+    public void summarizeExperience(Experience experience) {
         String message = String.format("""
                 역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘\s
                 요약만 출력되도록 해줘\s
@@ -45,7 +45,6 @@ public class OpenAiServiceImpl implements OpenAiService {
         log.info("summary : {}", summary);
 
         experience.setSummary(summary);
-        return CompletableFuture.completedFuture(null);
     }
 
     public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
@@ -116,7 +115,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         return builder.toString();
     }
 
-    public CompletableFuture<Void> getDetailRecruitFromExperience(Experience experience) {
+    public void getDetailRecruitFromExperience(Experience experience) {
         String experienceStr = experience.toString();
         String recruits = detailRecruitToString();
         System.out.println("recruits = " + recruits);
@@ -139,13 +138,12 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         experience.setDetailRecruit(detailRecruit);
         experienceRepository.save(experience);
-        return CompletableFuture.completedFuture(null);
     }
 
     private String detailRecruitToString() {
         StringBuilder recruits = new StringBuilder();
         detailRecruitRepository.findAll()
-                .forEach(recruit -> recruits.append(" / ").append(recruit.getName()));
+                .forEach(recruit -> recruits.append(", ").append(recruit.getName()));
         return recruits.toString();
     }
 }
