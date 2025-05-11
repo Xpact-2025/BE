@@ -1,6 +1,5 @@
 package com.itstime.xpact.domain.dashboard.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +26,7 @@ public class DashboardService {
 
     private final OpenAiService openAiService;
     private final SecurityProvider securityProvider;
+    private final ScoreResultStore scoreResultStore;
 
     private final MemberRepository memberRepository;
     private final DetailRecruitRepository detailRecruitRepository;
@@ -33,7 +34,7 @@ public class DashboardService {
 
 
     @Transactional(readOnly = true)
-    public String coreSkillMap() throws CustomException {
+    public CompletableFuture<String> coreSkillMap() throws CustomException {
 
         Long memberId = securityProvider.getCurrentMemberId();
         log.info("{} 회원 조회 시작...", memberId);
@@ -53,6 +54,10 @@ public class DashboardService {
                 .collect(Collectors.joining("\n"));
 
         List<String> coreSkillList = coreSkill.getCoreSKills();
-        return openAiService.evaluateScore(experiences, coreSkillList);
+        return openAiService.evaluateScore(experiences, coreSkillList)
+                .thenApply(result -> {
+                    scoreResultStore.save(memberId, result);
+                    return result;
+                });
     }
 }
