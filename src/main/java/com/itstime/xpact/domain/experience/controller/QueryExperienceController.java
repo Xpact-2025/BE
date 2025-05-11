@@ -77,6 +77,7 @@ public class QueryExperienceController {
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.read(experienceId)));
     }
 
+    @Operation(summary = "경험 검색", description = "경험의 제목과 키워드를 통한 검색 기능 제공")
     @GetMapping("/search")
     public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> queryExperience(
             @RequestParam("query") @Nullable String query) {
