@@ -118,4 +118,14 @@ public class OpenAiServiceImpl implements OpenAiService {
             throw CustomException.of(ErrorCode.OPENAI_ERROR);
         }
     }
+
+    private String buildSystemInstruction(List<String> coreSkills) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Explain Korean. Follow the format below.\n{\n");
+        for (String coreSkill : coreSkills) {
+            builder.append(coreSkill).append(": {score},\n");
+        }
+        builder.append("}");
+        return builder.toString();
+    }
 }
