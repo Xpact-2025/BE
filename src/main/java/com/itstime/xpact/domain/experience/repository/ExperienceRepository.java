@@ -15,7 +15,7 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
 
     List<Experience> findAllByMember(Member member, Sort sort);
 
-    @Query("SELECT e FROM Experience e JOIN FETCH e.detailRecruit WHERE e.member.id = :memberId")
+    @Query("SELECT e FROM Experience e LEFT JOIN FETCH e.detailRecruit WHERE e.member.id = :memberId")
     List<Experience> findAllWithDetailRecruitByMemberId(@Param("memberId") Long memberId);
 
     @Query("SELECT e FROM Experience e JOIN FETCH e.keywords WHERE e.member.id = :memberId")
