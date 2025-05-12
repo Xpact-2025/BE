@@ -70,7 +70,7 @@ public class DashboardService {
     // 직무 카운트 값을 가져와 직무 비율로 변환하는 로직
     public RatioResponseDto detailRecruitRatio() {
         // 직무 카운트 값 가져옴
-        Map<String, Integer> ratios = getRatios();
+        Map<String, Integer> ratios = getCounts();
 
         // 해당 카운트의 합 구함
         int sum = ratios
@@ -103,11 +103,11 @@ public class DashboardService {
      * 직무 비율을 redis에서 가져오는 메서드
      * 레디스에 없을 시, 직무 비율 새로 업데이트 진행 (setRatios())
      */
-    private Map<String, Integer> getRatios() {
+    private Map<String, Integer> getCounts() {
         RecruitCount recruitCount = recruitCountRepository.findById(securityProvider.getCurrentMemberId())
-                .orElseGet(this::setRatios);
+                .orElseGet(this::setCounts);
 
-        log.info("get ratio from redis");
+        log.info("get count from redis");
         return recruitCount.getRecruitCount().entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue()
                         .reversed()
@@ -119,7 +119,7 @@ public class DashboardService {
     /**
      * 모든 경험을 fetch하여 각 관련된 상세직무의 카운트를 구해 redis에 저장
      */
-    private RecruitCount setRatios() {
+    private RecruitCount setCounts() {
         Long memberId = securityProvider.getCurrentMemberId();
 
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(memberId);
@@ -131,10 +131,10 @@ public class DashboardService {
                     }
                 });
 
-        RecruitCount recruitRatio = RecruitCount.builder().id(memberId).recruitCount(result).build();
-        recruitCountRepository.save(recruitRatio);
-        log.info("new ratio was saved");
-        return recruitRatio;
+        RecruitCount recruitCount = RecruitCount.builder().id(memberId).recruitCount(result).build();
+        recruitCountRepository.save(recruitCount);
+        log.info("new count was saved");
+        return recruitCount;
     }
 
     /**
@@ -179,9 +179,6 @@ public class DashboardService {
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(securityProvider.getCurrentMemberId());
         experiences.stream()
                 .filter(e -> e.getDetailRecruit() == null)
-                .forEach(e -> {
-                        System.out.println("asdfasdf");
-                        openAiService.getDetailRecruitFromExperience(e);
-                });
+                .forEach(openAiService::getDetailRecruitFromExperience);
     }
 }
