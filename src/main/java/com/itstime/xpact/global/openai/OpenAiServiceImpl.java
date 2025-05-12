@@ -45,6 +45,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         log.info("summary : {}", summary);
 
         experience.setSummary(summary);
+        experienceRepository.save(experience);
     }
 
     public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
