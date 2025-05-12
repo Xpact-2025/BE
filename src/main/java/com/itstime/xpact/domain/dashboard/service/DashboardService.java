@@ -21,10 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -85,8 +82,13 @@ public class DashboardService {
         // entry의 value에 대해 sum으로 나눈 값(비율) 리턴
         Map<String, Double> result = ratios.entrySet()
                 .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey, entry -> Math.round(entry.getValue() / (double) sum * 1000) / 10.0));
+                        Map.Entry::getKey,
+                        entry -> Math.round(entry.getValue() / (double) sum * 1000) / 10.0,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
 
         // 비율이 각각 33.3, 33.3 33.3일 경우 합이 100이 안되는 경우 존재
         // adjustRatio()에서 이를 보정 (100에서 합을 빼고 가장 value가 큰 entry에 해당 차를 더함)
@@ -167,20 +169,17 @@ public class DashboardService {
 
     public void checkSummaryOfExperience() {
         List<Experience> experiences = experienceRepository.findAllWithKeywordByMemberId(securityProvider.getCurrentMemberId());
-        experiences.forEach(e -> {
-            String summary = e.getSummary();
-            if(summary == null) openAiService.summarizeExperience(e);
-        });
+        System.out.println("experiences = " + experiences.size());
 
-        experienceRepository.saveAll(experiences);
+        experiences.stream()
+            .filter(e -> e.getSummary() == null)
+            .forEach(openAiService::summarizeExperience);
     }
 
-    void checkDetailRecruitOfExperience() {
+    public void checkDetailRecruitOfExperience() {
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(securityProvider.getCurrentMemberId());
         experiences.forEach(e -> {
-            if(e.getDetailRecruit() == null) openAiService.summarizeExperience(e);
+            if(e.getDetailRecruit() == null) openAiService.getDetailRecruitFromExperience(e);
         });
-
-        experienceRepository.saveAll(experiences);
     }
 }
