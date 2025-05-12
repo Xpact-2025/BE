@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.dashboard.controller;
 
+import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
 import com.itstime.xpact.domain.dashboard.service.DashboardService;
 import com.itstime.xpact.domain.dashboard.service.ScoreResultStore;
 import com.itstime.xpact.global.exception.CustomException;
@@ -39,5 +40,11 @@ public class DashboardController {
         return ResponseEntity.ok(
                 RestResponse.ok(result)
         );
+    }
+
+    @GetMapping("/ratio")
+    public ResponseEntity<RestResponse<RatioResponseDto>> getRatio() {
+        RatioResponseDto dto = dashboardService.detailRecruitRatio();
+        return ResponseEntity.ok(RestResponse.ok(dto));
     }
 }
