@@ -169,7 +169,6 @@ public class DashboardService {
 
     public void checkSummaryOfExperience() {
         List<Experience> experiences = experienceRepository.findAllWithKeywordByMemberId(securityProvider.getCurrentMemberId());
-        System.out.println("experiences = " + experiences.size());
 
         experiences.stream()
             .filter(e -> e.getSummary() == null)
@@ -178,8 +177,11 @@ public class DashboardService {
 
     public void checkDetailRecruitOfExperience() {
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(securityProvider.getCurrentMemberId());
-        experiences.forEach(e -> {
-            if(e.getDetailRecruit() == null) openAiService.getDetailRecruitFromExperience(e);
-        });
+        experiences.stream()
+                .filter(e -> e.getDetailRecruit() == null)
+                .forEach(e -> {
+                        System.out.println("asdfasdf");
+                        openAiService.getDetailRecruitFromExperience(e);
+                });
     }
 }
