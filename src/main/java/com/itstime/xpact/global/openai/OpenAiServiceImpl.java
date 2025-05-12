@@ -105,7 +105,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     private String buildSystemInstruction(List<String> coreSkills) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Explain Korean. Follow the format below.\n{\n");
+        builder.append("Explain Korean. Follow the JSON format below.\n{\n");
         for (String coreSkill : coreSkills) {
             builder.append(coreSkill).append(": {score},\n");
         }
