@@ -44,7 +44,12 @@ public class DashboardController {
 
     @GetMapping("/ratio")
     public ResponseEntity<RestResponse<RatioResponseDto>> getRatio() {
-        RatioResponseDto dto = dashboardService.detailRecruitRatio();
-        return ResponseEntity.ok(RestResponse.ok(dto));
+        return ResponseEntity.ok(RestResponse.ok(dashboardService.detailRecruitRatio()));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<RestResponse<?>> refresh() {
+        dashboardService.refreshData();
+        return ResponseEntity.ok(RestResponse.ok());
     }
 }
