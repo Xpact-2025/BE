@@ -1,9 +1,13 @@
 package com.itstime.xpact.global.openai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -11,10 +15,11 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.prompt.PromptTemplate;;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -86,7 +91,7 @@ public class OpenAiServiceImpl implements OpenAiService {
     }
 
     @Async
-    public CompletableFuture<String> evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
+    public CompletableFuture<MapResponseDto> evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
 
         OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
 
@@ -106,9 +111,12 @@ public class OpenAiServiceImpl implements OpenAiService {
     private String buildSystemInstruction(List<String> coreSkills) {
         StringBuilder builder = new StringBuilder();
         builder.append("Explain Korean. Follow the JSON format below.\n{\n");
+        builder.append("\"coreSkillMaps\": [\n{");
         for (String coreSkill : coreSkills) {
-            builder.append(coreSkill).append(": {score},\n");
+            builder.append("\"coreSkillName\": ").append(coreSkill).append(", ");
+            builder.append("\"score\": float between 0.0~10.0 },\n");
         }
+        builder.append("]\n");
         builder.append("}");
         return builder.toString();
     }
