@@ -1,10 +1,8 @@
 package com.itstime.xpact.domain.dashboard.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.ScoreResponseDto;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.CoreSkill;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -33,6 +30,7 @@ public class DashboardService {
     private final OpenAiService openAiService;
     private final SecurityProvider securityProvider;
     private final ScoreResultStore scoreResultStore;
+
     private final ObjectMapper objectMapper;
 
     private final DetailRecruitRepository detailRecruitRepository;
@@ -70,10 +68,9 @@ public class DashboardService {
         List<String> coreSkillList = coreSkill.getCoreSKills();
 
         openAiService.evaluateScore(experiences, coreSkillList)
-                .thenApply(this::toMapDto)
                 .thenAccept(resultDto -> {
                     try {
-                        scoreResultStore.save(member.getId(), resultDto.toString());
+                        scoreResultStore.save(member.getId(), objectMapper.writeValueAsString(resultDto));
                     } catch (Exception e) {
                         log.error("결과를 저장하는 것에 실패하였습니다.", e);
                     }
@@ -88,14 +85,7 @@ public class DashboardService {
     private MapResponseDto toMapDto(String result) {
 
         try {
-            Map<String, Double> maps = objectMapper.readValue(result, new TypeReference<>() {});
-
-            List<ScoreResponseDto> scores = maps.entrySet()
-                    .stream()
-                    .map(entry -> new ScoreResponseDto(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
-
-            return new MapResponseDto(scores);
+            return objectMapper.readValue(result, MapResponseDto.class);
         } catch (JsonProcessingException e) {
             log.error("OpenAI 응답 중 오류... {}", result, e);
             throw CustomException.of(ErrorCode.UNMATCHED_OPENAI_FORMAT);
