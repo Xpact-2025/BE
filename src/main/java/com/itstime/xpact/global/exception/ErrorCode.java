@@ -56,6 +56,7 @@ public enum ErrorCode {
     OPENAI_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "OPENAI001", "OpenAI Error"),
     FAILED_OPENAI_PARSING(HttpStatus.BAD_REQUEST, "OPENAI002", "OpenAI의 응답을 파싱할 수 없습니다."),
     FILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "OPENAI003", "업로드할 파일이 존재하지 않습니다."),
+    UNMATCHED_OPENAI_FORMAT(HttpStatus.BAD_REQUEST, "OPENAI004", "OpenAI 응답이 형식에 맞지 않습니다."),
 
     // crawling
     CRAWLING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CRAWL001", "Crawling Error"),
@@ -75,6 +76,9 @@ public enum ErrorCode {
     // coreSkill
     NOT_FOUND_CORESKILLS(HttpStatus.BAD_REQUEST, "CSE001", "해당 핵심 역량을 불러오는 데에 실패했습니다."),
     DETAILRECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "CSE003", "찾을 수 없습니다."),
+
+    // skill map
+    UNLOADED_SKILL_MAP(HttpStatus.BAD_REQUEST, "SME001", "핵심 스킬맵 로드에 실패하였습니다."),
     ;
 
     private final HttpStatus httpStatus;
