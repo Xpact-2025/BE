@@ -11,12 +11,12 @@ public class ScoreResultStore {
     private final RedisTemplate<String, String> redisTemplate;
 
     public void save(Long memberId, String result) {
-        String key = "memberId:" + memberId;
+        String key = "coreSkillMap:" + memberId;
         redisTemplate.opsForValue().set(key, result);
     }
 
     public String get(Long memberId) {
-        String key = "memberId:" + memberId;
+        String key = "coreSkillMap:" + memberId;
         return (String) redisTemplate.opsForValue().get(key);
     }
 }

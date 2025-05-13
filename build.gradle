@@ -79,6 +79,7 @@ dependencies {
 
     // jackson
     implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     implementation 'org.seleniumhq.selenium:selenium-java:4.31.0'
 

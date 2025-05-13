@@ -1,8 +1,8 @@
 package com.itstime.xpact.domain.dashboard.controller;
 
+import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
 import com.itstime.xpact.domain.dashboard.service.DashboardService;
-import com.itstime.xpact.domain.dashboard.service.ScoreResultStore;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.response.RestResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,30 +16,28 @@ import org.springframework.web.bind.annotation.*;
 public class DashboardController {
 
     private final DashboardService dashboardService;
-    private final ScoreResultStore scoreResultStore;
 
-    // 점수 계산 환산 확인을 위한 Test Controller
-    // TODO : 추후에 수정 필요
-    @PostMapping
-    public ResponseEntity<?> getScore(
+    @PostMapping("/skills")
+    public ResponseEntity<?> evaluateScoreAsync(
             @RequestHeader("Authorization") String token) throws CustomException {
-        dashboardService.coreSkillMap();
-        return ResponseEntity.accepted()
-                .body("Request Accepted.");
+
+        Long memberId = dashboardService.evaluateAsync();
+        return ResponseEntity.accepted().body("Request Accepted for memberId: " + memberId);
     }
 
-    @PostMapping("/{memberId}")
+    @GetMapping("/skills/{memberId}")
     public ResponseEntity<?> getScoreResult(
             @RequestHeader("Authorization") String token,
             @PathVariable Long memberId) throws CustomException {
 
-        String result = scoreResultStore.get(memberId);
-        if (result == null) {
-            return ResponseEntity.status(HttpStatus.PROCESSING).body("Request Processing");
+        MapResponseDto response = dashboardService.getEvaluationResult(memberId)
+                .orElse(null);
+
+        if (response == null) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Processing");
         }
-        return ResponseEntity.ok(
-                RestResponse.ok(result)
-        );
+
+        return ResponseEntity.ok(RestResponse.ok(response));
     }
 
     @GetMapping("/ratio")
