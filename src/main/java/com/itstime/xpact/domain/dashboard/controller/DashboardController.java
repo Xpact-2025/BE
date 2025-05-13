@@ -16,7 +16,7 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
-    @PostMapping
+    @PostMapping("/skills")
     public ResponseEntity<?> evaluateScoreAsync(
             @RequestHeader("Authorization") String token) throws CustomException {
 
@@ -24,7 +24,7 @@ public class DashboardController {
         return ResponseEntity.accepted().body("Request Accepted for memberId: " + memberId);
     }
 
-    @GetMapping("/{memberId}")
+    @GetMapping("/skills/{memberId}")
     public ResponseEntity<?> getScoreResult(
             @RequestHeader("Authorization") String token,
             @PathVariable Long memberId) throws CustomException {
