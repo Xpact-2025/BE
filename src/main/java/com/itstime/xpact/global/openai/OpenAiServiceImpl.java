@@ -104,8 +104,17 @@ public class OpenAiServiceImpl implements OpenAiService {
         Message userMessage = new UserMessage(message);
         Message systemMessage = new SystemMessage(buildSystemInstruction(coreSkills));
 
-        String response = openAiChatModel.call(userMessage, systemMessage);
-        return CompletableFuture.completedFuture(response);
+        // JSON 파싱
+        String rawResponse = openAiChatModel.call(systemMessage, userMessage);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            MapResponseDto result = objectMapper.readValue(rawResponse, MapResponseDto.class);
+            return CompletableFuture.completedFuture(result);
+        } catch (JsonProcessingException e) {
+            log.error("readValue 불가...", e);
+            throw CustomException.of(ErrorCode.FAILED_OPENAI_PARSING);
+        }
     }
 
     private String buildSystemInstruction(List<String> coreSkills) {
