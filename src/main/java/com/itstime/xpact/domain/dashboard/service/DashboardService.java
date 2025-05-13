@@ -161,7 +161,6 @@ public class DashboardService {
         }
     }
 
-    @Transactional
     public void refreshData() {
         checkSummaryOfExperience();
         checkDetailRecruitOfExperience();
@@ -171,12 +170,12 @@ public class DashboardService {
         List<Experience> experiences = experienceRepository.findAllWithKeywordByMemberId(securityProvider.getCurrentMemberId());
 
         experiences.stream()
-            .filter(e -> e.getSummary() == null)
+            .filter(e -> e.getSummary() == null || e.getSummary().isEmpty())
             .forEach(openAiService::summarizeExperience);
     }
 
     public void checkDetailRecruitOfExperience() {
-        List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(securityProvider.getCurrentMemberId());
+        List<Experience> experiences = experienceRepository.findAllWithKeywordByMemberId(securityProvider.getCurrentMemberId());
         experiences.stream()
                 .filter(e -> e.getDetailRecruit() == null)
                 .forEach(openAiService::getDetailRecruitFromExperience);
