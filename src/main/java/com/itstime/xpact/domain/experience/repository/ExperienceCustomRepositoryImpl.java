@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.experience.repository;
 
 import com.itstime.xpact.domain.experience.common.ExperienceType;
+import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.QExperience;
 import com.itstime.xpact.domain.experience.entity.QKeyword;
@@ -38,6 +39,16 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
                 .where(experience.member.id.eq(memberId))
                 .where(builder)
                 .orderBy(orderSpecifier)
+                .fetch();
+    }
+
+    public List<String> findSummaryByMemberId(Long memberId) {
+        QExperience experience = QExperience.experience;
+
+        return queryFactory.select(experience.summary)
+                .from(experience)
+                .where(experience.status.eq(Status.SAVE)
+                        .and(experience.summary.isNotEmpty()))
                 .fetch();
     }
 

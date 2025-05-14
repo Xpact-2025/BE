@@ -1,16 +1,26 @@
 package com.itstime.xpact.global.openai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
-import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
+import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -23,9 +33,10 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
     private final DetailRecruitRepository detailRecruitRepository;
+    private final ExperienceRepository experienceRepository;
 
     @Async
-    public CompletableFuture<String> summarizeExperience(Experience experience) {
+    public void summarizeExperience(Experience experience) {
         String message = String.format("""
                 역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘\s
                 요약만 출력되도록 해줘\s
@@ -34,10 +45,11 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
-        String result = response.getResult().getOutput().getText();
-        log.info("result : {}", result);
+        String summary = response.getResult().getOutput().getText();
+        log.info("summary : {}", summary);
 
-        return CompletableFuture.completedFuture(result);
+        experience.setSummary(summary);
+        experienceRepository.save(experience);
     }
 
     public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
@@ -78,5 +90,77 @@ public class OpenAiServiceImpl implements OpenAiService {
         }
 
         return result;
+    }
+
+    @Async
+    public CompletableFuture<MapResponseDto> evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
+
+        OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
+
+        PromptTemplate template = new PromptTemplate(builder.buildScorePrompt(experiences, coreSkills));
+        builder.buildScoreVariables(experiences, coreSkills).forEach(
+                template::add
+        );
+        String message = template.render();
+
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage(buildSystemInstruction(coreSkills));
+
+        // JSON 파싱
+        String rawResponse = openAiChatModel.call(systemMessage, userMessage);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            MapResponseDto result = objectMapper.readValue(rawResponse, MapResponseDto.class);
+            return CompletableFuture.completedFuture(result);
+        } catch (JsonProcessingException e) {
+            log.error("readValue 불가...", e);
+            throw CustomException.of(ErrorCode.FAILED_OPENAI_PARSING);
+        }
+    }
+
+    private String buildSystemInstruction(List<String> coreSkills) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Explain Korean. Follow the JSON format below.\n{\n");
+        builder.append("\"coreSkillMaps\": [\n{");
+        for (String coreSkill : coreSkills) {
+            builder.append("\"coreSkillName\": ").append(coreSkill).append(", ");
+            builder.append("\"score\": float between 0.0~10.0 },\n");
+        }
+        builder.append("]\n");
+        builder.append("}");
+        return builder.toString();
+    }
+
+    public void getDetailRecruitFromExperience(Experience experience) {
+        String experienceStr = experience.toString();
+        String recruits = detailRecruitToString();
+        System.out.println("recruits = " + recruits);
+
+        String message = String.format(
+                "다음 객체를 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.\n" +
+                        "객체: %s\n" +
+                        "recruit (각 recruit는 '/'로 분리되어 있음) : %s\n" +
+                        "출력 형식 : {recruit}\n" +
+                        "출력 시 다른 문구 넣지 말고 그저 선택한 recruit만 출력해야함",
+                experienceStr, recruits
+        );
+
+        Prompt prompt = new Prompt(message);
+        ChatResponse response = openAiChatModel.call(prompt);
+        String result = response.getResult().getOutput().getText();
+        log.info("result : {}", result);
+        DetailRecruit detailRecruit = detailRecruitRepository.findByName(result).orElseThrow(() ->
+                CustomException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND));
+
+        experience.setDetailRecruit(detailRecruit);
+        experienceRepository.save(experience);
+    }
+
+    private String detailRecruitToString() {
+        StringBuilder recruits = new StringBuilder();
+        detailRecruitRepository.findAll()
+                .forEach(recruit -> recruits.append(", ").append(recruit.getName()));
+        return recruits.toString();
     }
 }

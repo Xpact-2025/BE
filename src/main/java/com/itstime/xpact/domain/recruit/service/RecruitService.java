@@ -9,8 +9,7 @@ import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.aws.LambdaResponseDto;
-import com.itstime.xpact.global.aws.LambdaUtil;
+import com.itstime.xpact.infra.lambda.LambdaUtil;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service

@@ -68,12 +68,9 @@ public class ExperienceService {
 
         experienceRepository.save(experience);
 
-        if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE))
-            openAiService.summarizeExperience(experience)
-                    .thenAccept(summary -> {
-                        experience.setSummary(summary);
-                        experienceRepository.save(experience);
-                    });
+        if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE)) {
+            setSummaryAndDetailRecruit(experience);
+        }
     }
 
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
@@ -106,8 +103,9 @@ public class ExperienceService {
 
         experienceRepository.save(experience);
 
-        if(Status.valueOf(updateRequestDto.getStatus()).equals(Status.SAVE))
-            openAiService.summarizeExperience(experience);
+        if(Status.valueOf(updateRequestDto.getStatus()).equals(Status.SAVE)) {
+            setSummaryAndDetailRecruit(experience);
+        }
     }
 
     public void delete(Long experienceId) {
@@ -121,5 +119,10 @@ public class ExperienceService {
         }
 
         experienceRepository.delete(experience);
+    }
+
+    private void setSummaryAndDetailRecruit(Experience experience) {
+        openAiService.summarizeExperience(experience);
+        openAiService.getDetailRecruitFromExperience(experience);
     }
 }
