@@ -9,6 +9,7 @@ import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
+import com.itstime.xpact.infra.lambda.LambdaUtil;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class RecruitService {
 
     private final SecurityProvider securityProvider;
     private final TrieUtil trieUtil;
+    private final LambdaUtil lambdaUtil;
 
     private final RecruitRepository recruitRepository;
     private final DetailRecruitRepository detailRecruitRepository;
@@ -73,7 +75,7 @@ public class RecruitService {
                 .orElseThrow(() -> CustomException.of(ErrorCode.RECRUIT_NOT_FOUND));
         Long recruitId = recruit.getId();
 
-        return detailRecruitRepository.findAllByRecruitId(recruitId);
+        return detailRecruitRepository.findDetailRecruitNamesByRecruitId(recruitId);
     }
 
     // 희망 상세 직군 검색 자동완성
@@ -122,5 +124,21 @@ public class RecruitService {
                 .recruitName(requestDto.recruitName())
                 .detailRecruitName(requestDto.detailRecruitName())
                 .build();
+    }
+
+    public boolean recruitExists() {
+        return recruitRepository.count() > 0;
+    }
+
+    public void saveRecruit() {
+        List<Recruit> recruits = lambdaUtil.invokeLambda(lambdaUtil.lambdaClient(), "recruitCrawler")
+                .stream()
+                .map(recruitName -> Recruit.builder()
+                        .name(recruitName.getGroupName())
+                        .build())
+                .toList();
+
+        recruitRepository.saveAll(recruits);
+        log.info("Saved {} rows of recruits", recruits.size());
     }
 }

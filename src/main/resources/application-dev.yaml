@@ -36,11 +36,13 @@ spring:
     openai:
       api-key: ${DEV_OPENAI_API_KEY}
 
-crawler:
-  chrome-driver-path: /home/ubuntu/chromedriver-linux64/chromedriver
-
 external:
   api:
     school:
       service-key: ${SCHOOL_REST_API_KEY}
       base-url: "http://openapi.academyinfo.go.kr"
+
+aws:
+  credentials:
+    access-key: ${DEV_AWS_ACCESS_KEY}
+    secret-key: ${DEV_AWS_SECRET_KEY}

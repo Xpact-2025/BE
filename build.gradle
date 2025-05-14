@@ -79,12 +79,16 @@ dependencies {
 
     // jackson
     implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     implementation 'org.seleniumhq.selenium:selenium-java:4.31.0'
 
     // Jaxb2XmlDecoder
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.3'
+
+    // aws lambda
+    implementation 'software.amazon.awssdk:lambda:2.25.8'
 }
 
 def queryDslSrcDir = 'build/generated/querydsl/'

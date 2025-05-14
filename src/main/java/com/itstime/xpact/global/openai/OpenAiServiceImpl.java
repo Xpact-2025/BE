@@ -1,19 +1,30 @@
 package com.itstime.xpact.global.openai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
+import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
+import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
+import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,38 +32,135 @@ import java.util.concurrent.CompletableFuture;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
+    private final DetailRecruitRepository detailRecruitRepository;
+    private final ExperienceRepository experienceRepository;
 
     @Async
     public void summarizeExperience(Experience experience) {
-        String message = String.format("역할, 내가 한 일, 성과(결과)가 드러나게 자세한 `~~했음`으로 끝나게 2줄로 요약해줘 : %s", experience.toString());
+        String message = String.format("""
+                역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘\s
+                요약만 출력되도록 해줘\s
+                data : %s""", experience.toString());
         log.info(message);
+
+        Prompt prompt = new Prompt(message);
+        ChatResponse response = openAiChatModel.call(prompt);
+        String summary = response.getResult().getOutput().getText();
+        log.info("summary : {}", summary);
+
+        experience.setSummary(summary);
+        experienceRepository.save(experience);
+    }
+
+    public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
+        Map<String, Map<String, String>> result = new LinkedHashMap<>();
+
+        for (String recruitName : recruitNames) {
+            log.info("Requesting core skill extraction from OpenAI for recruit: {}", recruitName);
+            List<DetailRecruit> detailRecruits = detailRecruitRepository.findAllByRecruitName(recruitName);
+
+            if (detailRecruits.isEmpty()) {
+                log.warn("{} : 해당되는 DetailRecruit 조회 불가", recruitName);
+                continue;
+            }
+
+            Map<String, String> coreSkillsForDetails = new LinkedHashMap<>();
+
+            String joinedDetailNames = detailRecruits.stream()
+                    .map(DetailRecruit::getName)
+                    .collect(Collectors.joining(","));
+
+            log.info("Requesting core skill extraction from OpenAI for detailRecruits: {}", joinedDetailNames);
+
+            String promptMessage = String.format(
+                    "다음 ','로 구분된 직무에 대해 반드시 요구되는 핵심 스킬 5가지를 도출해줘.(숫자 넣지 마)\n" +
+                            "출력 형식: {직무}-{핵심스킬1}/{핵심2}/{핵심스킬3}/{핵심스킬4}/{핵심스킬5}\n\n" +
+                            "출력 시 직무는 변형 없이 그대로 출력해라. -와 /는 필수이다.\n" +
+                            "%s", joinedDetailNames);
+
+            Prompt prompt = new Prompt(promptMessage);
+            ChatResponse response = openAiChatModel.call(prompt);
+            String responseText = response.getResult().getOutput().getText();
+
+            Arrays.stream(responseText.split("\n")).forEach(string -> {
+                String[] row = string.split("-");
+                coreSkillsForDetails.put(row[0], row[1].trim());
+            });
+            result.put(recruitName, coreSkillsForDetails);
+        }
+
+        return result;
+    }
+
+    @Async
+    public CompletableFuture<MapResponseDto> evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
+
+        OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
+
+        PromptTemplate template = new PromptTemplate(builder.buildScorePrompt(experiences, coreSkills));
+        builder.buildScoreVariables(experiences, coreSkills).forEach(
+                template::add
+        );
+        String message = template.render();
+
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage(buildSystemInstruction(coreSkills));
+
+        // JSON 파싱
+        String rawResponse = openAiChatModel.call(systemMessage, userMessage);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            MapResponseDto result = objectMapper.readValue(rawResponse, MapResponseDto.class);
+            return CompletableFuture.completedFuture(result);
+        } catch (JsonProcessingException e) {
+            log.error("readValue 불가...", e);
+            throw CustomException.of(ErrorCode.FAILED_OPENAI_PARSING);
+        }
+    }
+
+    private String buildSystemInstruction(List<String> coreSkills) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Explain Korean. Follow the JSON format below.\n{\n");
+        builder.append("\"coreSkillMaps\": [\n{");
+        for (String coreSkill : coreSkills) {
+            builder.append("\"coreSkillName\": ").append(coreSkill).append(", ");
+            builder.append("\"score\": float between 0.0~10.0 },\n");
+        }
+        builder.append("]\n");
+        builder.append("}");
+        return builder.toString();
+    }
+
+    public void getDetailRecruitFromExperience(Experience experience) {
+        String experienceStr = experience.toString();
+        String recruits = detailRecruitToString();
+        System.out.println("recruits = " + recruits);
+
+        String message = String.format(
+                "다음 객체를 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.\n" +
+                        "객체: %s\n" +
+                        "recruit (각 recruit는 '/'로 분리되어 있음) : %s\n" +
+                        "출력 형식 : {recruit}\n" +
+                        "출력 시 다른 문구 넣지 말고 그저 선택한 recruit만 출력해야함",
+                experienceStr, recruits
+        );
 
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
+        DetailRecruit detailRecruit = detailRecruitRepository.findByName(result).orElseThrow(() ->
+                CustomException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND));
 
-        CompletableFuture.completedFuture(result);
+        experience.setDetailRecruit(detailRecruit);
+        experienceRepository.save(experience);
     }
 
-    public Map<String, String> getCoreSkill(List<String> recruits) {
-        Map<String, String> coreSkillOfRecruit = new HashMap<>();
-        String joinedRecruits = String.join(",", recruits);
-
-        String message = String.format("다음에 ','로 구분되어 주어질 일련의 직무에 대해 필수적으로 요하는 구체적인 핵심 스킬을 5가지 도출해줘 (전공자의 시선에서 이해할 수 잇도록)\n" +
-                "출력 예시는 다음과 같아 (숫자 붙이지 마) ex) {직무}-{키워드1}/{키워드2}/{키워드3}/{키워드4}/{키워드5}\n\n" +
-                "%s", joinedRecruits);
-
-        Prompt prompt = new Prompt(message);
-        log.info("Requesting core skill extraction from OpenAI...");
-        ChatResponse response = openAiChatModel.call(prompt);
-        String result = response.getResult().getOutput().getText();
-
-        Arrays.stream(result.split("\n")).forEach(string -> {
-            String[] row = string.split("-");
-            coreSkillOfRecruit.put(row[0], row[1].trim());
-        });
-
-        return coreSkillOfRecruit;
+    private String detailRecruitToString() {
+        StringBuilder recruits = new StringBuilder();
+        detailRecruitRepository.findAll()
+                .forEach(recruit -> recruits.append(", ").append(recruit.getName()));
+        return recruits.toString();
     }
 }
