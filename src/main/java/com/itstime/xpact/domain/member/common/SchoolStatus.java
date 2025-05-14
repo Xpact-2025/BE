@@ -6,7 +6,7 @@ public enum SchoolStatus {
     SUSPENDED("휴학"),
     EXPECTED_GRADUATION("졸업예정"),
     COMPLETED("수료"),
-    WITHDRAWN("중퇴");
+    WITHDRAWN("중퇴"),
     ;
 
      private final String displayName;

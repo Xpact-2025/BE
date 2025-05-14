@@ -52,6 +52,7 @@ public class Education {
     }
 
     public void updateEducation(EducationSaveRequestDto requestDto) {
+        this.degree = requestDto.degree();
         this.educationName = requestDto.name();
         this.major = requestDto.major();
         this.schoolStatus = requestDto.schoolStatus();

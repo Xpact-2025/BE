@@ -113,6 +113,7 @@ public class EducationService {
 
         Education education = Education.builder()
                 .member(member)
+                .degree(requestDto.degree())
                 .schoolName(requestDto.name())
                 .major(requestDto.major())
                 .schoolStatus(requestDto.schoolStatus())
