@@ -111,9 +111,11 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
+            log.info("응답 내용 :" + rawResponse);
             MapResponseDto result = objectMapper.readValue(rawResponse, MapResponseDto.class);
             return CompletableFuture.completedFuture(result);
         } catch (JsonProcessingException e) {
+            log.info("응답 내용 :" + rawResponse);
             log.error("readValue 불가...", e);
             throw CustomException.of(ErrorCode.FAILED_OPENAI_PARSING);
         }
@@ -121,7 +123,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     private String buildSystemInstruction(List<String> coreSkills) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Explain Korean. Follow the JSON format below.\n{\n");
+        builder.append("Explain Korean. Follow the format below.\n{\n");
         builder.append("\"coreSkillMaps\": [\n{");
         for (String coreSkill : coreSkills) {
             builder.append("\"coreSkillName\": ").append(coreSkill).append(", ");
