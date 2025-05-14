@@ -45,6 +45,7 @@ public record EducationSaveResponseDto(
 
         public static EducationSaveResponseDto toDto(Education education) {
                 return EducationSaveResponseDto.builder()
+                        .degree(education.getDegree())
                         .name(education.getSchoolName())
                         .major(education.getMajor())
                         .schoolStatus(education.getSchoolStatus())
