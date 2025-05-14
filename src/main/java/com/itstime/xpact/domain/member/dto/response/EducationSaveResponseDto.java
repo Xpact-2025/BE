@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.member.dto.response;
 
+import com.itstime.xpact.domain.member.common.Degree;
 import com.itstime.xpact.domain.member.common.SchoolStatus;
 import com.itstime.xpact.domain.member.entity.Education;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,6 +11,12 @@ import java.time.LocalDate;
 @Builder
 @Schema(description = "회원 학력 저장에 사용되는 DTO")
 public record EducationSaveResponseDto(
+
+        @Schema(description = "학위 구분",
+                example = "UNIV",
+                allowableValues = {"UNIV", "HIGH", "GRADUATE", "MASTER", "DOCTOR"})
+        Degree degree,
+
         @Schema(description = "학교 이름",
                 example = "잇타대학교")
         String name,
@@ -20,7 +27,7 @@ public record EducationSaveResponseDto(
 
         @Schema(description = "현재 상태",
                 example = "CURRENT",
-                allowableValues = {"CURRENT", "GRADUATION", "SUSPENDED"})
+                allowableValues = {"CURRENT", "GRADUATION", "SUSPENDED", "EXPECTED_GRADUATION", "COMPLETE", "WITHDRAWN"})
         SchoolStatus schoolStatus,
 
         @Schema(description = "입학 날짜",

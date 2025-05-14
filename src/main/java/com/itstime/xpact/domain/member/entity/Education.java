@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.member.entity;
 
+import com.itstime.xpact.domain.member.common.Degree;
 import com.itstime.xpact.domain.member.common.SchoolStatus;
 import com.itstime.xpact.domain.member.dto.request.EducationSaveRequestDto;
 import jakarta.persistence.*;
@@ -18,6 +19,10 @@ public class Education {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "degree")
+    @Enumerated(EnumType.STRING)
+    private Degree degree;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
