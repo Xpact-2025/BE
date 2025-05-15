@@ -2,6 +2,7 @@ package com.itstime.xpact.domain.dashboard.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
 import com.itstime.xpact.domain.dashboard.entity.RecruitCount;
@@ -209,5 +210,22 @@ public class DashboardService {
         experiences.stream()
                 .filter(e -> e.getDetailRecruit() == null)
                 .forEach(openAiService::getDetailRecruitFromExperience);
+    }
+
+    public HistoryResponseDto getCountPerDay(int year, int month) {
+        validateDate(year, month);
+        List<HistoryResponseDto.DateCount> results = experienceRepository.countByDay(year, month).stream()
+                .map(object ->
+                    HistoryResponseDto.DateCount.builder()
+                            .date(object[0].toString())
+                            .count(Integer.parseInt(object[1].toString()))
+                            .build())
+                .toList();
+
+        return HistoryResponseDto.of(results);
+    }
+
+    private void validateDate(int year, int month) {
+        if(year < 1 || month < 1 || month > 12) throw CustomException.of(ErrorCode.INVALID_DATE);
     }
 }
