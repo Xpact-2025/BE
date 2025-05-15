@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +75,13 @@ public class QueryExperienceController {
     throws CustomException {
 
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.read(experienceId)));
+    }
+
+    @Operation(summary = "경험 검색", description = "경험의 제목과 키워드를 통한 검색 기능 제공")
+    @GetMapping("/search")
+    public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> queryExperience(
+            @RequestParam("query") @Nullable String query) {
+
+        return ResponseEntity.ok(RestResponse.ok(queryExperienceService.query(query)));
     }
 }
