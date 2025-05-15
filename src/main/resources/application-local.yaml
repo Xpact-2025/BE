@@ -15,7 +15,6 @@ spring:
     properties:
       hibernate:
         highlight_sql: true # 색상 부여
-        dialect: org.hibernate.dialect.MySQL8Dialect
 
   data:
     redis:
