@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.dashboard.controller;
 
+import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
 import com.itstime.xpact.domain.dashboard.service.DashboardService;
@@ -80,5 +81,18 @@ public class DashboardController {
     public ResponseEntity<RestResponse<?>> refresh() {
         dashboardService.refreshData();
         return ResponseEntity.ok(RestResponse.ok());
+    }
+
+    @Operation(summary = " 경험 히스토리 반환 API", description = """
+            사용자의 경험 생성 히스토리를 조회합니다.
+            """)
+    @ApiResponse(responseCode = "200", description = "응답 반환 성공",
+            content = @Content(schema = @Schema(implementation = RatioResponseDto.class)))
+    @GetMapping("/history")
+    public ResponseEntity<RestResponse<HistoryResponseDto>> getHistory(
+            @RequestParam("year") int year,
+            @RequestParam("month") int month) {
+        HistoryResponseDto dto = dashboardService.getCountPerDay(year, month);
+        return ResponseEntity.ok(RestResponse.ok(dto));
     }
 }
