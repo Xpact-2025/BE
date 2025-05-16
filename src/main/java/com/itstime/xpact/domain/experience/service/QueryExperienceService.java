@@ -72,4 +72,10 @@ public class QueryExperienceService {
 
         return DetailExperienceReadResponseDto.of(experience);
     }
+
+    public List<ThumbnailExperienceReadResponseDto> query(String query) {
+        return experienceRepository.queryExperience(query).stream()
+                .map(ThumbnailExperienceReadResponseDto::of)
+                .toList();
+    }
 }

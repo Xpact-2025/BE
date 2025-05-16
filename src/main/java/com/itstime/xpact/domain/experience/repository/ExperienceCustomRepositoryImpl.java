@@ -4,6 +4,7 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.QExperience;
+import com.itstime.xpact.domain.experience.entity.QKeyword;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -51,4 +52,23 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
                 .fetch();
     }
 
+    public List<Experience> queryExperience(String query) {
+        QExperience experience = QExperience.experience;
+        QKeyword keyword = QKeyword.keyword;
+
+        BooleanBuilder condition = new BooleanBuilder();
+
+        if(query != null) {
+            condition.and(
+                    experience.title.containsIgnoreCase(query)
+                            .or(keyword.name.containsIgnoreCase(query))
+            );
+        }
+
+        return queryFactory.selectFrom(experience)
+                .leftJoin(experience.keywords, keyword).fetchJoin()
+                .where(condition)
+                .distinct()
+                .fetch();
+    }
 }

@@ -79,6 +79,7 @@ public class Experience extends BaseEntity {
     @Column(name = "perform")
     private String perform;
 
+    @Builder.Default
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Keyword> keywords = new ArrayList<>();
 
