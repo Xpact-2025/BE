@@ -32,7 +32,7 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         BooleanBuilder builder = new BooleanBuilder();
         for (ExperienceType type : types) {
-            builder.or(experience.experienceType.eq(type));
+            builder.or(experience.metaData.experienceType.eq(type));
         }
 
         return queryFactory.selectFrom(experience)
@@ -47,7 +47,7 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         return queryFactory.select(experience.summary)
                 .from(experience)
-                .where(experience.status.eq(Status.SAVE)
+                .where(experience.metaData.status.eq(Status.SAVE)
                         .and(experience.summary.isNotEmpty()))
                 .fetch();
     }
@@ -60,7 +60,7 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         if(query != null) {
             condition.and(
-                    experience.title.containsIgnoreCase(query)
+                    experience.common.title.containsIgnoreCase(query)
                             .or(keyword.name.containsIgnoreCase(query))
             );
         }
