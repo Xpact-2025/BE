@@ -3,10 +3,12 @@ package com.itstime.xpact.domain.dashboard.controller;
 import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.dashboard.service.DashboardService;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -94,5 +98,33 @@ public class DashboardController {
             @RequestParam("month") int month) {
         HistoryResponseDto dto = dashboardService.getCountPerDay(year, month);
         return ResponseEntity.ok(RestResponse.ok(dto));
+    }
+
+    @Operation(summary = "타임라인 조회 API",
+    description = """
+            경험에 대한 타임라인 조회를 위한 API입니다.<br>
+            조회할 기간의 시작날짜와 종료날짜를 입력해주세요.
+            """)
+    @ApiResponse(responseCode = "200", description = "타임라인 조회 성공",
+    content = @Content(schema = @Schema(implementation = TimelineResponseDto.class)))
+    @GetMapping("/timeline")
+    public ResponseEntity<RestResponse<?>> getTimeline(
+            @Parameter(
+                    description = "조회 기간 시작 날짜 (yyyy-MM-dd)",
+                    required = true,
+                    example = "2025-03-01"
+            )
+            @RequestParam("startLine") LocalDate startLine,
+            @Parameter(
+                    description = "조회 기간 종료 날짜 (yyyy-MM-dd)",
+                    required = true,
+                    example = "2025-07-31"
+            )
+            @RequestParam("endLine") LocalDate endLine
+            ) {
+        return ResponseEntity.ok(
+                RestResponse.ok(dashboardService.getTimeline(startLine, endLine)
+                )
+        );
     }
 }
