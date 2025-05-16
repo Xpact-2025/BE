@@ -28,7 +28,7 @@ public class ExperienceUpdateRequestDto {
 
     @Schema(description = "시작 일시", example = "2025-03-27")
     private LocalDate startDate;
-    @Schema(description = "종료 일시", example = "2025-03-27")
+    @Schema(description = "종료 일시", example = "2025-05-27")
     private LocalDate endDate;
 
 
@@ -36,9 +36,9 @@ public class ExperienceUpdateRequestDto {
     private String title;
 
 
-    @Schema(description = "증명서", example = "파일 링크")
+    @Schema(description = "증명서", example = "증명서 링크")
     private String warrant;
-    @Schema(description = "산출물", example = "[\"파일 링크\"]")
+    @Schema(description = "산출물", example = "[\"파일1\", \"파일2\"]")
     private List<String> files;
 
 
@@ -69,6 +69,6 @@ public class ExperienceUpdateRequestDto {
     private String simpleDescription;
 
 
-    @Schema(description = "키워드", example = "[\"파일 링크\"]")
+    @Schema(description = "키워드", example = "[\"keyword1\", \"keyword2\"]")
     private List<String> keywords;
 }
