@@ -97,6 +97,7 @@ public class EducationController {
     @Operation(summary = "회원 정보에 반영될 학력 정보 저장",
     description = """
             입력 및 선택 정보를 통해 회원의 정보에 저장합니다.
+            만약 학위 구분이 고등학교일 경우, 바로 이 API로 직접추가하는 형식으로 저장합니다.
             """)
     @PostMapping("")
     public ResponseEntity<RestResponse<?>> saveEducationInfo(
