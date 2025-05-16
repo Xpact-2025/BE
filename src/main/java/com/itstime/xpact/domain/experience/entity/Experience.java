@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.experience.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
+import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
@@ -10,12 +11,10 @@ import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -172,5 +171,15 @@ public class Experience extends BaseEntity {
 
     public void setKeyword(List<Keyword> keywords) {
         this.keywords = keywords;
+    }
+
+
+    public static TimelineResponseDto toTimeLineDto(Experience experience) {
+            return TimelineResponseDto.builder()
+                    .startDate(experience.getStartDate())
+                    .endDate(experience.getEndDate())
+                    .title(experience.getTitle())
+                    .experienceType(experience.getExperienceType())
+                    .build();
     }
 }

@@ -4,11 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.dashboard.entity.RecruitCount;
 import com.itstime.xpact.domain.dashboard.repository.RecruitCountRepository;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
+import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.domain.recruit.entity.CoreSkill;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.*;
@@ -41,6 +44,7 @@ public class DashboardService {
     private final DetailRecruitRepository detailRecruitRepository;
     private final ExperienceRepository experienceRepository;
     private final RecruitCountRepository recruitCountRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
     public Long evaluateAsync() throws CustomException {
@@ -209,5 +213,30 @@ public class DashboardService {
         experiences.stream()
                 .filter(e -> e.getDetailRecruit() == null)
                 .forEach(openAiService::getDetailRecruitFromExperience);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TimelineResponseDto> getTimeline(
+            LocalDate startLine, LocalDate endLine) {
+
+        Long memberId = securityProvider.getCurrentMemberId();
+
+        // Fetch Join을 통한 LazyInitializationException 방지
+        Member member = memberRepository.findByIdWithExperiences(memberId)
+                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+
+        return member.getExperiences().stream()
+                .filter(experience ->
+                {
+                    LocalDate expStart = experience.getStartDate();
+                    LocalDate expEnd = experience.getEndDate();
+
+                    if (expStart == null) return false; // 시작일자 없는 것은 제외
+
+                    return (expEnd == null || !expEnd.isBefore(startLine)) && (!expStart.isAfter(endLine) && (expStart.isAfter(startLine)));
+                })
+                .sorted(Comparator.comparing(Experience::getStartDate))
+                .map(Experience::toTimeLineDto)
+                .collect(Collectors.toList());
     }
 }
