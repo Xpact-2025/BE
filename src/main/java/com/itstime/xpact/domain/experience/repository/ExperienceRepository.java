@@ -30,4 +30,6 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
             "WHERE YEAR(e.createdTime) = :year AND MONTH(e.createdTime) = :month " +
             "GROUP BY DATE ")
     List<Object[]> countByDay(@Param("year") int year, @Param("month") int month);
+
+    void deleteAllByMember(Member member);
 }

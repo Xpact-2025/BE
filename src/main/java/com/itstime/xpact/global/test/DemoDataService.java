@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
 import com.itstime.xpact.domain.experience.service.ExperienceService;
+import com.itstime.xpact.global.auth.SecurityProvider;
 import jakarta.annotation.Priority;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class DemoDataService {
                 new TypeReference<>() {
                 });
 
+        experienceService.deleteAll();
         experienceCreateRequestDtos.forEach(experienceService::create);
     }
 }

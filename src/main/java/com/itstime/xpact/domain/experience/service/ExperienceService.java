@@ -125,4 +125,9 @@ public class ExperienceService {
         openAiService.summarizeExperience(experience);
         openAiService.getDetailRecruitFromExperience(experience);
     }
+
+    public void deleteAll() {
+        Member member = memberRepository.findById(securityProvider.getCurrentMemberId()).orElseThrow();
+        experienceRepository.deleteAllByMember(member);
+    }
 }
