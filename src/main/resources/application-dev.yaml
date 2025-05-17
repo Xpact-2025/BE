@@ -48,4 +48,4 @@ aws:
     secret-key: ${DEV_AWS_SECRET_KEY}
 
 json:
-  exp-data: "/home/ubuntu/xpact-api/exp-demo.json"
+  exp-data: "/home/xpact/exp-demo.json"

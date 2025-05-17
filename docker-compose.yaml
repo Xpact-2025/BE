@@ -6,6 +6,8 @@ services:
       - "8080:8080"
     env_file:
       - /home/ubuntu/xpact-api/.env
+    volumes:
+      - /home/ubuntu/xpact-api:/home/xpact
     networks:
       - mynetwork
     depends_on:
