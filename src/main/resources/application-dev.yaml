@@ -46,3 +46,6 @@ aws:
   credentials:
     access-key: ${DEV_AWS_ACCESS_KEY}
     secret-key: ${DEV_AWS_SECRET_KEY}
+
+json:
+  exp-data: "/home/ubuntu/xpact-api/exp-demo.json"
