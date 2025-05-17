@@ -4,10 +4,7 @@ import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -27,11 +24,14 @@ public class Keyword extends BaseEntity {
     @Column(name = "name", length = 20, nullable = false)
     private String name;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "experience_id")
     private Experience experience;
 
     public static void validateKeyword(List<String> keywords) {
+        if(keywords == null || keywords.isEmpty()) return;
+
         if(keywords.size() > 5) {
             throw CustomException.of(ErrorCode.KEYWORD_EXCEEDED);
         }
