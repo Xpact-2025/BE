@@ -24,7 +24,7 @@ public class Keyword extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", length = 10, nullable = false)
+    @Column(name = "name", length = 20, nullable = false)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,7 +37,7 @@ public class Keyword extends BaseEntity {
         }
 
         keywords.forEach(keyword -> {
-            if(keyword.length() > 10) {
+            if(keyword.length() > 20) {
                 throw CustomException.of(ErrorCode.KEYWORD_TOO_LONG);
             }
         });
