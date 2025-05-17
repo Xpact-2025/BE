@@ -20,6 +20,6 @@ public class Qualification {
     private String qualification;
     @Column(name = "publisher")
     private String publisher;
-    @Column(name = "simple_description")
+    @Column(name = "simple_description", length = 512)
     private String simpleDescription;
 }

@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SimpleForm {
 
-    @Column(name = "role")
+    @Column(name = "role", length = 512)
     private String role;
-    @Column(name = "perform")
+    @Column(name = "perform", length = 512)
     private String perform;
 }

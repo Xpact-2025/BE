@@ -50,7 +50,7 @@ public class Experience extends BaseEntity {
 
 
     @Setter
-    @Column(name = "summary")
+    @Column(name = "summary", length = 512)
     private String summary;
 
     @Builder.Default
