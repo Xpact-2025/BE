@@ -3,12 +3,15 @@ package com.itstime.xpact.domain.experience.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
+
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Schema(description = "경험 생성 요청 DTO")
 public class ExperienceCreateRequestDto {
 
