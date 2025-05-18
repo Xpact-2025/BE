@@ -60,7 +60,7 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         if(query != null) {
             condition.and(
-                    experience.common.title.containsIgnoreCase(query)
+                    experience.title.containsIgnoreCase(query)
                             .or(keyword.name.containsIgnoreCase(query))
             );
         }
