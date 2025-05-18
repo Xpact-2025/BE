@@ -50,7 +50,6 @@ public class DetailExperienceReadResponseDto {
     private String simpleDescription;
 
     private List<String> keywords;
-    private String warrant;
     private List<String> files;
 
     /**
@@ -80,7 +79,6 @@ public class DetailExperienceReadResponseDto {
                     .issueDate(experience.getPeriod().getEndDate())
                     .simpleDescription(null)
                     .keywords(null)
-                    .warrant(null)
                     .files(null)
                     .build();
         }
@@ -117,13 +115,11 @@ public class DetailExperienceReadResponseDto {
                 .isEnded(experience.getPeriod().getIsEnded())
                 .startDate(experience.getPeriod().getStartDate())
                 .endDate(experience.getPeriod().getEndDate())
-                .title(experience.getCommon().getTitle())
+                .title(experience.getTitle())
                 .qualification(null)
                 .publisher(null)
                 .simpleDescription(null)
                 .keywords(experience.getKeywords().stream().map(Keyword::getName).toList())
-                .warrant(Experience.isNeedWarrant(experience.getMetaData().getExperienceType().toString())
-                        ? experience.getCommon().getWarrant() : null)
                 .files(Experience.isNeedFiles(experience.getMetaData().getExperienceType().toString())
                         ? experience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()) : null);
     }

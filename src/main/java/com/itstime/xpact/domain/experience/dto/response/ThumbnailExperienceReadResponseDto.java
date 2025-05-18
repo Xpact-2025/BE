@@ -19,7 +19,7 @@ public class ThumbnailExperienceReadResponseDto {
     public static ThumbnailExperienceReadResponseDto of(Experience experience) {
         return ThumbnailExperienceReadResponseDto.builder()
                 .id(experience.getId())
-                .title(experience.getCommon() != null ? experience.getCommon().getTitle() : experience.getQualification().getQualification())
+                .title(experience.getTitle() != null ? experience.getTitle() : experience.getQualification().getQualification())
                 .experienceType(experience.getMetaData().getExperienceType())
                 .status(experience.getMetaData().getStatus())
                 .build();

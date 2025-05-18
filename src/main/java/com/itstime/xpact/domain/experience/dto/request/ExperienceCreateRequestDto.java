@@ -35,9 +35,6 @@ public class ExperienceCreateRequestDto {
     @Schema(description = "경험 제목", example = "제목을 입력하세요")
     private String title;
 
-
-    @Schema(description = "증명서", example = "증명서 링크")
-    private String warrant;
     @Schema(description = "산출물", example = "[\"파일1\", \"파일2\"]")
     private List<String> files;
 
