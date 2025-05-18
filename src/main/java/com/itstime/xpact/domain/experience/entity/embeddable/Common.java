@@ -16,8 +16,4 @@ import java.util.List;
 @AllArgsConstructor
 public class Common {
 
-    @Column(name = "title", nullable = false)
-    private String title;
-    @Column(name = "warrant")
-    private String warrant;
 }

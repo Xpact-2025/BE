@@ -36,8 +36,8 @@ public class Experience extends BaseEntity {
     @Embedded // startDate, endDate, isEnded 포함
     private Period period;
 
-    @Embedded // title, warrant 포함
-    private Common common;
+    @Column(name = "title", nullable = false)
+    private String title;
 
     @Embedded
     private StarForm starForm;
@@ -57,8 +57,6 @@ public class Experience extends BaseEntity {
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Keyword> keywords = new ArrayList<>();
 
-
-    @Setter
     @Builder.Default
     @OneToMany(mappedBy = "experience", cascade =  CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<File> files = new ArrayList<>();
@@ -93,9 +91,7 @@ public class Experience extends BaseEntity {
                         .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                         .startDate(createRequestDto.getStartDate())
                         .endDate(createRequestDto.getEndDate()).build())
-                .common(Common.builder()
-                        .title(createRequestDto.getTitle())
-                        .warrant(isNeedWarrant(createRequestDto.getExperienceType()) ? createRequestDto.getWarrant() : null).build())
+                .title(createRequestDto.getTitle())
                 .simpleForm(SimpleForm.builder().build())
                 .starForm(StarForm.builder()
                         .situation(createRequestDto.getSituation())
@@ -117,9 +113,7 @@ public class Experience extends BaseEntity {
                         .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                         .startDate(createRequestDto.getStartDate())
                         .endDate(createRequestDto.getEndDate()).build())
-                .common(Common.builder()
-                        .title(createRequestDto.getTitle())
-                        .warrant(isNeedWarrant(createRequestDto.getExperienceType()) ? createRequestDto.getWarrant() : null).build())
+                .title(createRequestDto.getTitle())
                 .simpleForm(SimpleForm.builder()
                         .role(createRequestDto.getRole())
                         .perform(createRequestDto.getPerform()).build())
@@ -138,7 +132,7 @@ public class Experience extends BaseEntity {
                         .isEnded(createRequestDto.getIssueDate().isBefore(LocalDate.now()))
                         .startDate(createRequestDto.getIssueDate())
                         .endDate(createRequestDto.getIssueDate()).build())
-                .common(Common.builder().build())
+                .title(null)
                 .simpleForm(SimpleForm.builder().build())
                 .starForm(StarForm.builder().build())
                 .qualification(Qualification.builder()
