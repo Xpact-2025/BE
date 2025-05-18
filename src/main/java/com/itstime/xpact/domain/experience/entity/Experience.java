@@ -158,7 +158,6 @@ public class Experience extends BaseEntity {
     }
 
     public void updateToSimpleForm(ExperienceUpdateRequestDto updateRequestDto) {
-        this.metaData = null;
         this.metaData = MetaData.builder()
                 .status(Status.valueOf(updateRequestDto.getStatus()))
                 .formType(FormType.valueOf(updateRequestDto.getFormType()))
@@ -167,9 +166,7 @@ public class Experience extends BaseEntity {
                 .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
                 .startDate(updateRequestDto.getStartDate())
                 .endDate(updateRequestDto.getEndDate()).build();
-        this.common =  Common.builder()
-                .title(updateRequestDto.getTitle())
-                .warrant(isNeedWarrant(updateRequestDto.getExperienceType()) ? updateRequestDto.getWarrant() : null).build();
+        this.title = updateRequestDto.getTitle();
         this.simpleForm = SimpleForm.builder()
                 .role(updateRequestDto.getRole())
                 .perform(updateRequestDto.getPerform()).build();
@@ -186,9 +183,7 @@ public class Experience extends BaseEntity {
                 .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
                 .startDate(updateRequestDto.getStartDate())
                 .endDate(updateRequestDto.getEndDate()).build();
-        this.common =  Common.builder()
-                .title(updateRequestDto.getTitle())
-                .warrant(isNeedWarrant(updateRequestDto.getExperienceType()) ? updateRequestDto.getWarrant() : null).build();
+        this.title = updateRequestDto.getTitle();
         this.simpleForm = SimpleForm.builder().build();
         this.starForm = StarForm.builder()
                 .situation(updateRequestDto.getSituation())
@@ -207,7 +202,7 @@ public class Experience extends BaseEntity {
                 .isEnded(updateRequestDto.getIssueDate().isBefore(LocalDate.now()))
                 .startDate(updateRequestDto.getIssueDate())
                 .endDate(updateRequestDto.getIssueDate()).build();
-        this.common = Common.builder().build();
+        this.title = null;
         this.starForm = StarForm.builder().build();
         this.simpleForm = SimpleForm.builder().build();
         this.qualification = Qualification.builder()
