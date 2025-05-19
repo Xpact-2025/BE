@@ -43,3 +43,6 @@ aws:
   credentials:
     access-key: ${LOCAL_AWS_ACCESS_KEY}
     secret-key: ${LOCAL_AWS_SECRET_KEY}
+
+json:
+  exp-data: "src/main/resources/exp-demo.json"
