@@ -8,7 +8,6 @@ import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDt
 import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
@@ -34,12 +33,10 @@ public class ExperienceService {
     private final ExperienceRepository experienceRepository;
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
-    private final MemberRepository memberRepository;
 
     public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
         // member 조회
-        Member member = memberRepository.findById(securityProvider.getCurrentMemberId()).orElseThrow(() ->
-                CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+        Member member = securityProvider.getCurrentMember();
 
         // enum타입이 될 string 필드 검증 로직 (INVALID한 값이 들어오면 CustomException발생)
         Status.validateStatus(createRequestDto.getStatus());
@@ -81,7 +78,7 @@ public class ExperienceService {
                 .collect(Collectors.toCollection(ArrayList::new));
         experience.setKeywords(keywords);
 
-        if(Experience.isNeedFiles(createRequestDto.getExperienceType())) {
+        if(Experience.isNeedFiles(createRequestDto.getExperienceType()) && createRequestDto.getFiles() != null) {
             List<File> files = createRequestDto.getFiles().stream()
                     .map(fileUrl -> File.builder()
                             .fileUrl(fileUrl)
@@ -171,7 +168,7 @@ public class ExperienceService {
     }
 
     public void deleteAll() {
-        Member member = memberRepository.findById(securityProvider.getCurrentMemberId()).orElseThrow();
+        Member member = securityProvider.getCurrentMember();
         experienceRepository.deleteAllByMember(member);
     }
 }
