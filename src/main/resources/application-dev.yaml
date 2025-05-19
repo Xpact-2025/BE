@@ -49,3 +49,9 @@ aws:
 
 json:
   exp-data: "/home/xpact/exp-demo.json"
+
+swagger:
+  server-url: ${DEV_DNS_URL}
+
+server:
+  forward-headers-strategy: framework

@@ -46,3 +46,6 @@ aws:
 
 json:
   exp-data: "src/main/resources/exp-demo.json"
+
+swagger:
+  server-url: ${LOCAL_BASE_URL}
