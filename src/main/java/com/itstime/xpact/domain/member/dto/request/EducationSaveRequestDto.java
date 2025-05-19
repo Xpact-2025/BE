@@ -4,8 +4,6 @@ import com.itstime.xpact.domain.member.common.Degree;
 import com.itstime.xpact.domain.member.common.SchoolStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDate;
-
 @Schema(description = "회원이 학력을 저장할 때 사용하는 DTO")
 public record EducationSaveRequestDto(
 
@@ -25,22 +23,9 @@ public record EducationSaveRequestDto(
         @Schema(description = "현재 상태",
                 example = "CURRENT",
                 allowableValues = {"CURRENT", "GRADUATION", "SUSPENDED", "EXPECTED_GRADUATION", "COMPLETE", "WITHDRAWN"})
-        SchoolStatus schoolStatus,
-
-        @Schema(description = "입학 날짜",
-        example = "2025-03-02")
-        LocalDate startedAt,
-
-        @Schema(description = "졸업 날짜(Null 허용)",
-        example = "2025-03-02")
-        LocalDate endedAt
+        SchoolStatus schoolStatus
 ) {
-
         public static EducationSaveRequestDto of(Degree degree, String name, String major, SchoolStatus schoolStatus) {
-                return new EducationSaveRequestDto(degree, name, major, schoolStatus, null, null);
-        }
-
-        public static EducationSaveRequestDto of(Degree degree, String name, String major, SchoolStatus status, LocalDate startedAt, LocalDate endedAt) {
-                return new EducationSaveRequestDto(degree, name, major, status, startedAt, endedAt);
+                return new EducationSaveRequestDto(degree, name, major, schoolStatus);
         }
 }

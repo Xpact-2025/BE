@@ -30,14 +30,6 @@ public record EducationSaveResponseDto(
                 allowableValues = {"CURRENT", "GRADUATION", "SUSPENDED", "EXPECTED_GRADUATION", "COMPLETE", "WITHDRAWN"})
         SchoolStatus schoolStatus,
 
-        @Schema(description = "입학 날짜",
-                example = "2025-03-02")
-        LocalDate startedAt,
-
-        @Schema(description = "졸업 날짜(Null 허용)",
-                example = "2025-03-02")
-        LocalDate endedAt,
-
         @Schema(description = "최종학력 한 줄 ( 마이페이지에 최종 반영 내용 )",
         example = "잇타대학교 잇타학과 재학")
         String educationName
@@ -49,8 +41,6 @@ public record EducationSaveResponseDto(
                         .name(education.getSchoolName())
                         .major(education.getMajor())
                         .schoolStatus(education.getSchoolStatus())
-                        .startedAt(education.getStartedAt())
-                        .endedAt(education.getEndedAt())
                         .educationName(education.getEducationName())
                         .build();
         }

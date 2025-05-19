@@ -1,7 +1,6 @@
 package com.itstime.xpact.domain.recruit.service;
 
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.domain.member.util.TrieUtil;
 import com.itstime.xpact.domain.recruit.dto.request.DesiredRecruitRequestDto;
 import com.itstime.xpact.domain.recruit.dto.response.DesiredRecruitResponseDto;
@@ -31,7 +30,6 @@ public class RecruitService {
 
     private final RecruitRepository recruitRepository;
     private final DetailRecruitRepository detailRecruitRepository;
-    private final MemberRepository memberRepository;
 
 
     // 산업 전체 조회
@@ -41,30 +39,6 @@ public class RecruitService {
         securityProvider.getCurrentMemberId();
 
         return recruitRepository.findAllNames();
-    }
-
-    // 희망 산업 분야 검색 자동완성
-    @Transactional(readOnly = true)
-    public List<String> autocompleteName(String term) throws CustomException {
-
-        try {
-            securityProvider.getCurrentMemberId();
-
-            // Trie에 검색어 입력 내용 넣기
-            trieUtil.addAutocompleteKeyword(term);
-
-            // DB에 있는 Recruit name 전체 load
-            List<String> recruitNames = recruitRepository.findAllNames();
-            trieUtil.loadDatasIntoTrie(recruitNames);
-
-            // 일치 반환
-            return trieUtil.autocomplete(term);
-        } catch (Exception e) {
-            log.error("autocompleteName error: {}", e.getMessage());
-            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
-        } finally {
-            trieUtil.deleteAutocompleteKeyword(term);
-        }
     }
 
     // 상세 직군 전체 조회
@@ -108,11 +82,8 @@ public class RecruitService {
     @Transactional
     public DesiredRecruitResponseDto updateDesiredRecruit(DesiredRecruitRequestDto requestDto) throws CustomException {
 
-        Long memberId = securityProvider.getCurrentMemberId();
-
         // 실제 DB에서 영속 상태의 Member 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXISTS));
+        Member member = securityProvider.getCurrentMember();
 
         if (requestDto.detailRecruitName() == null || requestDto.detailRecruitName().isBlank()) {
             throw new CustomException(ErrorCode.EMPTY_DESIRED_RECRUIT);

@@ -38,7 +38,7 @@ public class DashboardController {
     public ResponseEntity<?> evaluateScoreAsync(
             @RequestHeader("Authorization") String token) throws CustomException {
 
-        Long memberId = dashboardService.evaluateAsync();
+        Long memberId = dashboardService.startSkillEvaluation();
         return ResponseEntity.accepted().body("Request Accepted for memberId: " + memberId);
     }
 
@@ -72,7 +72,7 @@ public class DashboardController {
     content = @Content(schema = @Schema(implementation = RatioResponseDto.class)))
     @GetMapping("/ratio")
     public ResponseEntity<RestResponse<RatioResponseDto>> getRatio() {
-        return ResponseEntity.ok(RestResponse.ok(dashboardService.detailRecruitRatio()));
+        return ResponseEntity.ok(RestResponse.ok(dashboardService.getRecruitCategoryRatio()));
     }
 
     @Operation(summary = "사용자 경험 반영 API", description = """
@@ -96,7 +96,7 @@ public class DashboardController {
     public ResponseEntity<RestResponse<HistoryResponseDto>> getHistory(
             @RequestParam("year") int year,
             @RequestParam("month") int month) {
-        HistoryResponseDto dto = dashboardService.getCountPerDay(year, month);
+        HistoryResponseDto dto = dashboardService.getExperienceHistory(year, month);
         return ResponseEntity.ok(RestResponse.ok(dto));
     }
 
@@ -123,7 +123,7 @@ public class DashboardController {
             @RequestParam("endLine") LocalDate endLine
             ) {
         return ResponseEntity.ok(
-                RestResponse.ok(dashboardService.getTimeline(startLine, endLine)
+                RestResponse.ok(dashboardService.getExperienceTimeline(startLine, endLine)
                 )
         );
     }
