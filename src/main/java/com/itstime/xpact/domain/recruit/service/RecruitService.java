@@ -31,7 +31,6 @@ public class RecruitService {
 
     private final RecruitRepository recruitRepository;
     private final DetailRecruitRepository detailRecruitRepository;
-    private final MemberRepository memberRepository;
 
 
     // 산업 전체 조회
@@ -84,11 +83,8 @@ public class RecruitService {
     @Transactional
     public DesiredRecruitResponseDto updateDesiredRecruit(DesiredRecruitRequestDto requestDto) throws CustomException {
 
-        Long memberId = securityProvider.getCurrentMemberId();
-
         // 실제 DB에서 영속 상태의 Member 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXISTS));
+        Member member = securityProvider.getCurrentMember();
 
         if (requestDto.detailRecruitName() == null || requestDto.detailRecruitName().isBlank()) {
             throw new CustomException(ErrorCode.EMPTY_DESIRED_RECRUIT);

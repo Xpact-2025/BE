@@ -34,12 +34,10 @@ public class ExperienceService {
     private final ExperienceRepository experienceRepository;
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
-    private final MemberRepository memberRepository;
 
     public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
         // member 조회
-        Member member = memberRepository.findById(securityProvider.getCurrentMemberId()).orElseThrow(() ->
-                CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+        Member member = securityProvider.getCurrentMember();
 
         // enum타입이 될 string 필드 검증 로직 (INVALID한 값이 들어오면 CustomException발생)
         Status.validateStatus(createRequestDto.getStatus());
@@ -171,7 +169,7 @@ public class ExperienceService {
     }
 
     public void deleteAll() {
-        Member member = memberRepository.findById(securityProvider.getCurrentMemberId()).orElseThrow();
+        Member member = securityProvider.getCurrentMember();
         experienceRepository.deleteAllByMember(member);
     }
 }
