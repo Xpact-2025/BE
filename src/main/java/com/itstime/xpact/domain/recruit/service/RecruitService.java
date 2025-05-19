@@ -43,30 +43,6 @@ public class RecruitService {
         return recruitRepository.findAllNames();
     }
 
-    // 희망 산업 분야 검색 자동완성
-    @Transactional(readOnly = true)
-    public List<String> autocompleteName(String term) throws CustomException {
-
-        try {
-            securityProvider.getCurrentMemberId();
-
-            // Trie에 검색어 입력 내용 넣기
-            trieUtil.addAutocompleteKeyword(term);
-
-            // DB에 있는 Recruit name 전체 load
-            List<String> recruitNames = recruitRepository.findAllNames();
-            trieUtil.loadDatasIntoTrie(recruitNames);
-
-            // 일치 반환
-            return trieUtil.autocomplete(term);
-        } catch (Exception e) {
-            log.error("autocompleteName error: {}", e.getMessage());
-            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
-        } finally {
-            trieUtil.deleteAutocompleteKeyword(term);
-        }
-    }
-
     // 상세 직군 전체 조회
     @Transactional(readOnly = true)
     public List<String> readAllDetailRecruits(String recruitName) throws CustomException {

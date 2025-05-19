@@ -1,14 +1,14 @@
 package com.itstime.xpact.domain.member.service;
 
+import com.itstime.xpact.domain.member.common.Degree;
+import com.itstime.xpact.domain.member.common.SchoolStatus;
 import com.itstime.xpact.domain.member.dto.request.EducationSaveRequestDto;
 import com.itstime.xpact.domain.member.dto.response.EducationSaveResponseDto;
 import com.itstime.xpact.domain.member.entity.Education;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.EducationRepository;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
 import com.itstime.xpact.domain.member.util.TrieUtil;
-import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -23,19 +23,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EducationService {
 
-    private final SecurityProvider securityProvider;
     private final TrieUtil trieUtil;
 
     private final SchoolCustomRepositoryImpl schoolCustomRepository;
     private final EducationRepository educationRepository;
-    private final MemberRepository memberRepository;
-
 
     // 학교 전체 조회
     @Transactional(readOnly = true)
     public List<String> readSchoolNames() throws CustomException {
-
-        securityProvider.getCurrentMemberId();
 
         return schoolCustomRepository.findAllSchoolNames();
     }
@@ -45,8 +40,6 @@ public class EducationService {
     public List<String> autocompleteName(String term) throws CustomException {
 
         try {
-            securityProvider.getCurrentMemberId();
-
             // Trie의 keyword에 검색어 넣기
             trieUtil.addAutocompleteKeyword(term);
 
@@ -68,8 +61,6 @@ public class EducationService {
     @Transactional(readOnly = true)
     public List<String> readMajor(String schoolName) throws CustomException {
 
-        securityProvider.getCurrentMemberId();
-
         return schoolCustomRepository.findMajorBySchoolName(schoolName);
     }
 
@@ -78,8 +69,6 @@ public class EducationService {
     public List<String> searchMajor(String schoolName, String term) throws CustomException {
 
         try {
-            securityProvider.getCurrentMemberId();
-
             // Trie의 keyword에 검색어 넣기
             trieUtil.addAutocompleteKeyword(term);
 
@@ -99,66 +88,74 @@ public class EducationService {
 
     // 학력사항 저장 ( 선택을 한 것을 파싱하든, 직접 입력하든 )
     @Transactional
-    public EducationSaveResponseDto saveEducationInfo(EducationSaveRequestDto requestDto) {
+    public EducationSaveResponseDto saveEducationInfo(
+            Member member,
+            EducationSaveRequestDto requestDto) {
 
-        Long memberId = securityProvider.getCurrentMemberId();
+        Education education = educationRepository.findByMemberId(member.getId())
+                .orElse(null);
+        String educationName = createEducationName(education, requestDto);
 
-        // 실제 DB에서 영속 상태의 Member 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXISTS));
+        // Education 생성과 수정 로직 분리
+        if (education == null) {
 
+            education = createEducation(member, requestDto, educationName);
+            member.setEducation(education);
 
-        // 학교명과 학과명 입력하기
-        String educationName = createEducationName(requestDto);
+            // Education DB 저장 반영
+            educationRepository.save(education);
 
-        Education education = Education.builder()
+            return EducationSaveResponseDto.toDto(education);
+        } else {
+            modifyEducation(member, requestDto, educationName);
+
+            return EducationSaveResponseDto.toDto(education);
+        }
+    }
+
+    // Education을 새로 저장
+    private Education createEducation(
+            Member member, EducationSaveRequestDto requestDto, String educationName) {
+        return Education.builder()
                 .member(member)
                 .degree(requestDto.degree())
                 .schoolName(requestDto.name())
                 .major(requestDto.major())
                 .schoolStatus(requestDto.schoolStatus())
                 .educationName(educationName)
-                .startedAt(requestDto.startedAt())
-                .endedAt(requestDto.endedAt())
                 .build();
-
-        member.setEducation(education); // 최종만 저장
-        educationRepository.save(education);
-
-        return EducationSaveResponseDto.toDto(education);
     }
 
-    @Transactional
-    public EducationSaveResponseDto updateEducationInfo(EducationSaveRequestDto requestDto) {
-
-        Long memberId = securityProvider.getCurrentMemberId();
-
-        // 실제 DB에서 영속 상태의 Member 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXISTS));
-
-        // 최초 저장과 수정의 경우 구분
-        Education education = educationRepository.findByMemberId(member.getId())
-                .orElseThrow(() -> CustomException.of(ErrorCode.EDUCATION_NOT_FOUND));
-
-        education.updateEducation(requestDto);
-        String educationName = createEducationName(requestDto);
-        education.setEducationName(educationName);
-
-        return EducationSaveResponseDto.toDto(education);
+    // 기존의 Education을 수정
+    private void modifyEducation(
+            Member member, EducationSaveRequestDto requestDto, String educationName) {
+        member.getEducation().updateEducation(requestDto);
+        member.getEducation().setEducationName(educationName);
     }
 
-    private String createEducationName(EducationSaveRequestDto requestDto) {
 
-        if (requestDto.schoolStatus() == null) {
-            throw new CustomException(ErrorCode.EMPTY_SCHOOL_STATUS);
+    private String createEducationName(Education education, EducationSaveRequestDto requestDto) {
+
+        // Null에 대한 처리
+        if (education == null && (requestDto.name() == null || requestDto.major() == null || requestDto.schoolStatus() == null)) {
+            throw CustomException.of(ErrorCode.INSUFFICIENT_SCHOOL_INFO);
         }
 
-        String statusName = requestDto.schoolStatus().getDisplayName();
-        return String.format("%s %s (%s)",
-                requestDto.name(),
-                requestDto.major(),
-                statusName);
-    }
+        String name = requestDto.name() != null ? requestDto.name() : education != null ? education.getSchoolName() : null;
+        String major = requestDto.major() != null ? requestDto.major() : education != null ? education.getMajor() : null;
+        SchoolStatus schoolStatus = requestDto.schoolStatus() != null
+                ? requestDto.schoolStatus()
+                : education != null ? education.getSchoolStatus() : null;
 
+
+        // 고등학교일 경우 로직 추가
+        if ((education != null && Degree.HIGH.equals(education.getDegree())) ||
+        (requestDto.degree() != null && requestDto.degree().equals(Degree.HIGH))) {
+            major = "";
+        }
+
+        String statusName = schoolStatus.getDisplayName();
+        return String.format("%s %s (%s)",
+                name, major, statusName);
+    }
 }

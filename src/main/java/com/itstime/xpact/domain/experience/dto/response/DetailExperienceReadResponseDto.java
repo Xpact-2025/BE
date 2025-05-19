@@ -5,8 +5,6 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.*;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,8 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALIFICATION;
-import static com.itstime.xpact.domain.experience.common.FormType.SIMPLE_FORM;
-import static com.itstime.xpact.domain.experience.common.FormType.STAR_FORM;
 
 @Getter
 @Builder
@@ -64,7 +60,7 @@ public class DetailExperienceReadResponseDto {
                     .status(experience.getMetaData().getStatus())
                     .formType(null)
                     .experienceType(experience.getMetaData().getExperienceType())
-                    .isEnded(experience.getPeriod().getIsEnded())
+                    .isEnded(experience.getIsEnded())
                     .startDate(null)
                     .endDate(null)
                     .title(null)
@@ -76,7 +72,7 @@ public class DetailExperienceReadResponseDto {
                     .perform(null)
                     .qualification(experience.getQualification().getQualification())
                     .publisher(experience.getQualification().getPublisher())
-                    .issueDate(experience.getPeriod().getEndDate())
+                    .issueDate(experience.getEndDate())
                     .simpleDescription(null)
                     .keywords(null)
                     .files(null)
@@ -112,9 +108,9 @@ public class DetailExperienceReadResponseDto {
                 .status(experience.getMetaData().getStatus())
                 .formType(experience.getMetaData().getFormType())
                 .experienceType(experience.getMetaData().getExperienceType())
-                .isEnded(experience.getPeriod().getIsEnded())
-                .startDate(experience.getPeriod().getStartDate())
-                .endDate(experience.getPeriod().getEndDate())
+                .isEnded(experience.getIsEnded())
+                .startDate(experience.getStartDate())
+                .endDate(experience.getEndDate())
                 .title(experience.getTitle())
                 .qualification(null)
                 .publisher(null)

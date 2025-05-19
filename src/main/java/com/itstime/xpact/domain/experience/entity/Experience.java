@@ -34,9 +34,6 @@ public class Experience extends BaseEntity {
     @Embedded // status, formType, ExperienceType 포함
     private MetaData metaData;
 
-    @Embedded // startDate, endDate, isEnded 포함
-    private Period period;
-
     @Column(name = "title", nullable = false)
     private String title;
 
@@ -72,6 +69,15 @@ public class Experience extends BaseEntity {
     @JoinColumn(name = "detail_recruit_id")
     private DetailRecruit detailRecruit;
 
+    @Column(name = "is_ended")
+    private Boolean isEnded;
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
     public void setKeywords(List<Keyword> keywords) {
         this.keywords.clear();
         this.keywords.addAll(keywords);
@@ -88,10 +94,9 @@ public class Experience extends BaseEntity {
                         .status(Status.valueOf(createRequestDto.getStatus()))
                         .formType(FormType.valueOf(createRequestDto.getFormType()))
                         .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType())).build())
-                .period(Period.builder()
-                        .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
-                        .startDate(createRequestDto.getStartDate())
-                        .endDate(createRequestDto.getEndDate()).build())
+                .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .startDate(createRequestDto.getStartDate())
+                .endDate(createRequestDto.getEndDate())
                 .title(createRequestDto.getTitle())
                 .simpleForm(SimpleForm.builder().build())
                 .starForm(StarForm.builder()
@@ -110,10 +115,9 @@ public class Experience extends BaseEntity {
                         .status(Status.valueOf(createRequestDto.getStatus()))
                         .formType(FormType.valueOf(createRequestDto.getFormType()))
                         .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType())).build())
-                .period(Period.builder()
-                        .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
-                        .startDate(createRequestDto.getStartDate())
-                        .endDate(createRequestDto.getEndDate()).build())
+                .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .startDate(createRequestDto.getStartDate())
+                .endDate(createRequestDto.getEndDate())
                 .title(createRequestDto.getTitle())
                 .simpleForm(SimpleForm.builder()
                         .role(createRequestDto.getRole())
@@ -129,10 +133,9 @@ public class Experience extends BaseEntity {
                         .status(Status.valueOf(createRequestDto.getStatus()))
                         .formType(FormType.valueOf(createRequestDto.getFormType()))
                         .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType())).build())
-                .period(Period.builder()
-                        .isEnded(createRequestDto.getIssueDate().isBefore(LocalDate.now()))
-                        .startDate(createRequestDto.getIssueDate())
-                        .endDate(createRequestDto.getIssueDate()).build())
+                .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .startDate(createRequestDto.getStartDate())
+                .endDate(createRequestDto.getEndDate())
                 .title(null)
                 .simpleForm(SimpleForm.builder().build())
                 .starForm(StarForm.builder().build())
@@ -163,10 +166,9 @@ public class Experience extends BaseEntity {
                 .status(Status.valueOf(updateRequestDto.getStatus()))
                 .formType(FormType.valueOf(updateRequestDto.getFormType()))
                 .experienceType(ExperienceType.valueOf(updateRequestDto.getExperienceType())).build();
-        this.period =  Period.builder()
-                .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
-                .startDate(updateRequestDto.getStartDate())
-                .endDate(updateRequestDto.getEndDate()).build();
+        this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
+        this.startDate = updateRequestDto.getStartDate();
+        this.endDate = updateRequestDto.getEndDate();
         this.title = updateRequestDto.getTitle();
         this.simpleForm = SimpleForm.builder()
                 .role(updateRequestDto.getRole())
@@ -180,10 +182,9 @@ public class Experience extends BaseEntity {
                 .status(Status.valueOf(updateRequestDto.getStatus()))
                 .formType(FormType.valueOf(updateRequestDto.getFormType()))
                 .experienceType(ExperienceType.valueOf(updateRequestDto.getExperienceType())).build();
-        this.period =  Period.builder()
-                .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
-                .startDate(updateRequestDto.getStartDate())
-                .endDate(updateRequestDto.getEndDate()).build();
+        this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
+        this.startDate = updateRequestDto.getStartDate();
+        this.endDate = updateRequestDto.getEndDate();
         this.title = updateRequestDto.getTitle();
         this.simpleForm = SimpleForm.builder().build();
         this.starForm = StarForm.builder()
@@ -199,10 +200,9 @@ public class Experience extends BaseEntity {
                 .status(Status.valueOf(updateRequestDto.getStatus()))
                 .formType(FormType.valueOf(updateRequestDto.getFormType()))
                 .experienceType(ExperienceType.valueOf(updateRequestDto.getExperienceType())).build();
-        this.period = Period.builder()
-                .isEnded(updateRequestDto.getIssueDate().isBefore(LocalDate.now()))
-                .startDate(updateRequestDto.getIssueDate())
-                .endDate(updateRequestDto.getIssueDate()).build();
+        this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
+        this.startDate = updateRequestDto.getStartDate();
+        this.endDate = updateRequestDto.getEndDate();
         this.title = null;
         this.starForm = StarForm.builder().build();
         this.simpleForm = SimpleForm.builder().build();
@@ -218,7 +218,7 @@ public class Experience extends BaseEntity {
                     .startDate(experience.getStartDate())
                     .endDate(experience.getEndDate())
                     .title(experience.getTitle())
-                    .experienceType(experience.getExperienceType())
+                    .experienceType(experience.getMetaData().getExperienceType())
                     .build();
     }
 }

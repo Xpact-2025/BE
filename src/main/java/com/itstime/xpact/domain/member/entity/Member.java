@@ -5,8 +5,11 @@ import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
-import com.itstime.xpact.domain.member.dto.request.MemberInfoRequestDto;
-import com.itstime.xpact.domain.member.dto.response.MemberInfoResponseDto;
+import com.itstime.xpact.domain.member.dto.request.MemberSaveRequestDto;
+import com.itstime.xpact.domain.member.dto.response.EducationSaveResponseDto;
+import com.itstime.xpact.domain.member.dto.response.MemberSaveResponseDto;
+import com.itstime.xpact.domain.member.dto.response.MypageInfoResponseDto;
+import com.itstime.xpact.domain.recruit.dto.response.DesiredRecruitResponseDto;
 import com.itstime.xpact.domain.scrap.entity.Scrap;
 import jakarta.persistence.*;
 import lombok.*;
@@ -84,19 +87,29 @@ public class Member extends BaseEntity {
     }
 
     // 프로필 설정에 사용될 메소드
-    public MemberInfoResponseDto toMemberInfoResponseDto(Member member) {
-        return MemberInfoResponseDto.builder()
+    public MypageInfoResponseDto toMypageInfoResponseDto(Member member) {
+        return MypageInfoResponseDto.builder()
                 .name(member.getName())
-                .imgurl(member.getImgurl())
-                .education(member.getEducation().getEducationName())
+                .imgurl(member.getImgurl() != null ? member.getImgurl() : null)
                 .age(member.getAge() != null ? member.getAge() : 0)
+                .educationName(member.getEducation().getEducationName() != null ? member.getEducation().getEducationName() : null)
                 .desiredDetailRecruit(member.getDesiredRecruit() != null ? member.getDesiredRecruit() : null)
-                .startedAt(member.getEducation().getStartedAt() != null ? member.getEducation().getStartedAt() : null)
-                .endedAt(member.getEducation().getEndedAt() != null ? member.getEducation().getEndedAt() : null)
                 .build();
     }
 
-    public void updateMemberInfo(MemberInfoRequestDto requestDto) {
+    public MemberSaveResponseDto toMemberSaveResponseDto(Member member, EducationSaveResponseDto educationDto, DesiredRecruitResponseDto desiredRecruitDto) {
+        return MemberSaveResponseDto.builder()
+                .name(member.getName())
+                .imgurl(member.getImgurl() != null ? member.getImgurl() : null)
+                .age(member.getAge() != null ? member.getAge() : 0)
+                .educationName(member.getEducation() == null ? null : member.getEducation().getEducationName())
+                .desiredDetailRecruit(member.getDesiredRecruit() != null ? member.getDesiredRecruit() : null)
+                .educationSaveResponseDto(educationDto != null ? educationDto : null)
+                .desiredRecruitResponseDto(desiredRecruitDto != null ? desiredRecruitDto : null)
+                .build();
+    }
+
+    public void updateMemberInfo(MemberSaveRequestDto requestDto) {
         if (requestDto.name() != null) this.name = requestDto.name();
         if (requestDto.age() != null) this.age = requestDto.age();
         if (requestDto.imgurl() != null) this.imgurl = requestDto.imgurl();
