@@ -5,8 +5,6 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.*;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,8 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALIFICATION;
-import static com.itstime.xpact.domain.experience.common.FormType.SIMPLE_FORM;
-import static com.itstime.xpact.domain.experience.common.FormType.STAR_FORM;
 
 @Getter
 @Builder
