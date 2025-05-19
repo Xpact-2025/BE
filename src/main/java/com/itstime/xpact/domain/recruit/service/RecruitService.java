@@ -1,7 +1,6 @@
 package com.itstime.xpact.domain.recruit.service;
 
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.domain.member.util.TrieUtil;
 import com.itstime.xpact.domain.recruit.dto.request.DesiredRecruitRequestDto;
 import com.itstime.xpact.domain.recruit.dto.response.DesiredRecruitResponseDto;

@@ -8,7 +8,6 @@ import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDt
 import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
