@@ -7,6 +7,7 @@ import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
+import com.itstime.xpact.domain.experience.entity.embeddable.*;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import jakarta.persistence.*;
@@ -30,59 +31,38 @@ public class Experience extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @Embedded // status, formType, ExperienceType 포함
+    private MetaData metaData;
 
-    @Column(name = "form_type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private FormType formType;
+    @Embedded // startDate, endDate, isEnded 포함
+    private Period period;
 
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "is_ended", nullable = false)
-    private Boolean isEnded;
+    @Embedded
+    private StarForm starForm;
 
-    @Column(name = "start_date")
-    private LocalDate startDate;
+    @Embedded
+    private SimpleForm simpleForm;
 
-    @Column(name = "end_date")
-    private LocalDate endDate;
+    @Embedded
+    private Qualification qualification;
+
 
     @Setter
-    @Column(name = "summary")
+    @Column(name = "summary", length = 512)
     private String summary;
-
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ExperienceType experienceType;
-
-    // STAR_FORM
-    @Column(name = "situation")
-    private String situation;
-
-    @Column(name = "task")
-    private String task;
-
-    @Column(name = "action")
-    private String action;
-
-    @Column(name = "result")
-    private String result;
-
-
-    // SIMPLE_FORM
-    @Column(name = "role")
-    private String role;
-
-    @Column(name = "perform")
-    private String perform;
 
     @Builder.Default
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Keyword> keywords = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "experience", cascade =  CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<File> files = new ArrayList<>();
+
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -92,86 +72,144 @@ public class Experience extends BaseEntity {
     @JoinColumn(name = "detail_recruit_id")
     private DetailRecruit detailRecruit;
 
-    public static Experience StarForm(ExperienceCreateRequestDto createRequestDto) {
+    public void setKeywords(List<Keyword> keywords) {
+        this.keywords.clear();
+        this.keywords.addAll(keywords);
+    }
+
+    public void setFiles(List<File> files) {
+        this.files.clear();
+        this.files.addAll(files);
+    }
+
+    public static Experience starForm(ExperienceCreateRequestDto createRequestDto) {
         return Experience.builder()
-                .status(Status.valueOf(createRequestDto.getStatus()))
-                .formType(FormType.valueOf(createRequestDto.getFormType()))
+                .metaData(MetaData.builder()
+                        .status(Status.valueOf(createRequestDto.getStatus()))
+                        .formType(FormType.valueOf(createRequestDto.getFormType()))
+                        .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType())).build())
+                .period(Period.builder()
+                        .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+                        .startDate(createRequestDto.getStartDate())
+                        .endDate(createRequestDto.getEndDate()).build())
                 .title(createRequestDto.getTitle())
-                .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
-                .startDate(createRequestDto.getStartDate())
-                .endDate(createRequestDto.getEndDate())
-                .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType()))
-                .situation(createRequestDto.getSituation())
-                .task(createRequestDto.getTask())
-                .action(createRequestDto.getAction())
-                .result(createRequestDto.getResult())
-                .role(null)
-                .perform(null)
+                .simpleForm(SimpleForm.builder().build())
+                .starForm(StarForm.builder()
+                        .situation(createRequestDto.getSituation())
+                        .task(createRequestDto.getTask())
+                        .action(createRequestDto.getAction())
+                        .result(createRequestDto.getResult()).build())
+                .qualification(null)
                 .build();
     }
 
-    public static Experience SimpleForm(ExperienceCreateRequestDto createRequestDto) {
+
+    public static Experience simpleForm(ExperienceCreateRequestDto createRequestDto) {
         return Experience.builder()
-                .status(Status.valueOf(createRequestDto.getStatus()))
-                .formType(FormType.valueOf(createRequestDto.getFormType()))
+                .metaData(MetaData.builder()
+                        .status(Status.valueOf(createRequestDto.getStatus()))
+                        .formType(FormType.valueOf(createRequestDto.getFormType()))
+                        .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType())).build())
+                .period(Period.builder()
+                        .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+                        .startDate(createRequestDto.getStartDate())
+                        .endDate(createRequestDto.getEndDate()).build())
                 .title(createRequestDto.getTitle())
-                .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
-                .startDate(createRequestDto.getStartDate())
-                .endDate(createRequestDto.getEndDate())
-                .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType()))
-                .situation(null)
-                .task(null)
-                .action(null)
-                .result(null)
-                .role(createRequestDto.getRole())
-                .perform(createRequestDto.getPerform())
+                .simpleForm(SimpleForm.builder()
+                        .role(createRequestDto.getRole())
+                        .perform(createRequestDto.getPerform()).build())
+                .starForm(StarForm.builder().build())
+                .qualification(Qualification.builder().build())
                 .build();
     }
 
-    public void addMember(Member member) {
-        this.member = member;
-        member.getExperiences().add(this);
+    public static Experience qualification(ExperienceCreateRequestDto createRequestDto) {
+        return Experience.builder()
+                .metaData(MetaData.builder()
+                        .status(Status.valueOf(createRequestDto.getStatus()))
+                        .formType(FormType.valueOf(createRequestDto.getFormType()))
+                        .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType())).build())
+                .period(Period.builder()
+                        .isEnded(createRequestDto.getIssueDate().isBefore(LocalDate.now()))
+                        .startDate(createRequestDto.getIssueDate())
+                        .endDate(createRequestDto.getIssueDate()).build())
+                .title(null)
+                .simpleForm(SimpleForm.builder().build())
+                .starForm(StarForm.builder().build())
+                .qualification(Qualification.builder()
+                        .qualification(createRequestDto.getQualification())
+                        .publisher(createRequestDto.getPublisher())
+                        .simpleDescription(createRequestDto.getSimpleDescription()).build())
+                .keywords(null)
+                .build();
+    }
+
+    // 해당 experience의 유형이 파일을 필요로 하지 않는 유형인지 확인
+    public static boolean isNeedFiles(String experienceType) {
+        return !ExperienceType.NOT_NEED_FILE.contains(ExperienceType.valueOf(experienceType));
+    }
+
+    // 해당 experience의 유형이 warrant를 필요로 하는 유형인지 확인
+    public static boolean isNeedWarrant(String experienceType) {
+        return ExperienceType.NEED_WARRNT.contains(ExperienceType.valueOf(experienceType));
+    }
+
+    public static boolean isQualification(String experienceType) {
+        return ExperienceType.IS_QUALIFICATION.contains(ExperienceType.valueOf(experienceType));
     }
 
     public void updateToSimpleForm(ExperienceUpdateRequestDto updateRequestDto) {
-        updateCommonFields(updateRequestDto);
-        this.situation = null;
-        this.task = null;
-        this.action = null;
-        this.result = null;
-        this.role = updateRequestDto.getRole();
-        this.perform = updateRequestDto.getPerform();
+        this.metaData = MetaData.builder()
+                .status(Status.valueOf(updateRequestDto.getStatus()))
+                .formType(FormType.valueOf(updateRequestDto.getFormType()))
+                .experienceType(ExperienceType.valueOf(updateRequestDto.getExperienceType())).build();
+        this.period =  Period.builder()
+                .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .startDate(updateRequestDto.getStartDate())
+                .endDate(updateRequestDto.getEndDate()).build();
+        this.title = updateRequestDto.getTitle();
+        this.simpleForm = SimpleForm.builder()
+                .role(updateRequestDto.getRole())
+                .perform(updateRequestDto.getPerform()).build();
+        this.starForm = StarForm.builder().build();
+        this.qualification = Qualification.builder().build();
     }
 
     public void updateToStarForm(ExperienceUpdateRequestDto updateRequestDto) {
-        updateCommonFields(updateRequestDto);
-        this.situation = updateRequestDto.getSituation();
-        this.task = updateRequestDto.getTask();
-        this.action = updateRequestDto.getAction();
-        this.result = updateRequestDto.getResult();
-        this.role = null;
-        this.perform = null;
-    }
-
-    private void updateCommonFields(ExperienceUpdateRequestDto updateRequestDto) {
-        this.status = Status.valueOf(updateRequestDto.getStatus());
-        this.formType = FormType.valueOf(updateRequestDto.getFormType());
+        this.metaData = MetaData.builder()
+                .status(Status.valueOf(updateRequestDto.getStatus()))
+                .formType(FormType.valueOf(updateRequestDto.getFormType()))
+                .experienceType(ExperienceType.valueOf(updateRequestDto.getExperienceType())).build();
+        this.period =  Period.builder()
+                .isEnded(updateRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .startDate(updateRequestDto.getStartDate())
+                .endDate(updateRequestDto.getEndDate()).build();
         this.title = updateRequestDto.getTitle();
-        this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
-        this.startDate = updateRequestDto.getStartDate();
-        this.endDate = updateRequestDto.getEndDate();
-        this.keywords.clear();
-        this.keywords.addAll(updateRequestDto.getKeywords().stream()
-                .map(keywordStr -> Keyword.builder()
-                        .name(keywordStr)
-                        .experience(this)
-                        .build()).toList());
-
-        this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
+        this.simpleForm = SimpleForm.builder().build();
+        this.starForm = StarForm.builder()
+                .situation(updateRequestDto.getSituation())
+                .task(updateRequestDto.getTask())
+                .action(updateRequestDto.getAction())
+                .result(updateRequestDto.getResult()).build();
+        this.qualification = Qualification.builder().build();
     }
 
-    public void setKeyword(List<Keyword> keywords) {
-        this.keywords = keywords;
+    public void updateToQualification(ExperienceUpdateRequestDto updateRequestDto) {
+        this.metaData = MetaData.builder()
+                .status(Status.valueOf(updateRequestDto.getStatus()))
+                .formType(FormType.valueOf(updateRequestDto.getFormType()))
+                .experienceType(ExperienceType.valueOf(updateRequestDto.getExperienceType())).build();
+        this.period = Period.builder()
+                .isEnded(updateRequestDto.getIssueDate().isBefore(LocalDate.now()))
+                .startDate(updateRequestDto.getIssueDate())
+                .endDate(updateRequestDto.getIssueDate()).build();
+        this.title = null;
+        this.starForm = StarForm.builder().build();
+        this.simpleForm = SimpleForm.builder().build();
+        this.qualification = Qualification.builder()
+                .qualification(updateRequestDto.getQualification())
+                .publisher(updateRequestDto.getPublisher())
+                .simpleDescription(updateRequestDto.getSimpleDescription()).build();
     }
 
 
