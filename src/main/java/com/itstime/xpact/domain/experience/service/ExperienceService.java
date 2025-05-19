@@ -81,7 +81,7 @@ public class ExperienceService {
                 .collect(Collectors.toCollection(ArrayList::new));
         experience.setKeywords(keywords);
 
-        if(Experience.isNeedFiles(createRequestDto.getExperienceType())) {
+        if(Experience.isNeedFiles(createRequestDto.getExperienceType()) && createRequestDto.getFiles() != null) {
             List<File> files = createRequestDto.getFiles().stream()
                     .map(fileUrl -> File.builder()
                             .fileUrl(fileUrl)
