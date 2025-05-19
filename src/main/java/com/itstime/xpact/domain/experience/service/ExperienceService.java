@@ -9,7 +9,6 @@ import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
-import com.itstime.xpact.domain.member.service.MemberService;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
@@ -19,9 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALIFICATION;
 
 
 @Slf4j
@@ -44,32 +45,50 @@ public class ExperienceService {
         Status.validateStatus(createRequestDto.getStatus());
         FormType.validateFormType(createRequestDto.getFormType());
         ExperienceType.validateExperienceType(createRequestDto.getExperienceType());
-
-        // 키워드 설정하지 않는 로직 (따로 keyword 설정 필요)
-        Experience experience = switch (FormType.valueOf(createRequestDto.getFormType())) {
-            case SIMPLE_FORM -> Experience.SimpleForm(createRequestDto);
-            case STAR_FORM -> Experience.StarForm(createRequestDto);
-        };
-
-        // keyword 개수 체크
         Keyword.validateKeyword(createRequestDto.getKeywords());
 
+        Experience experience;
+        // experience가 prize or certificates일 때
+        if(IS_QUALIFICATION.contains(ExperienceType.valueOf(createRequestDto.getExperienceType()))) {
+             experience = Experience.qualification(createRequestDto);
+        } else {
+            // 아닐 때는 star, simple 나눠야함
+            experience = switch (FormType.valueOf(createRequestDto.getFormType())) {
+                case SIMPLE_FORM -> Experience.simpleForm(createRequestDto);
+                case STAR_FORM -> Experience.starForm(createRequestDto);
+            };
+            saveNonQualification(experience, createRequestDto);
+        }
+
+
+        // experience와의 연관관계 설정
+        experience.setMember(member); //TODO setMember 데이터 정합성 만족하는지 검증 필요 (exp <-> member 양방향 관계이므로)
+        experienceRepository.save(experience);
+
+        if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE)) {
+            setSummaryAndDetailRecruit(experience);
+        }
+    }
+
+    // keyword, fils 설정하여 set
+    private void saveNonQualification(Experience experience, ExperienceCreateRequestDto createRequestDto) throws CustomException {
         // dto의 keywords를 keyword 엔티티로 변경
         List<Keyword> keywords = createRequestDto.getKeywords().stream()
                 .map(keywordStr -> Keyword.builder()
                         .name(keywordStr)
                         .experience(experience)
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
+        experience.setKeywords(keywords);
 
-        // experience와의 연관관계 설정
-        experience.setKeyword(keywords);
-        experience.addMember(member);
-
-        experienceRepository.save(experience);
-
-        if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE)) {
-            setSummaryAndDetailRecruit(experience);
+        if(Experience.isNeedFiles(createRequestDto.getExperienceType())) {
+            List<File> files = createRequestDto.getFiles().stream()
+                    .map(fileUrl -> File.builder()
+                            .fileUrl(fileUrl)
+                            .experience(experience)
+                            .build())
+                    .collect(Collectors.toCollection(ArrayList::new));
+            experience.setFiles(files);
         }
     }
 
@@ -81,7 +100,7 @@ public class ExperienceService {
                 .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         // 저장된 경험을 임시저장으로 돌리는 플로우 막는 로직
-        if(experience.getStatus().equals(Status.SAVE) && updateRequestDto.getStatus().equals(Status.DRAFT.name())) {
+        if(Status.SAVE.equals(experience.getMetaData().getStatus()) && Status.DRAFT.equals(Status.valueOf(updateRequestDto.getStatus()))) {
             throw CustomException.of(ErrorCode.INVALID_SAVE);
         }
 
@@ -94,17 +113,42 @@ public class ExperienceService {
         FormType.validateFormType(updateRequestDto.getFormType());
         ExperienceType.validateExperienceType(updateRequestDto.getExperienceType());
 
-        switch (FormType.valueOf(updateRequestDto.getFormType())) {
-            case STAR_FORM -> experience.updateToStarForm(updateRequestDto);
-            case SIMPLE_FORM -> experience.updateToSimpleForm(updateRequestDto);
+        if(IS_QUALIFICATION.contains(ExperienceType.valueOf(updateRequestDto.getExperienceType()))) {
+            experience.updateToQualification(updateRequestDto);
+        } else {
+            // 아닐 때는 star, simple 나눠야함
+            switch (FormType.valueOf(updateRequestDto.getFormType())) {
+                case STAR_FORM -> experience.updateToStarForm(updateRequestDto);
+                case SIMPLE_FORM -> experience.updateToSimpleForm(updateRequestDto);
+            }
+            saveNonQualification(experience, updateRequestDto);
         }
-
-        Keyword.validateKeyword(updateRequestDto.getKeywords());
 
         experienceRepository.save(experience);
 
         if(Status.valueOf(updateRequestDto.getStatus()).equals(Status.SAVE)) {
             setSummaryAndDetailRecruit(experience);
+        }
+    }
+
+    private void saveNonQualification(Experience experience, ExperienceUpdateRequestDto updateRequestDto) {
+        Keyword.validateKeyword(updateRequestDto.getKeywords());
+        List<Keyword> keywords = updateRequestDto.getKeywords().stream()
+                .map(keywordStr -> Keyword.builder()
+                        .name(keywordStr)
+                        .experience(experience)
+                        .build())
+                .collect(Collectors.toCollection(ArrayList::new));
+        experience.setKeywords(keywords);
+
+        if(Experience.isNeedFiles(updateRequestDto.getExperienceType())) {
+            List<File> files = updateRequestDto.getFiles().stream()
+                    .map(fileUrl -> File.builder()
+                            .fileUrl(fileUrl)
+                            .experience(experience)
+                            .build())
+                    .collect(Collectors.toCollection(ArrayList::new));
+            experience.setFiles(files);
         }
     }
 
