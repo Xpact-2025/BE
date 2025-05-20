@@ -64,14 +64,14 @@ public class TimeService {
 
     public HistoryResponseDto getCountPerDay(int year, int month, Member member) {
         validateDate(year, month);
-
-        LocalDateTime startDate = LocalDateTime.of(year, month - 1, 1, 0, 0, 0);
-        LocalDateTime endDate = LocalDateTime.of(year, month + 2, 1, 0, 0, 0);
+        LocalDateTime now = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime startDate = now.withDayOfMonth(1).minusMonths(1);
+        LocalDateTime endDate = now.withDayOfMonth(1).plusMonths(2);
 
         // 현월일 때
         if(isNow(year, month)) {
-            startDate = LocalDateTime.of(year, month - 2, 1, 0, 0, 0);
-            endDate = LocalDateTime.of(year, month + 1, 1, 0, 0, 0);
+            startDate = now.withDayOfMonth(1).minusMonths(2);
+            endDate = now.withDayOfMonth(1).plusMonths(1);
         }
 
         List<HistoryResponseDto.DateCount> results = experienceRepository.countByDay(startDate, endDate, member).stream()
