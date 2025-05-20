@@ -57,7 +57,8 @@ public class DashboardService {
 
     // 히스토리 조회
     public HistoryResponseDto getExperienceHistory(int year, int month) {
-        return timeService.getCountPerDay(year, month);
+        Member member = securityProvider.getCurrentMember();
+        return timeService.getCountPerDay(year, month, member);
     }
 
     // 타임라인 조회

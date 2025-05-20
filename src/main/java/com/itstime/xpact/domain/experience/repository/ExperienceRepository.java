@@ -27,9 +27,9 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
 
     @Query("SELECT FUNCTION('DATE_FORMAT', e.createdTime, '%Y-%m-%d') AS DATE, count(*) " +
             "FROM Experience e " +
-            "WHERE YEAR(e.createdTime) = :year AND MONTH(e.createdTime) = :month " +
+            "WHERE YEAR(e.createdTime) = :year AND MONTH(e.createdTime) = :month AND e.member = :member " +
             "GROUP BY DATE ")
-    List<Object[]> countByDay(@Param("year") int year, @Param("month") int month);
+    List<Object[]> countByDay(@Param("year") int year, @Param("month") int month, Member member);
 
     void deleteAllByMember(Member member);
 }

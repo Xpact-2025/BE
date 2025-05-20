@@ -58,9 +58,9 @@ public class TimeService {
                 .forEach(openAiService::getDetailRecruitFromExperience);
     }
 
-    public HistoryResponseDto getCountPerDay(int year, int month) {
+    public HistoryResponseDto getCountPerDay(int year, int month, Member member) {
         validateDate(year, month);
-        List<HistoryResponseDto.DateCount> results = experienceRepository.countByDay(year, month).stream()
+        List<HistoryResponseDto.DateCount> results = experienceRepository.countByDay(year, month, member).stream()
                 .map(object ->
                         HistoryResponseDto.DateCount.builder()
                                 .date(object[0].toString())
