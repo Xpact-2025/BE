@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,9 +28,9 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
 
     @Query("SELECT FUNCTION('DATE_FORMAT', e.createdTime, '%Y-%m-%d') AS DATE, count(*) " +
             "FROM Experience e " +
-            "WHERE YEAR(e.createdTime) = :year AND MONTH(e.createdTime) = :month AND e.member = :member " +
+            "WHERE e.createdTime >= :startDate AND e.createdTime < :endDate AND e.member = :member " +
             "GROUP BY DATE ")
-    List<Object[]> countByDay(@Param("year") int year, @Param("month") int month, Member member);
+    List<Object[]> countByDay(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Member member);
 
     void deleteAllByMember(Member member);
 }
