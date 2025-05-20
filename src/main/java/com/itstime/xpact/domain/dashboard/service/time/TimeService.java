@@ -13,8 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +64,17 @@ public class TimeService {
 
     public HistoryResponseDto getCountPerDay(int year, int month, Member member) {
         validateDate(year, month);
-        List<HistoryResponseDto.DateCount> results = experienceRepository.countByDay(year, month, member).stream()
+
+        LocalDateTime startDate = LocalDateTime.of(year, month - 1, 1, 0, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(year, month + 2, 1, 0, 0, 0);
+
+        // 현월일 때
+        if(isNow(year, month)) {
+            startDate = LocalDateTime.of(year, month - 2, 1, 0, 0, 0);
+            endDate = LocalDateTime.of(year, month + 1, 1, 0, 0, 0);
+        }
+
+        List<HistoryResponseDto.DateCount> results = experienceRepository.countByDay(startDate, endDate, member).stream()
                 .map(object ->
                         HistoryResponseDto.DateCount.builder()
                                 .date(object[0].toString())
@@ -68,7 +82,17 @@ public class TimeService {
                                 .build())
                 .toList();
 
-        return HistoryResponseDto.of(results);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Map<Integer, List<HistoryResponseDto.DateCount>> groupByMonth = results.stream()
+                .collect(Collectors.groupingBy(dateCount ->
+                        YearMonth.from(LocalDate.parse(dateCount.getDate(), formatter)).getMonthValue()));
+
+        return HistoryResponseDto.of(groupByMonth);
+    }
+
+    private boolean isNow(int year, int month) {
+        return (LocalDate.now().getYear() == year && LocalDate.now().getMonth().getValue() == month);
     }
 
     private void validateDate(int year, int month) {
