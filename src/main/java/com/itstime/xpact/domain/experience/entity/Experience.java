@@ -34,7 +34,7 @@ public class Experience extends BaseEntity {
     @Embedded // status, formType, ExperienceType 포함
     private MetaData metaData;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
     @Embedded
