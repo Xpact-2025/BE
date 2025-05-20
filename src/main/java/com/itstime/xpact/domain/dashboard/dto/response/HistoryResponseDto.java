@@ -5,9 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Builder
@@ -15,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HistoryResponseDto {
 
-    private List<DateCount> dateCounts;
+    private Map<Integer, List<DateCount>> dateCounts;
 
     @Getter
     @Builder
@@ -25,9 +24,9 @@ public class HistoryResponseDto {
         private int count;
     }
 
-    public static HistoryResponseDto of(List<DateCount> dateCounts) {
+    public static HistoryResponseDto of(Map<Integer, List<DateCount>> groupByMonth) {
         return HistoryResponseDto.builder()
-                .dateCounts(dateCounts)
+                .dateCounts(groupByMonth)
                 .build();
     }
 }
