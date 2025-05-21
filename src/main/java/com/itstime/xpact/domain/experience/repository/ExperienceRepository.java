@@ -1,8 +1,5 @@
 package com.itstime.xpact.domain.experience.repository;
 
-import com.google.common.collect.FluentIterable;
-import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.SummaryResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.entity.Member;
 import org.springframework.data.domain.Pageable;
