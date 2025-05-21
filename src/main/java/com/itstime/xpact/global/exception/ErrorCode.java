@@ -78,14 +78,18 @@ public enum ErrorCode {
 
     // coreSkill
     NOT_FOUND_CORESKILLS(HttpStatus.BAD_REQUEST, "CSE001", "해당 핵심 역량을 불러오는 데에 실패했습니다."),
-    DETAILRECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "CSE003", "찾을 수 없습니다."),
+    DETAILRECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "CSE002", "찾을 수 없습니다."),
 
     // skill map
     UNLOADED_SKILL_MAP(HttpStatus.BAD_REQUEST, "SME001", "핵심 스킬맵 로드에 실패하였습니다."),
+    EXPERIENCES_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "SME002", "입력된 경험이 충분하지 않습니다."),
+
+    // Async
+    FAILED_GET_RESULT(HttpStatus.BAD_REQUEST, "AE001", "요청에 대한 응답을 얻지 못했습니다."),
+    REQUEST_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "AE002", "요청 시간이 초과되었습니다."),
 
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
-
     ;
 
     private final HttpStatus httpStatus;

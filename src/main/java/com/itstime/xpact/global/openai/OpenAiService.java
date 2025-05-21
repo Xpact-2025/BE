@@ -15,7 +15,7 @@ public interface OpenAiService {
 
     Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames);
 
-    @Async
+    @Async("taskExecutor")
     CompletableFuture<MapResponseDto> evaluateScore(String experiences, List<String> coreSkills);
 
     @Async("taskExecutor")

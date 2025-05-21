@@ -1,11 +1,12 @@
 package com.itstime.xpact.domain.dashboard.controller;
 
 import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.dashboard.service.DashboardService;
 import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.response.ErrorResponse;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,9 +15,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import java.time.LocalDate;
 
@@ -28,41 +29,35 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
+
     @Operation(summary = "핵심스킬맵 요청 API", description = """
-            핵심스킬맵을 추출하기 위한 요청을 보내는 API입니다.<br>
-            요청이 성공되면 Reqeust Accepted 응답이 반환되며,<br>
-            해당 반환의 memberId로 GET 요청을 보내면 응답을 확인할 수 있습니다.<br>
-            핵심스킬맵 결과를 새로 확인하고 싶을 때도 사용이 가능합니다.
+            핵심스킬맵 대시보드 반환을 위한 API입니다.
             """)
     @PostMapping("/skills")
-    public ResponseEntity<?> evaluateScoreAsync(
+    public DeferredResult<ResponseEntity<?>> evaluateScore(
             @RequestHeader("Authorization") String token) throws CustomException {
 
-        Long memberId = dashboardService.startSkillEvaluation();
-        return ResponseEntity.accepted().body("Request Accepted for memberId: " + memberId);
-    }
+        DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>(20_000L);
 
-    @Operation(summary = "핵심스킬맵 추출 API", description = """
-            핵심스킬맵 반환 결과에 대한 API입니다.<br>
-            memberId를 path에 넣으면, 해당 회원의 핵심스킬맵 결과가 나옵니다.<br>
-            만약 아직 결과가 요청을 받는 중이라면, Processing의 응답이 나오니,<br>
-            잠시 후에 다시 요청해주세요.
-            """)
-    @ApiResponse(responseCode = "200", description = "응답 반환 성공",
-    content = @Content(schema = @Schema(implementation = MapResponseDto.class)))
-    @GetMapping("/skills/{memberId}")
-    public ResponseEntity<?> getScoreResult(
-            @RequestHeader("Authorization") String token,
-            @PathVariable Long memberId) throws CustomException {
+        deferredResult.onTimeout(() -> {
+            deferredResult.setErrorResult(
+                    ErrorResponse.toResponseEntity(ErrorCode.REQUEST_TIMEOUT)
+            );
+        });
 
-        MapResponseDto response = dashboardService.getEvaluationResult(memberId)
-                .orElse(null);
-
-        if (response == null) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Processing");
-        }
-
-        return ResponseEntity.ok(RestResponse.ok(response));
+        dashboardService.evaluateScore()
+                .thenAccept(result -> {
+                    deferredResult.setResult(ResponseEntity.ok(
+                            RestResponse.ok(result)
+                    ));
+                })
+                .exceptionally(e -> {
+                    deferredResult.setErrorResult(
+                            ErrorResponse.toResponseEntity(ErrorCode.FAILED_GET_RESULT)
+                    );
+                    return null;
+                });
+        return deferredResult;
     }
 
     @Operation(summary = "직무비율 반환 API", description = """
@@ -93,12 +88,24 @@ public class DashboardController {
     @ApiResponse(responseCode = "200", description = "응답 반환 성공",
             content = @Content(schema = @Schema(implementation = RatioResponseDto.class)))
     @GetMapping("/history")
+    public ResponseEntity<RestResponse<HistoryOldResponseDto>> getOldHistory(
+            @RequestParam("year") int year,
+            @RequestParam("month") int month) {
+        HistoryOldResponseDto dto = dashboardService.getOldExperienceHistory(year, month);
+        return ResponseEntity.ok(RestResponse.ok(dto));
+    }
+
+    @Operation(summary = "경험 히스토리 반환 API (new)", description = """
+            사용자의 경험 생성 히스토리를 3개월 단위로 조회합니다.
+            """)
+    @GetMapping("/history-new")
     public ResponseEntity<RestResponse<HistoryResponseDto>> getHistory(
             @RequestParam("year") int year,
             @RequestParam("month") int month) {
         HistoryResponseDto dto = dashboardService.getExperienceHistory(year, month);
         return ResponseEntity.ok(RestResponse.ok(dto));
     }
+
 
     @Operation(summary = "타임라인 조회 API",
     description = """

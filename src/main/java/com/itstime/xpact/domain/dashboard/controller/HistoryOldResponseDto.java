@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.dashboard.dto.response;
+package com.itstime.xpact.domain.dashboard.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,15 +6,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
+
 
 @Getter
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class HistoryResponseDto {
+public class HistoryOldResponseDto {
 
-    private Map<Integer, List<DateCount>> dateCounts;
+    private List<DateCount> dateCounts;
 
     @Getter
     @Builder
@@ -24,9 +24,9 @@ public class HistoryResponseDto {
         private int count;
     }
 
-    public static HistoryResponseDto of(Map<Integer, List<DateCount>> groupByMonth) {
-        return HistoryResponseDto.builder()
-                .dateCounts(groupByMonth)
+    public static HistoryOldResponseDto of(List<DateCount> dateCounts) {
+        return HistoryOldResponseDto.builder()
+                .dateCounts(dateCounts)
                 .build();
     }
 }

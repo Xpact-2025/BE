@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.dashboard.service.time;
 
+import com.itstime.xpact.domain.dashboard.controller.HistoryOldResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
@@ -13,8 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,9 +63,35 @@ public class TimeService {
                 .forEach(openAiService::getDetailRecruitFromExperience);
     }
 
-    public HistoryResponseDto getCountPerDay(int year, int month) {
+    public HistoryOldResponseDto getOldCountPerDay(int year, int month, Member member) {
         validateDate(year, month);
-        List<HistoryResponseDto.DateCount> results = experienceRepository.countByDay(year, month).stream()
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(year, month + 1, 1, 0, 0, 0);
+
+        List<HistoryOldResponseDto.DateCount> results = experienceRepository.countOldByDay(startDate, endDate, member).stream()
+                .map(object ->
+                        HistoryOldResponseDto.DateCount.builder()
+                                .date(object[0].toString())
+                                .count(Integer.parseInt(object[1].toString()))
+                                .build())
+                .toList();
+
+        return HistoryOldResponseDto.of(results);
+    }
+
+    public HistoryResponseDto getCountPerDay(int year, int month, Member member) {
+        validateDate(year, month);
+        LocalDateTime now = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime startDate = now.withDayOfMonth(1).minusMonths(1);
+        LocalDateTime endDate = now.withDayOfMonth(1).plusMonths(2);
+
+        // 현월일 때
+        if(isNow(year, month)) {
+            startDate = now.withDayOfMonth(1).minusMonths(2);
+            endDate = now.withDayOfMonth(1).plusMonths(1);
+        }
+
+        List<HistoryResponseDto.DateCount> results = experienceRepository.countByDay(startDate, endDate, member).stream()
                 .map(object ->
                         HistoryResponseDto.DateCount.builder()
                                 .date(object[0].toString())
@@ -68,7 +99,17 @@ public class TimeService {
                                 .build())
                 .toList();
 
-        return HistoryResponseDto.of(results);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Map<Integer, List<HistoryResponseDto.DateCount>> groupByMonth = results.stream()
+                .collect(Collectors.groupingBy(dateCount ->
+                        YearMonth.from(LocalDate.parse(dateCount.getDate(), formatter)).getMonthValue()));
+
+        return HistoryResponseDto.of(groupByMonth);
+    }
+
+    private boolean isNow(int year, int month) {
+        return (LocalDate.now().getYear() == year && LocalDate.now().getMonth().getValue() == month);
     }
 
     private void validateDate(int year, int month) {

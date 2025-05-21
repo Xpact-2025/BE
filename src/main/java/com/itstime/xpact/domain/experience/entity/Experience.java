@@ -34,7 +34,7 @@ public class Experience extends BaseEntity {
     @Embedded // status, formType, ExperienceType 포함
     private MetaData metaData;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
     @Embedded
@@ -133,7 +133,7 @@ public class Experience extends BaseEntity {
                         .status(Status.valueOf(createRequestDto.getStatus()))
                         .formType(FormType.valueOf(createRequestDto.getFormType()))
                         .experienceType(ExperienceType.valueOf(createRequestDto.getExperienceType())).build())
-                .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+                .isEnded(createRequestDto.getIssueDate().isBefore(LocalDate.now()))
                 .startDate(createRequestDto.getStartDate())
                 .endDate(createRequestDto.getEndDate())
                 .title(null)
