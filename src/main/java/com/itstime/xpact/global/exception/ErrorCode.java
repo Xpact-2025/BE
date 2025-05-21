@@ -83,9 +83,11 @@ public enum ErrorCode {
     // skill map
     UNLOADED_SKILL_MAP(HttpStatus.BAD_REQUEST, "SME001", "핵심 스킬맵 로드에 실패하였습니다."),
 
+    // Async
+    FAILED_GET_RESULT(HttpStatus.BAD_REQUEST, "AE001", "요청에 대한 응답을 얻지 못했습니다."),
+
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
-
     ;
 
     private final HttpStatus httpStatus;
