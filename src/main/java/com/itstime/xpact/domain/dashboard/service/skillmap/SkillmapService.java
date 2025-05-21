@@ -47,6 +47,11 @@ public class SkillmapService {
 
         List<String> coreSkillList = coreSkill.getCoreSKills();
 
+        // experiences가 null이거나 비어있는 경우 예외 처리
+        if (experiences == null || experiences.trim().isEmpty()) {
+            throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+        }
+
         return openAiService.evaluateScore(experiences, coreSkillList)
                 .thenApply(resultDto -> {
                     try {
