@@ -31,14 +31,19 @@ public class DashboardController {
 
 
     @Operation(summary = "핵심스킬맵 요청 API", description = """
-            핵심스킬맵을 추출하기 위한 요청을 보내는 API입니다.<br>
-            
+            핵심스킬맵 대시보드 반환을 위한 API입니다.
             """)
     @PostMapping("/skills")
     public DeferredResult<ResponseEntity<?>> evaluateScore(
             @RequestHeader("Authorization") String token) throws CustomException {
 
-        DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>(30_000L);
+        DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>(20_000L);
+
+        deferredResult.onTimeout(() -> {
+            deferredResult.setErrorResult(
+                    ErrorResponse.toResponseEntity(ErrorCode.REQUEST_TIMEOUT)
+            );
+        });
 
         dashboardService.evaluateScore()
                 .thenAccept(result -> {
