@@ -82,8 +82,8 @@ public class RatioService {
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(memberId);
         Map<String, Integer> result = new HashMap<>();
         experiences.forEach(e -> {
-            String detailRecruit = e.getDetailRecruit().getName();
-            if(detailRecruit != null) {
+            if(e.getDetailRecruit() != null) {
+                String detailRecruit = e.getDetailRecruit().getName();
                 result.put(detailRecruit, result.getOrDefault(detailRecruit, 0) + 1);
             }
         });

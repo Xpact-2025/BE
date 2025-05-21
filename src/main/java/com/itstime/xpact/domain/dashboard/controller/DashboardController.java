@@ -93,12 +93,24 @@ public class DashboardController {
     @ApiResponse(responseCode = "200", description = "응답 반환 성공",
             content = @Content(schema = @Schema(implementation = RatioResponseDto.class)))
     @GetMapping("/history")
+    public ResponseEntity<RestResponse<HistoryOldResponseDto>> getOldHistory(
+            @RequestParam("year") int year,
+            @RequestParam("month") int month) {
+        HistoryOldResponseDto dto = dashboardService.getOldExperienceHistory(year, month);
+        return ResponseEntity.ok(RestResponse.ok(dto));
+    }
+
+    @Operation(summary = "경험 히스토리 반환 API (new)", description = """
+            사용자의 경험 생성 히스토리를 3개월 단위로 조회합니다.
+            """)
+    @GetMapping("/history-new")
     public ResponseEntity<RestResponse<HistoryResponseDto>> getHistory(
             @RequestParam("year") int year,
             @RequestParam("month") int month) {
         HistoryResponseDto dto = dashboardService.getExperienceHistory(year, month);
         return ResponseEntity.ok(RestResponse.ok(dto));
     }
+
 
     @Operation(summary = "타임라인 조회 API",
     description = """
