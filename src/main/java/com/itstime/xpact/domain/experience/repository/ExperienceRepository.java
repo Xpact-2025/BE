@@ -30,7 +30,15 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
             "FROM Experience e " +
             "WHERE e.createdTime >= :startDate AND e.createdTime < :endDate AND e.member = :member " +
             "GROUP BY DATE ")
+    List<Object[]> countOldByDay(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Member member);
+
+    @Query("SELECT FUNCTION('DATE_FORMAT', e.createdTime, '%Y-%m-%d') AS DATE, count(*) " +
+            "FROM Experience e " +
+            "WHERE e.createdTime >= :startDate AND e.createdTime < :endDate AND e.member = :member " +
+            "GROUP BY DATE ")
     List<Object[]> countByDay(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Member member);
 
     void deleteAllByMember(Member member);
+
+
 }

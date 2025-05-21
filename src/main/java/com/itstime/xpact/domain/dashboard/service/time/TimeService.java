@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.dashboard.service.time;
 
+import com.itstime.xpact.domain.dashboard.controller.HistoryOldResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
@@ -60,6 +61,22 @@ public class TimeService {
         experiences.stream()
                 .filter(e -> e.getDetailRecruit() == null)
                 .forEach(openAiService::getDetailRecruitFromExperience);
+    }
+
+    public HistoryOldResponseDto getOldCountPerDay(int year, int month, Member member) {
+        validateDate(year, month);
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(year, month + 1, 1, 0, 0, 0);
+
+        List<HistoryOldResponseDto.DateCount> results = experienceRepository.countOldByDay(startDate, endDate, member).stream()
+                .map(object ->
+                        HistoryOldResponseDto.DateCount.builder()
+                                .date(object[0].toString())
+                                .count(Integer.parseInt(object[1].toString()))
+                                .build())
+                .toList();
+
+        return HistoryOldResponseDto.of(results);
     }
 
     public HistoryResponseDto getCountPerDay(int year, int month, Member member) {
