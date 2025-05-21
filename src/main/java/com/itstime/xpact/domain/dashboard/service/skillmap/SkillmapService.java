@@ -1,8 +1,8 @@
 package com.itstime.xpact.domain.dashboard.service.skillmap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.ScoreResponseDto;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.CoreSkill;
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class SkillmapService {
                 .thenApply(resultDto -> {
                     try {
                         scoreResultStore.save(member.getId(), objectMapper.writeValueAsString(resultDto));
-                        return resultDto;
+                        return analysisScore(member, resultDto);
                     } catch (Exception e) {
                         log.error("결과를 저장하는 것에 실패하였습니다.", e);
                         throw CustomException.of(ErrorCode.FAILED_GET_RESULT);
@@ -64,14 +65,25 @@ public class SkillmapService {
                 });
     }
 
-    // 점수를 DTO로 매핑
-    private MapResponseDto toMapDto(String result) {
+    // 점수가 낮은 것과 높은 것 고르기
+    private MapResponseDto analysisScore(Member member, MapResponseDto dto) {
+        List<ScoreResponseDto> skills = dto.getCoreSkillMaps();
 
-        try {
-            return objectMapper.readValue(result, MapResponseDto.class);
-        } catch (JsonProcessingException e) {
-            log.error("OpenAI 응답 중 오류... {}", result, e);
-            throw CustomException.of(ErrorCode.UNMATCHED_OPENAI_FORMAT);
+        String minScoreSkill = skills.stream()
+                .min(Comparator.comparingDouble(ScoreResponseDto::getScore))
+                .map(ScoreResponseDto::getCoreSkillName)
+                .orElse(null);
+        scoreResultStore.saveWeakness(member.getId(), minScoreSkill);
+
+        String maxScoreSkill = skills.stream()
+                .max(Comparator.comparingDouble(ScoreResponseDto::getScore))
+                .map(ScoreResponseDto::getCoreSkillName)
+                .orElse(null);
+        scoreResultStore.saveWeakness(member.getId(), maxScoreSkill);
+
+        if (minScoreSkill != null && maxScoreSkill != null) {
+            dto.setAnalysis(maxScoreSkill, minScoreSkill);
         }
+        return dto;
     }
 }

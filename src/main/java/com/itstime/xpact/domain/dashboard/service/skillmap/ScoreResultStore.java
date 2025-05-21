@@ -19,4 +19,14 @@ public class ScoreResultStore {
         String key = "coreSkillMap:" + memberId;
         return (String) redisTemplate.opsForValue().get(key);
     }
+
+    public void saveStrength(Long memberId, String strength) {
+        String key = "coreStrength:" + memberId;
+        redisTemplate.opsForValue().set(key, strength);
+    }
+
+    public void saveWeakness(Long memberId, String weakness) {
+        String key = "coreWeakness:" + memberId;
+        redisTemplate.opsForValue().set(key, weakness);
+    }
 }

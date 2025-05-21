@@ -4,11 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
-@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Data
@@ -40,5 +38,11 @@ public class MapResponseDto {
             ]
             """)
     private List<ScoreResponseDto> coreSkillMaps;
+    private String strength;
+    private String weakness;
 
+    public void setAnalysis(String strength, String weakness) {
+        this.strength = strength;
+        this.weakness = weakness;
+    }
 }
