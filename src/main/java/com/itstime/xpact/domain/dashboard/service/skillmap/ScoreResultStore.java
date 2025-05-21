@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.dashboard.service;
+package com.itstime.xpact.domain.dashboard.service.skillmap;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

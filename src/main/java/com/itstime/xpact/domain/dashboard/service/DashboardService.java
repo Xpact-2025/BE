@@ -9,10 +9,7 @@ import com.itstime.xpact.domain.dashboard.service.ratio.RatioService;
 import com.itstime.xpact.domain.dashboard.service.skillmap.SkillmapService;
 import com.itstime.xpact.domain.dashboard.service.time.TimeService;
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -28,20 +25,15 @@ import java.util.Optional;
 public class DashboardService {
 
     private final SecurityProvider securityProvider;
-    private final MemberRepository memberRepository;
 
     private final SkillmapService skillmapService;
     private final RatioService ratioService;
     private final TimeService timeService;
 
     // 핵심스킬 맵 점수
-    public Long startSkillEvaluation() {
+    public CompletableFuture<MapResponseDto> evaluateScore() {
         Member member = securityProvider.getCurrentMember();
-        return skillmapService.evaluateAsync(member);
-    }
-
-    public Optional<MapResponseDto> getEvaluationResult(Long memberId) {
-        return skillmapService.getEvaluationResult(memberId);
+        return skillmapService.performEvaluation(member);
     }
 
     // 직무 비율
@@ -73,11 +65,8 @@ public class DashboardService {
     public List<TimelineResponseDto> getExperienceTimeline(
             LocalDate startLine, LocalDate endLine) {
 
-        Long memberId = securityProvider.getCurrentMemberId();
-
         // Fetch Join을 통한 LazyInitializationException 방지
-        Member member = memberRepository.findByIdWithExperiences(memberId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+        Member member = securityProvider.getCurrentMember();
 
         return timeService.getTimeLine(member, startLine, endLine);
     }
