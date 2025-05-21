@@ -123,6 +123,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     private String buildSystemInstruction(List<String> coreSkills) {
         StringBuilder builder = new StringBuilder();
+        builder.append("You are an AI evaluator for job competency. ");
         builder.append("Explain Korean. Follow the format below.\n{\n");
         builder.append("\"coreSkillMaps\": [\n{");
         for (String coreSkill : coreSkills) {
@@ -133,6 +134,18 @@ public class OpenAiServiceImpl implements OpenAiService {
         builder.append("}");
         return builder.toString();
     }
+
+    // 강점 피드백
+    public String feedbackStrength(String strength) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("다음은 나의 역량에 대한 강점이다.\n");
+        builder.append("내 경험들을 토대로 50자 내외로 분석에 대하여 피드백을 줘.\n");
+        builder.append("또한 50자 내외로 커리어 연결에 대하여 피드백을 줘.");
+
+        Prompt prompt = new Prompt(builder.toString());
+        return openAiChatModel.call(prompt).toString();
+    }
+
 
     public void getDetailRecruitFromExperience(Experience experience) {
         String experienceStr = experience.toString();
