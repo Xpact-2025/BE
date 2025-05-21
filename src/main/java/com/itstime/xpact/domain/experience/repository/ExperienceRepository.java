@@ -2,9 +2,11 @@ package com.itstime.xpact.domain.experience.repository;
 
 import com.google.common.collect.FluentIterable;
 import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.SummaryResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.entity.Member;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +14,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Objects;
 
 @Repository
 public interface ExperienceRepository extends JpaRepository<Experience, Long>, ExperienceCustomRepository {
@@ -32,4 +33,6 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
     List<Object[]> countByDay(@Param("year") int year, @Param("month") int month);
 
     void deleteAllByMember(Member member);
+
+    Slice<Experience> findExperienceByMember(Member member, Pageable pageable);
 }

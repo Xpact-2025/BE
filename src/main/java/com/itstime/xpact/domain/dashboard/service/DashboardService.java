@@ -1,11 +1,9 @@
 package com.itstime.xpact.domain.dashboard.service;
 
-import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.*;
 import com.itstime.xpact.domain.dashboard.service.ratio.RatioService;
 import com.itstime.xpact.domain.dashboard.service.skillmap.SkillmapService;
+import com.itstime.xpact.domain.dashboard.service.summary.SummaryService;
 import com.itstime.xpact.domain.dashboard.service.time.TimeService;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
@@ -14,6 +12,10 @@ import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class DashboardService {
     private final SkillmapService skillmapService;
     private final RatioService ratioService;
     private final TimeService timeService;
+    private final SummaryService summaryService;
 
     // 핵심스킬 맵 점수
     public Long startSkillEvaluation() {
@@ -72,5 +75,11 @@ public class DashboardService {
                 .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         return timeService.getTimeLine(member, startLine, endLine);
+    }
+
+    public Slice<SummaryResponseDto> getSliceSummary(int page, int size) {
+        Member member = securityProvider.getCurrentMember();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdTime").descending());
+        return summaryService.getSliceSummary(member, pageable);
     }
 }

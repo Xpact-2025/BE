@@ -1,9 +1,6 @@
 package com.itstime.xpact.domain.dashboard.controller;
 
-import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.*;
 import com.itstime.xpact.domain.dashboard.service.DashboardService;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.response.RestResponse;
@@ -14,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -126,5 +124,12 @@ public class DashboardController {
                 RestResponse.ok(dashboardService.getExperienceTimeline(startLine, endLine)
                 )
         );
+    }
+
+    @GetMapping("/exp-summary")
+    public ResponseEntity<RestResponse<Slice<SummaryResponseDto>>> getExpSummary(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size) {
+        return ResponseEntity.ok(RestResponse.ok(dashboardService.getSliceSummary(page, size)));
     }
 }
