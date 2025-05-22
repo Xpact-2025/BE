@@ -29,4 +29,14 @@ public class ScoreResultStore {
         String key = "coreWeakness:" + memberId;
         redisTemplate.opsForValue().set(key, weakness);
     }
+
+    public String getStrength(Long memberId) {
+        String key = "coreStrength:" + memberId;
+        return (String) redisTemplate.opsForValue().get(key);
+    }
+
+    public String getWeakness(Long memberId) {
+        String key = "coreWeakness:" + memberId;
+        return (String) redisTemplate.opsForValue().get(key);
+    }
 }

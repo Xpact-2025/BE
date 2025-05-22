@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.dashboard.service.skillmap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itstime.xpact.domain.dashboard.dto.response.FeedbackResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.ScoreResponseDto;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
@@ -79,11 +80,29 @@ public class SkillmapService {
                 .max(Comparator.comparingDouble(ScoreResponseDto::getScore))
                 .map(ScoreResponseDto::getCoreSkillName)
                 .orElse(null);
-        scoreResultStore.saveWeakness(member.getId(), maxScoreSkill);
+        scoreResultStore.saveStrength(member.getId(), maxScoreSkill);
 
         if (minScoreSkill != null && maxScoreSkill != null) {
             dto.setAnalysis(maxScoreSkill, minScoreSkill);
         }
         return dto;
+    }
+
+    // 피드백에 대한 조회 - 강점
+    public CompletableFuture<FeedbackResponseDto> getFeedbackStrength(Member member) throws CustomException {
+
+        String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
+                .collect(Collectors.joining("\n"));
+
+        return openAiService.feedbackStrength(experiences, scoreResultStore.getStrength(member.getId()));
+    }
+
+    // 피드백에 대한 조회 - 약점
+    public CompletableFuture<FeedbackResponseDto> getFeedbackWeakness(Member member) throws CustomException {
+
+        String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
+                .collect(Collectors.joining("\n"));
+
+        return openAiService.feedbackWeakness(experiences, scoreResultStore.getWeakness(member.getId()));
     }
 }
