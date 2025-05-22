@@ -80,6 +80,11 @@ public class RatioService {
     private RecruitCount setCounts(Long memberId) {
 
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(memberId);
+
+        if(experiences == null || experiences.isEmpty()){
+            throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+        }
+
         Map<String, Integer> result = new HashMap<>();
         experiences.forEach(e -> {
             if(e.getDetailRecruit() != null) {
