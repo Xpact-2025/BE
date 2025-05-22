@@ -122,4 +122,44 @@ public class DashboardController {
                 )
         );
     }
+
+    @PostMapping("/skills/feedback/strength")
+    public DeferredResult<ResponseEntity<?>> getFeedbackStrength() {
+
+        DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>(20_000L);
+
+        dashboardService.getStrengthFeedback()
+                .thenAccept(result -> {
+                    deferredResult.setResult(ResponseEntity.ok(
+                            RestResponse.ok(result)
+                    ));
+                })
+                .exceptionally(e -> {
+                    deferredResult.setErrorResult(
+                            ErrorResponse.toResponseEntity(ErrorCode.FAILED_GET_RESULT)
+                    );
+                    return null;
+                });
+        return deferredResult;
+    }
+
+    @PostMapping("/skills/feedback/weakness")
+    public DeferredResult<ResponseEntity<?>> getFeedbackWeakness() {
+
+        DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>(20_000L);
+
+        dashboardService.getWeaknessFeedback()
+                .thenAccept(result -> {
+                    deferredResult.setResult(ResponseEntity.ok(
+                            RestResponse.ok(result)
+                    ));
+                })
+                .exceptionally(e -> {
+                    deferredResult.setErrorResult(
+                            ErrorResponse.toResponseEntity(ErrorCode.FAILED_GET_RESULT)
+                    );
+                    return null;
+                });
+        return deferredResult;
+    }
 }

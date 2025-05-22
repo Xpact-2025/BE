@@ -1,9 +1,6 @@
 package com.itstime.xpact.domain.dashboard.service;
 
-import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.*;
 import com.itstime.xpact.domain.dashboard.service.ratio.RatioService;
 import com.itstime.xpact.domain.dashboard.service.skillmap.SkillmapService;
 import com.itstime.xpact.domain.dashboard.service.time.TimeService;
@@ -61,5 +58,21 @@ public class DashboardService {
         Member member = securityProvider.getCurrentMember();
 
         return timeService.getTimeLine(member, startLine, endLine);
+    }
+
+    // 피드백 부분 - 강점
+    public CompletableFuture<FeedbackResponseDto> getStrengthFeedback() {
+
+        Member member = securityProvider.getCurrentMember();
+
+        return skillmapService.getFeedbackStrength(member);
+    }
+
+    // 피드백 부분 - 단점
+    public CompletableFuture<FeedbackResponseDto> getWeaknessFeedback() {
+
+        Member member = securityProvider.getCurrentMember();
+
+        return skillmapService.getFeedbackWeakness(member);
     }
 }
