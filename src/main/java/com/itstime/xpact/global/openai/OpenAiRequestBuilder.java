@@ -7,6 +7,7 @@ import java.util.*;
 @Slf4j
 public class OpenAiRequestBuilder {
 
+    // Score 산정
     public String buildScorePrompt(String experiences, List<String> coreSkills) {
             StringBuilder builder = new StringBuilder();
             builder.append("당신은 인사 전문가이며, 지원자의 직무 역량을 평가하는 \"AI evaluator for job competency\"이다.\n");
@@ -34,5 +35,29 @@ public class OpenAiRequestBuilder {
             variables.put("core_skill_"+ (i+1), coreSkills.get(i));
         }
         return variables;
+    }
+
+    // Feedback with Strength
+    public String buildStrengthPrompt(String experiences, String strength) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(strength).append("은 나의 경험 중 강점인 역량이다.\n");
+        builder.append("첫번째 문단은 내 경험들을 토대로 50자 내외로 해당 역량이 강점인 이유 대하여 서술해줘.\n");
+        builder.append("두번째 문단은 내 경험들을 토대로 50자 내외로 연결할 수 있는 커리어에 대하여 추천해줘.\n");
+        builder.append("나의 경험들은 다음과 같다.\n");
+        builder.append(experiences);
+
+        return builder.toString();
+    }
+
+    // Feedback with Weakness
+    public String buildWeaknessPrompt(String experiences, String weakness) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(weakness).append("은 나의 경험 중 부족한 역량이다.\n");
+        builder.append("첫번째 문단은 내 경험들을 토대로 50자 내외로 해당 역량이 약점인 이유 대하여 분석해줘.\n");
+        builder.append("두번째 문단은 내 경험들을 토대로 50자 내외로 보완할 수 있는 추천 활동들을 제시해줘.\n");
+        builder.append("나의 경험들은 다음과 같다.\n");
+        builder.append(experiences);
+
+        return builder.toString();
     }
 }

@@ -2,6 +2,7 @@ package com.itstime.xpact.global.openai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itstime.xpact.domain.dashboard.dto.response.FeedbackResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
@@ -136,7 +137,48 @@ public class OpenAiServiceImpl implements OpenAiService {
     }
 
     // 강점 피드백
-    public String feedbackStrength(String strength) {
+    public CompletableFuture<FeedbackResponseDto> feedbackStrength(String experiences, String strength) {
+        OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
+
+        PromptTemplate template = new PromptTemplate(builder.buildStrengthPrompt(experiences, strength));
+        String message = template.render();
+
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage("두 개의 문단으로 답해라.");
+
+        String rawResponse = openAiChatModel.call(systemMessage, userMessage);
+
+        String[] paragraphs = rawResponse.split("\\n\\n", 2);
+
+        FeedbackResponseDto dto = new FeedbackResponseDto();
+        dto.setExpAnalysis(paragraphs.length > 0 ? paragraphs[0].trim() : "");
+        dto.setRecommend(paragraphs.length > 1 ? paragraphs[1].trim() : "");
+
+        return CompletableFuture.completedFuture(dto);
+    };
+
+    public CompletableFuture<FeedbackResponseDto> feedbackWeakness(String experiences, String weakness) {
+        OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
+
+        PromptTemplate template = new PromptTemplate(builder.buildWeaknessPrompt(experiences, weakness));
+        String message = template.render();
+
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage("두 개의 문단으로 답해라.");
+
+        String rawResponse = openAiChatModel.call(systemMessage, userMessage);
+
+        String[] paragraphs = rawResponse.split("\\n\\n", 2); // 문단 기준으로 나눔
+
+        FeedbackResponseDto dto = new FeedbackResponseDto();
+        dto.setExpAnalysis(paragraphs.length > 0 ? paragraphs[0].trim() : "");
+        dto.setRecommend(paragraphs.length > 1 ? paragraphs[1].trim() : "");
+
+        return CompletableFuture.completedFuture(dto);
+    };
+
+
+    public String feedbackWeakness(String weakness) {
         StringBuilder builder = new StringBuilder();
         builder.append("다음은 나의 역량에 대한 강점이다.\n");
         builder.append("내 경험들을 토대로 50자 내외로 분석에 대하여 피드백을 줘.\n");
