@@ -82,7 +82,7 @@ public enum ErrorCode {
 
     // skill map
     UNLOADED_SKILL_MAP(HttpStatus.BAD_REQUEST, "SME001", "핵심 스킬맵 로드에 실패하였습니다."),
-    EXPERIENCES_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "SME002", "입력된 경험이 충분하지 않습니다."),
+    EXPERIENCES_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "SME002", "경험을 입력해주세요."),
 
     // Async
     FAILED_GET_RESULT(HttpStatus.BAD_REQUEST, "AE001", "요청에 대한 응답을 얻지 못했습니다."),
