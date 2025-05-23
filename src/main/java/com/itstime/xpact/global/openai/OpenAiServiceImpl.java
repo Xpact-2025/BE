@@ -42,7 +42,6 @@ public class OpenAiServiceImpl implements OpenAiService {
                 역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘\s
                 요약만 출력되도록 해줘\s
                 data : %s""", experience.toString());
-        log.info(message);
 
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
@@ -184,8 +183,6 @@ public class OpenAiServiceImpl implements OpenAiService {
     public void getDetailRecruitFromExperience(Experience experience) {
         String experienceStr = experience.toString();
         String recruits = detailRecruitToString();
-        System.out.println("recruits = " + recruits);
-
         String message = String.format(
                 "다음 객체를 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.\n" +
                         "객체: %s\n" +

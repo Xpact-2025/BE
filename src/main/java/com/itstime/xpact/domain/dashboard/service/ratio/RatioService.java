@@ -80,10 +80,15 @@ public class RatioService {
     private RecruitCount setCounts(Long memberId) {
 
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(memberId);
+
+        if(experiences == null || experiences.isEmpty()) {
+            throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+        }
+
         Map<String, Integer> result = new HashMap<>();
         experiences.forEach(e -> {
-            String detailRecruit = e.getDetailRecruit().getName();
-            if(detailRecruit != null) {
+            if(e.getDetailRecruit() != null) {
+                String detailRecruit = e.getDetailRecruit().getName();
                 result.put(detailRecruit, result.getOrDefault(detailRecruit, 0) + 1);
             }
         });
@@ -99,19 +104,17 @@ public class RatioService {
      */
     private void adjustRatio(Map<String, Double> result) {
         double diff = Math.round((100.0 - result.values().stream().mapToDouble(Double::doubleValue).sum()) * 10) / 10.0;
-        System.out.println("diff = " + diff);
-
         if(diff > 0) {
             String maxKey = result.entrySet().stream()
                     .max(Map.Entry.comparingByValue())
-                    .orElseThrow(() -> CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR))
+                    .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH))
                     .getKey();
 
             result.put(maxKey, result.get(maxKey) + diff);
         } else if(diff < 0) {
             String minKey = result.entrySet().stream()
                     .min(Map.Entry.comparingByValue())
-                    .orElseThrow(() -> CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR))
+                    .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH))
                     .getKey();
 
             result.put(minKey, result.get(minKey) - diff);

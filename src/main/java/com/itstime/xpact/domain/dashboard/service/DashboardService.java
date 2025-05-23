@@ -1,6 +1,11 @@
 package com.itstime.xpact.domain.dashboard.service;
 
 import com.itstime.xpact.domain.dashboard.dto.response.*;
+import com.itstime.xpact.domain.dashboard.controller.HistoryOldResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.dashboard.service.ratio.RatioService;
 import com.itstime.xpact.domain.dashboard.service.skillmap.SkillmapService;
 import com.itstime.xpact.domain.dashboard.service.time.TimeService;
@@ -45,9 +50,16 @@ public class DashboardService {
     }
 
     // 히스토리 조회
-    public HistoryResponseDto getExperienceHistory(int year, int month) {
-        return timeService.getCountPerDay(year, month);
+    public HistoryOldResponseDto getOldExperienceHistory(int year, int month) {
+        Member member = securityProvider.getCurrentMember();
+        return timeService.getOldCountPerDay(year, month, member);
     }
+
+    public HistoryResponseDto getExperienceHistory(int year, int month) {
+        Member member = securityProvider.getCurrentMember();
+        return timeService.getCountPerDay(year, month, member);
+    }
+
 
     // 타임라인 조회
     @Transactional(readOnly = true)

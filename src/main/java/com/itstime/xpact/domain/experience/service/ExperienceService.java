@@ -70,13 +70,15 @@ public class ExperienceService {
     // keyword, fils 설정하여 set
     private void saveNonQualification(Experience experience, ExperienceCreateRequestDto createRequestDto) throws CustomException {
         // dto의 keywords를 keyword 엔티티로 변경
-        List<Keyword> keywords = createRequestDto.getKeywords().stream()
-                .map(keywordStr -> Keyword.builder()
-                        .name(keywordStr)
-                        .experience(experience)
-                        .build())
-                .collect(Collectors.toCollection(ArrayList::new));
-        experience.setKeywords(keywords);
+        if(createRequestDto.getKeywords() != null && !createRequestDto.getKeywords().isEmpty()) {
+            List<Keyword> keywords = createRequestDto.getKeywords().stream()
+                    .map(keywordStr -> Keyword.builder()
+                            .name(keywordStr)
+                            .experience(experience)
+                            .build())
+                    .collect(Collectors.toCollection(ArrayList::new));
+            experience.setKeywords(keywords);
+        }
 
         if(Experience.isNeedFiles(createRequestDto.getExperienceType()) && createRequestDto.getFiles() != null) {
             List<File> files = createRequestDto.getFiles().stream()
@@ -130,13 +132,15 @@ public class ExperienceService {
 
     private void saveNonQualification(Experience experience, ExperienceUpdateRequestDto updateRequestDto) {
         Keyword.validateKeyword(updateRequestDto.getKeywords());
-        List<Keyword> keywords = updateRequestDto.getKeywords().stream()
-                .map(keywordStr -> Keyword.builder()
-                        .name(keywordStr)
-                        .experience(experience)
-                        .build())
-                .collect(Collectors.toCollection(ArrayList::new));
-        experience.setKeywords(keywords);
+        if(updateRequestDto.getKeywords() != null && !updateRequestDto.getKeywords().isEmpty()) {
+            List<Keyword> keywords = updateRequestDto.getKeywords().stream()
+                    .map(keywordStr -> Keyword.builder()
+                            .name(keywordStr)
+                            .experience(experience)
+                            .build())
+                    .collect(Collectors.toCollection(ArrayList::new));
+            experience.setKeywords(keywords);
+        }
 
         if(Experience.isNeedFiles(updateRequestDto.getExperienceType())) {
             List<File> files = updateRequestDto.getFiles().stream()
