@@ -1,8 +1,6 @@
 package com.itstime.xpact.domain.dashboard.controller;
 
-import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.*;
 import com.itstime.xpact.domain.dashboard.service.DashboardService;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
@@ -11,8 +9,10 @@ import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +33,20 @@ public class DashboardController {
     @Operation(summary = "핵심스킬맵 요청 API", description = """
             핵심스킬맵 대시보드 반환을 위한 API입니다.
             """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "저장된 경험이 없을 때의 에러 유형", content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                    examples = {
+                            @ExampleObject(name = "EXPERIENCES_NOT_ENOUGH", value = """
+                        {
+                              "httpStatus": "BAD_REQUEST",
+                              "code": "SME002",
+                              "message": "입력된 경험이 충분하지 않습니다."
+                        }""")
+                    }
+            ))
+    })
+    @ApiResponse(responseCode = "200", description = "핵심스킬맵 요청 성공",
+            content = @Content(schema = @Schema(implementation = MapResponseDto.class)))
     @PostMapping("/skills")
     public DeferredResult<ResponseEntity<?>> evaluateScore(
             @RequestHeader("Authorization") String token) throws CustomException {
@@ -123,6 +137,13 @@ public class DashboardController {
         );
     }
 
+    @Operation(summary = "핵심스킬맵 강점 역량 피드백 요청 API", description = """
+            사용자의 경험 기반으로 핵심 역량 중 강점에 대한 피드백을 제시합니다.<br>
+            expAnalysis는 경험 기반 분석으로,<br>
+            recommend는 커리어 연결로 매핑하시면 됩니다.
+            """)
+    @ApiResponse(responseCode = "200", description = "역량 피드백 요청 성공",
+            content = @Content(schema = @Schema(implementation = FeedbackResponseDto.class)))
     @PostMapping("/skills/feedback/strength")
     public DeferredResult<ResponseEntity<?>> getFeedbackStrength() {
 
@@ -143,6 +164,13 @@ public class DashboardController {
         return deferredResult;
     }
 
+    @Operation(summary = "핵심스킬맵 약점 역량 피드백 요청 API", description = """
+            사용자의 경험 기반으로 핵심 역량 중 약점에 대한 피드백을 제시합니다.<br>
+            expAnalysis는 경험 기반 분석으로,<br>
+            recommend는 추천 활동으로 매핑하시면 됩니다.
+            """)
+    @ApiResponse(responseCode = "200", description = "역량 피드백 요청 성공",
+            content = @Content(schema = @Schema(implementation = FeedbackResponseDto.class)))
     @PostMapping("/skills/feedback/weakness")
     public DeferredResult<ResponseEntity<?>> getFeedbackWeakness() {
 
