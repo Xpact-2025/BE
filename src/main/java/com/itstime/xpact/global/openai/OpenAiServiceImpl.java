@@ -144,19 +144,21 @@ public class OpenAiServiceImpl implements OpenAiService {
         String message = template.render();
 
         Message userMessage = new UserMessage(message);
-        Message systemMessage = new SystemMessage("두 개의 문단으로 답해라.");
+        Message systemMessage = new SystemMessage("두 개의 문단으로 답해라. 존댓말을 써라.");
 
         String rawResponse = openAiChatModel.call(systemMessage, userMessage);
 
         String[] paragraphs = rawResponse.split("\\n\\n", 2);
 
         FeedbackResponseDto dto = new FeedbackResponseDto();
+        dto.setCoreSkillName(strength);
         dto.setExpAnalysis(paragraphs.length > 0 ? paragraphs[0].trim() : "");
         dto.setRecommend(paragraphs.length > 1 ? paragraphs[1].trim() : "");
 
         return CompletableFuture.completedFuture(dto);
     };
 
+    // 약점 피드백
     public CompletableFuture<FeedbackResponseDto> feedbackWeakness(String experiences, String weakness) {
         OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
 
@@ -164,29 +166,19 @@ public class OpenAiServiceImpl implements OpenAiService {
         String message = template.render();
 
         Message userMessage = new UserMessage(message);
-        Message systemMessage = new SystemMessage("두 개의 문단으로 답해라.");
+        Message systemMessage = new SystemMessage("두 개의 문단으로 답해라. 존댓말을 써라.");
 
         String rawResponse = openAiChatModel.call(systemMessage, userMessage);
 
-        String[] paragraphs = rawResponse.split("\\n\\n", 2); // 문단 기준으로 나눔
+        String[] paragraphs = rawResponse.split("\\n\\n", 2);
 
         FeedbackResponseDto dto = new FeedbackResponseDto();
+        dto.setCoreSkillName(weakness);
         dto.setExpAnalysis(paragraphs.length > 0 ? paragraphs[0].trim() : "");
         dto.setRecommend(paragraphs.length > 1 ? paragraphs[1].trim() : "");
 
         return CompletableFuture.completedFuture(dto);
     };
-
-
-    public String feedbackWeakness(String weakness) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("다음은 나의 역량에 대한 강점이다.\n");
-        builder.append("내 경험들을 토대로 50자 내외로 분석에 대하여 피드백을 줘.\n");
-        builder.append("또한 50자 내외로 커리어 연결에 대하여 피드백을 줘.");
-
-        Prompt prompt = new Prompt(builder.toString());
-        return openAiChatModel.call(prompt).toString();
-    }
 
 
     public void getDetailRecruitFromExperience(Experience experience) {
