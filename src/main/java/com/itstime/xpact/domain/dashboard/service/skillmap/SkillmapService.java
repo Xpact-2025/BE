@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.dashboard.service.skillmap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.dashboard.dto.response.FeedbackResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
@@ -28,6 +29,7 @@ public class SkillmapService {
 
     private final OpenAiService openAiService;
     private final ScoreResultStore scoreResultStore;
+
     private final ObjectMapper objectMapper;
 
     private final DetailRecruitRepository detailRecruitRepository;
@@ -38,7 +40,7 @@ public class SkillmapService {
         String desiredRecruit = member.getDesiredRecruit();
         log.info("{} DetailRecruit 조회 시작...", desiredRecruit);
         DetailRecruit detailRecruit = detailRecruitRepository.findByName(desiredRecruit)
-                .orElseThrow(() -> CustomException.of(ErrorCode.DETAILRECRUIT_NOT_FOUND));
+                .orElseThrow(() -> CustomException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND));
 
         log.info("{} DetailRecruit에 맞는 CoreSkill 조회 시작...", detailRecruit.getName());
         CoreSkill coreSkill = detailRecruitRepository.findCoreSkillById(detailRecruit.getId())
@@ -57,7 +59,7 @@ public class SkillmapService {
         return openAiService.evaluateScore(experiences, coreSkillList)
                 .thenApply(resultDto -> {
                     try {
-                        scoreResultStore.save(member.getId(), objectMapper.writeValueAsString(resultDto));
+                        scoreResultStore.saveSkillMap(member.getId(), objectMapper.writeValueAsString(resultDto));
                         return analysisScore(member, resultDto);
                     } catch (Exception e) {
                         log.error("결과를 저장하는 것에 실패하였습니다.", e);
@@ -74,18 +76,26 @@ public class SkillmapService {
                 .min(Comparator.comparingDouble(ScoreResponseDto::getScore))
                 .map(ScoreResponseDto::getCoreSkillName)
                 .orElse(null);
-        scoreResultStore.saveWeakness(member.getId(), minScoreSkill);
 
         String maxScoreSkill = skills.stream()
                 .max(Comparator.comparingDouble(ScoreResponseDto::getScore))
                 .map(ScoreResponseDto::getCoreSkillName)
                 .orElse(null);
-        scoreResultStore.saveStrength(member.getId(), maxScoreSkill);
 
         if (minScoreSkill != null && maxScoreSkill != null) {
             dto.setAnalysis(maxScoreSkill, minScoreSkill);
         }
-        return dto;
+
+        try {
+            log.info("skills: {}", skills);
+            log.info("minScoreSkill: {}", minScoreSkill);
+            log.info("maxScoreSkill: {}", maxScoreSkill);
+            scoreResultStore.saveSkillMap(member.getId(), objectMapper.writeValueAsString(dto));
+            return dto;
+        } catch (JsonProcessingException e) {
+            log.error("강점 및 약점 역량 저장 중 오류 ... : {}", e.getMessage());
+            throw CustomException.of(ErrorCode.FEEDBACK_SAVE_ERROR);
+        }
     }
 
     // 피드백에 대한 조회 - 강점
@@ -93,8 +103,42 @@ public class SkillmapService {
 
         String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
                 .collect(Collectors.joining("\n"));
+        
+        // 예외 처리 필요
+        if (experiences == null || experiences.trim().isEmpty()) {
+            throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+        }
+        
+        String skillMap = scoreResultStore.getSkillMap(member.getId());
+        if (skillMap == null || skillMap.trim().isEmpty()) {
+            throw CustomException.of(ErrorCode.SKILLMAP_NOT_FOUND);
+        }
 
-        return openAiService.feedbackStrength(experiences, scoreResultStore.getStrength(member.getId()));
+        MapResponseDto skillMapDto;
+        try {
+            skillMapDto = objectMapper.readValue(skillMap, MapResponseDto.class);
+        } catch (JsonProcessingException e) {
+            log.error("객체로 역직렬화 실패", e);
+            throw CustomException.of(ErrorCode.FAILED_DESERIALIZE);
+        }
+
+        String strength = skillMapDto.getStrength();
+        if (strength == null || strength.trim().isEmpty()) {
+            throw CustomException.of(ErrorCode.EMPTY_STRENGTH);
+        }
+
+        return openAiService.feedbackStrength(experiences, strength)
+                .thenApply(feedbackDto -> {
+                    try {
+                        String json = objectMapper.writeValueAsString(feedbackDto);
+                        log.info(json);
+                        scoreResultStore.saveStrengthFeedback(member.getId(), json);
+                        return feedbackDto;
+                    } catch (JsonProcessingException e) {
+                        log.error("JSON 직렬화 실패", e);
+                        throw CustomException.of(ErrorCode.FAILED_SERIALIZE);
+                    }
+                });
     }
 
     // 피드백에 대한 조회 - 약점
@@ -103,6 +147,40 @@ public class SkillmapService {
         String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
                 .collect(Collectors.joining("\n"));
 
-        return openAiService.feedbackWeakness(experiences, scoreResultStore.getWeakness(member.getId()));
+        // 예외 처리 필요
+        if (experiences == null || experiences.trim().isEmpty()) {
+            throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+        }
+
+        String skillMap = scoreResultStore.getSkillMap(member.getId());
+        if (skillMap == null || skillMap.trim().isEmpty()) {
+            throw CustomException.of(ErrorCode.SKILLMAP_NOT_FOUND);
+        }
+
+        MapResponseDto skillMapDto;
+        try {
+            skillMapDto = objectMapper.readValue(skillMap, MapResponseDto.class);
+        } catch (JsonProcessingException e) {
+            log.error("객체로 역직렬화 실패", e);
+            throw CustomException.of(ErrorCode.FAILED_DESERIALIZE);
+        }
+
+        String weakness = skillMapDto.getWeakness();
+        if (weakness == null || weakness.trim().isEmpty()) {
+            throw CustomException.of(ErrorCode.EMPTY_STRENGTH);
+        }
+
+        return openAiService.feedbackWeakness(experiences, weakness)
+                .thenApply(feedbackDto -> {
+                    try {
+                        String json = objectMapper.writeValueAsString(feedbackDto);
+                        log.info(json);
+                        scoreResultStore.saveWeaknessFeedback(member.getId(), json);
+                        return feedbackDto;
+                    } catch (JsonProcessingException e) {
+                        log.error("JSON 직렬화 실패", e);
+                        throw CustomException.of(ErrorCode.FAILED_SERIALIZE);
+                    }
+                });
     }
 }
