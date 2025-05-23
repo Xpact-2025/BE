@@ -21,8 +21,6 @@ import java.util.Date;
 @Slf4j
 public class TokenProvider {
 
-    private final RedisTemplate<String, String> redisTemplate;
-
     private static final String KEY_ROLES = "roles";
 
     @Value("${spring.jwt.secret}")
