@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @Hidden
 @RestControllerAdvice
-public class CustomExceptionHandler {
+public class GlobalExceptionHandler {
 
     // GeneralException ( RuntimeException )
     @ExceptionHandler(GeneralException.class)
@@ -23,6 +23,7 @@ public class CustomExceptionHandler {
     }
 
     // CustomException - 상태코드는 200이지만, ErrorCode에 대한 예외를 처리
+    @ExceptionHandler(CustomException.class)
     protected ResponseEntity<RestResponse<Void>> customException(CustomException e, HttpServletRequest request) {
         logError(e, request);
         return ResponseEntity.ok(
