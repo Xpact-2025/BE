@@ -1,13 +1,18 @@
 package com.itstime.xpact.domain.dashboard.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(name = "RatioResponseDto", description = "직무별 비율 정보를 담은 응답 DTO")
 public class RatioResponseDto {
 
@@ -20,11 +25,10 @@ public class RatioResponseDto {
                 }
                 """
     )
-    private Map<String, Double> ratios;
+    private String name;
+    private Double value;
 
-    public static RatioResponseDto of(Map<String, Double> data) {
-        return RatioResponseDto.builder()
-                .ratios(data)
-                .build();
+    public static RatioResponseDto of(Map.Entry<String, Double> entry) {
+        return RatioResponseDto.builder().name(entry.getKey()).value(entry.getValue()).build();
     }
 }
