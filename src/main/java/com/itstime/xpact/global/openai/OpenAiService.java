@@ -1,5 +1,6 @@
 package com.itstime.xpact.global.openai;
 
+import com.itstime.xpact.domain.dashboard.dto.response.FeedbackResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import org.springframework.scheduling.annotation.Async;
@@ -20,4 +21,7 @@ public interface OpenAiService {
 
     @Async("taskExecutor")
     void getDetailRecruitFromExperience(Experience experience);
+
+    CompletableFuture<FeedbackResponseDto> feedbackStrength(String experiences, String strength);
+    CompletableFuture<FeedbackResponseDto> feedbackWeakness(String experiences, String weakness);
 }

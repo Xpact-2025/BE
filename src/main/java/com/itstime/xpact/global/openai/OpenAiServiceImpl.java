@@ -2,6 +2,7 @@ package com.itstime.xpact.global.openai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itstime.xpact.domain.dashboard.dto.response.FeedbackResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
@@ -122,6 +123,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     private String buildSystemInstruction(List<String> coreSkills) {
         StringBuilder builder = new StringBuilder();
+        builder.append("You are an AI evaluator for job competency. ");
         builder.append("Explain Korean. Follow the format below.\n{\n");
         builder.append("\"coreSkillMaps\": [\n{");
         for (String coreSkill : coreSkills) {
@@ -132,6 +134,51 @@ public class OpenAiServiceImpl implements OpenAiService {
         builder.append("}");
         return builder.toString();
     }
+
+    // 강점 피드백
+    public CompletableFuture<FeedbackResponseDto> feedbackStrength(String experiences, String strength) {
+        OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
+
+        PromptTemplate template = new PromptTemplate(builder.buildStrengthPrompt(experiences, strength));
+        String message = template.render();
+
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage("두 개의 문단으로 답해라. 존댓말을 써라.");
+
+        String rawResponse = openAiChatModel.call(systemMessage, userMessage);
+
+        String[] paragraphs = rawResponse.split("\\n\\n", 2);
+
+        FeedbackResponseDto dto = new FeedbackResponseDto();
+        dto.setCoreSkillName(strength);
+        dto.setExpAnalysis(paragraphs.length > 0 ? paragraphs[0].trim() : "");
+        dto.setRecommend(paragraphs.length > 1 ? paragraphs[1].trim() : "");
+
+        return CompletableFuture.completedFuture(dto);
+    };
+
+    // 약점 피드백
+    public CompletableFuture<FeedbackResponseDto> feedbackWeakness(String experiences, String weakness) {
+        OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
+
+        PromptTemplate template = new PromptTemplate(builder.buildWeaknessPrompt(experiences, weakness));
+        String message = template.render();
+
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage("두 개의 문단으로 답해라. 존댓말을 써라.");
+
+        String rawResponse = openAiChatModel.call(systemMessage, userMessage);
+
+        String[] paragraphs = rawResponse.split("\\n\\n", 2);
+
+        FeedbackResponseDto dto = new FeedbackResponseDto();
+        dto.setCoreSkillName(weakness);
+        dto.setExpAnalysis(paragraphs.length > 0 ? paragraphs[0].trim() : "");
+        dto.setRecommend(paragraphs.length > 1 ? paragraphs[1].trim() : "");
+
+        return CompletableFuture.completedFuture(dto);
+    };
+
 
     public void getDetailRecruitFromExperience(Experience experience) {
         String experienceStr = experience.toString();

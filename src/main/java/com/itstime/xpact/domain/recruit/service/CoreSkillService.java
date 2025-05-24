@@ -58,7 +58,7 @@ public class CoreSkillService {
                 DetailRecruit detailRecruit = detailRecruitRepository.findByName(detailRecruitName)
                         .orElseThrow(() -> {
                             log.warn("DetailRecruit 조회 실패 : {}", detailRecruitName);
-                            return CustomException.of(ErrorCode.DETAILRECRUIT_NOT_FOUND);
+                            return CustomException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND);
                         });
                 detailRecruit.setCoreSkill(coreSkillRepository.save(coreSkill));
                 coreSkills.add(coreSkill);
