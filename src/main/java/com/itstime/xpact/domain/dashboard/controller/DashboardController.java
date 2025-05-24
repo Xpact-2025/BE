@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -80,7 +81,7 @@ public class DashboardController {
     @ApiResponse(responseCode = "200", description = "비율 산정 성공",
     content = @Content(schema = @Schema(implementation = RatioResponseDto.class)))
     @GetMapping("/ratio")
-    public ResponseEntity<RestResponse<RatioResponseDto>> getRatio() {
+    public ResponseEntity<RestResponse<List<RatioResponseDto>>> getRatio() {
         return ResponseEntity.ok(RestResponse.ok(dashboardService.getRecruitCategoryRatio()));
     }
 
