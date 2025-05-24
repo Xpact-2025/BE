@@ -18,7 +18,7 @@ spring:
     refresh:
       expiration: 604800 # 7일
     access:
-      expiration: 900 # 15분 임시 변경
+      expiration: 60 # 15분 임시 변경
     secret: ${JWT_SECRET_KEY}
 
 
