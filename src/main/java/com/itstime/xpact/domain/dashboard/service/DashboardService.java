@@ -38,7 +38,7 @@ public class DashboardService {
     }
 
     // 직무 비율
-    public RatioResponseDto getRecruitCategoryRatio() {
+    public List<RatioResponseDto> getRecruitCategoryRatio() {
         Long memberId = securityProvider.getCurrentMemberId();
         return ratioService.detailRecruitRatio(memberId);
     }
