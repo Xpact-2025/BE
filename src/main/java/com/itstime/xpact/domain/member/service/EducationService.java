@@ -9,7 +9,7 @@ import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.EducationRepository;
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
 import com.itstime.xpact.domain.member.util.TrieUtil;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,14 +30,14 @@ public class EducationService {
 
     // 학교 전체 조회
     @Transactional(readOnly = true)
-    public List<String> readSchoolNames() throws CustomException {
+    public List<String> readSchoolNames() throws GeneralException {
 
         return schoolCustomRepository.findAllSchoolNames();
     }
 
     // 학교 이름 검색함으로써 조회
     @Transactional(readOnly = true)
-    public List<String> autocompleteName(String term) throws CustomException {
+    public List<String> autocompleteName(String term) throws GeneralException {
 
         try {
             // Trie의 keyword에 검색어 넣기
@@ -50,7 +50,7 @@ public class EducationService {
             // prefix와 일치 반환
             return trieUtil.autocomplete(term);
         } catch (Exception e) {
-            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw GeneralException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         } finally {
             // Trie 구조 다시 비우기
             trieUtil.deleteAutocompleteKeyword(term);
@@ -59,14 +59,14 @@ public class EducationService {
 
     // 학교를 기반으로 학과 필터링 ( 전체 조회 )
     @Transactional(readOnly = true)
-    public List<String> readMajor(String schoolName) throws CustomException {
+    public List<String> readMajor(String schoolName) throws GeneralException {
 
         return schoolCustomRepository.findMajorBySchoolName(schoolName);
     }
 
     // 직접 학과 검색
     @Transactional(readOnly = true)
-    public List<String> searchMajor(String schoolName, String term) throws CustomException {
+    public List<String> searchMajor(String schoolName, String term) throws GeneralException {
 
         try {
             // Trie의 keyword에 검색어 넣기
@@ -79,7 +79,7 @@ public class EducationService {
             // prefix와 일치 반환
             return trieUtil.autocomplete(term);
         } catch (Exception e) {
-            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw GeneralException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         } finally {
             // Trie 구조 다시 비우기
             trieUtil.deleteAutocompleteKeyword(term);
@@ -138,7 +138,7 @@ public class EducationService {
 
         // Null에 대한 처리
         if (education == null && (requestDto.name() == null || requestDto.major() == null || requestDto.schoolStatus() == null)) {
-            throw CustomException.of(ErrorCode.INSUFFICIENT_SCHOOL_INFO);
+            throw GeneralException.of(ErrorCode.INSUFFICIENT_SCHOOL_INFO);
         }
 
         String name = requestDto.name() != null ? requestDto.name() : education != null ? education.getSchoolName() : null;

@@ -28,16 +28,11 @@ public class LogAspect {
         System.out.printf("[실행 API Controller] - %s.%s(%s)%n",
                 className, methodName, args.length > 0 ? args[0].toString() : "");
 
-        try {
-            Object result = joinPoint.proceed();
-            stopWatch.stop();
-            long time = stopWatch.getLastTaskTimeMillis();
+        Object result = joinPoint.proceed();
+        stopWatch.stop();
+        long time = stopWatch.getLastTaskTimeMillis();
 
-            System.out.printf("[API 종료] - %s.%s() - %d ms \n", className, methodName, time);
-            return result;
-        } catch (Throwable throwable) {
-            System.out.printf("[API 예외] - %s.%s(): %s%n", className, methodName, throwable.getMessage());
-            return null;
-        }
+        System.out.printf("[API 종료] - %s.%s() - %d ms \n", className, methodName, time);
+        return result;
     }
 }

@@ -1,7 +1,7 @@
 package com.itstime.xpact.global.webclient;
 
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class SchoolApiClient {
     private static final String SCHOOL_OPEN_API_URL = "/openapi/service/rest/SchoolMajorInfoService/getSchoolMajorInfo";
 
 
-    public void syncAllSchools() throws CustomException {
+    public void syncAllSchools() throws GeneralException {
         int page = 1;
         int numOfRows = 100;
         int totalCount;
@@ -49,7 +49,7 @@ public class SchoolApiClient {
                 page++;
             } catch (Exception e) {
                 log.error("학교 동기화 실패: {}", e.getMessage(), e);
-                throw new CustomException(ErrorCode.PARSING_ERROR);
+                throw new GeneralException(ErrorCode.PARSING_ERROR);
             }
         } while ((page - 1) * numOfRows < totalCount);
     }

@@ -2,7 +2,7 @@ package com.itstime.xpact.global.auth;
 
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -23,18 +23,18 @@ public class SecurityProvider {
     // 현재 인증된 Member를 반환
     public Member getCurrentMember() {
         return memberRepository.findById(getMemberFromSecurityContext().getId()).orElseThrow(() ->
-                CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+                GeneralException.of(ErrorCode.MEMBER_NOT_EXISTS));
     }
 
     private Member getMemberFromSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (!(authentication instanceof MemberAuthentication memberAuth)) {
-            throw CustomException.of(ErrorCode.UNAUTHORIZED_ACCESS);
+            throw GeneralException.of(ErrorCode.UNAUTHORIZED_ACCESS);
         }
         Member member = memberAuth.getMember();
         if (member == null) {
-            throw CustomException.of(ErrorCode.MEMBER_NOT_EXISTS);
+            throw GeneralException.of(ErrorCode.MEMBER_NOT_EXISTS);
         }
         return member;
     }

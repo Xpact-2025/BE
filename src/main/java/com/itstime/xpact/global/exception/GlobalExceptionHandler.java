@@ -1,9 +1,11 @@
 package com.itstime.xpact.global.exception;
 
 import com.itstime.xpact.global.response.ErrorResponse;
+import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,13 +14,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @Hidden
 @RestControllerAdvice
-public class CustomExceptionHandler {
+public class GlobalExceptionHandler {
 
-    // CustomException ( RuntimeException )
-    @ExceptionHandler(CustomException.class)
-    protected ResponseEntity<ErrorResponse> customException(CustomException e, HttpServletRequest request) {
+    // GeneralException ( RuntimeException )
+    @ExceptionHandler(GeneralException.class)
+    protected ResponseEntity<ErrorResponse> generalException(GeneralException e, HttpServletRequest request) {
         logError(e, request);
         return ErrorResponse.toResponseEntity(e.getErrorCode());
+    }
+
+    // CustomException - 상태코드는 200이지만, ErrorCode에 대한 예외를 처리
+    @ExceptionHandler(CustomException.class)
+    protected ResponseEntity<RestResponse<?>> customException(CustomException e, HttpServletRequest request) {
+        logError(e, request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(RestResponse.onFailure(e.getErrorCode())
+                );
     }
 
     // Header missing Exception

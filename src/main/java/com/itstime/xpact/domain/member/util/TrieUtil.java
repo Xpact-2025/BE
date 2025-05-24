@@ -21,7 +21,6 @@ public class TrieUtil {
     // Trie 키워드 조회
     public List<String> autocomplete(String keyword) {
         return (List<String>) this.trie
-                .prefixMap(keyword)
                 .keySet()
                 .stream()
                 .collect(Collectors.toList());

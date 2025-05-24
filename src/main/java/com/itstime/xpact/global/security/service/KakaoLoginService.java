@@ -5,8 +5,6 @@ import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.TokenProvider;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.security.common.LoginStrategy;
 import com.itstime.xpact.global.security.dto.response.KakaoInfoResponseDto;
 import com.itstime.xpact.global.security.dto.response.KakaoTokenDto;

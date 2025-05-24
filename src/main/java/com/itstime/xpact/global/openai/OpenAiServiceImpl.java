@@ -8,7 +8,7 @@ import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,7 +93,7 @@ public class OpenAiServiceImpl implements OpenAiService {
     }
 
     @Async
-    public CompletableFuture<MapResponseDto> evaluateScore(String experiences, List<String> coreSkills) throws CustomException {
+    public CompletableFuture<MapResponseDto> evaluateScore(String experiences, List<String> coreSkills) throws GeneralException {
 
         OpenAiRequestBuilder builder = new OpenAiRequestBuilder();
 
@@ -117,7 +117,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         } catch (JsonProcessingException e) {
             log.info("응답 내용 :" + rawResponse);
             log.error("readValue 불가...", e);
-            throw CustomException.of(ErrorCode.FAILED_OPENAI_PARSING);
+            throw GeneralException.of(ErrorCode.FAILED_OPENAI_PARSING);
         }
     }
 
@@ -197,7 +197,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
         DetailRecruit detailRecruit = detailRecruitRepository.findByName(result).orElseThrow(() ->
-                CustomException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND));
+                GeneralException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND));
 
         experience.setDetailRecruit(detailRecruit);
         experienceRepository.save(experience);

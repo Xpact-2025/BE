@@ -1,6 +1,6 @@
 package com.itstime.xpact.global.security.controller;
 
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.response.ErrorResponse;
 import com.itstime.xpact.global.response.RestResponse;
 import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
@@ -49,7 +49,7 @@ public class FormLoginController {
     public ResponseEntity<RestResponse<?>> formLogin(
             @RequestBody LoginRequestDto requestDto,
             HttpServletResponse response
-    ) throws CustomException {
+    ) throws GeneralException {
         return ResponseEntity.ok(
                 RestResponse.ok(
                         formLoginService.generalLogin(requestDto, response)
@@ -76,7 +76,7 @@ public class FormLoginController {
     @PostMapping("/signup")
     public ResponseEntity<RestResponse<SignupResponseDto>> signup (
             @RequestBody SignupRequestDto signupRequestDto
-    ) throws CustomException{
+    ) throws GeneralException {
 
         return ResponseEntity.ok(
                 RestResponse.ok(
@@ -131,7 +131,7 @@ public class FormLoginController {
     @PostMapping("/refresh")
     public ResponseEntity<RestResponse<?>> refresh(
             HttpServletRequest request, HttpServletResponse response
-    ) throws CustomException {
+    ) throws GeneralException {
         return ResponseEntity.ok(
                 RestResponse.ok(
                         formLoginService.refresh(request, response)));

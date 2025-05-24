@@ -5,7 +5,7 @@ public class CustomException extends RuntimeException {
     private ErrorCode errorCode;
 
     public CustomException(ErrorCode errorCode) {
-        super(errorCode.getMessage()); // RuntimeException으로 전달
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 

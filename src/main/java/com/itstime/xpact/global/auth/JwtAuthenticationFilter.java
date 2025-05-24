@@ -3,7 +3,7 @@ package com.itstime.xpact.global.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.response.RestResponse;
 import jakarta.servlet.FilterChain;
@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // ID(PK)를 통한 인증 생성
                 Member member = memberRepository.findById(memberId)
-                        .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+                        .orElseThrow(() -> GeneralException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
                 MemberAuthentication authentication = MemberAuthentication.createMemberAuthentication(member);
 
