@@ -9,7 +9,7 @@ import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.infra.lambda.LambdaUtil;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class RecruitService {
 
     // 산업 전체 조회
     @Transactional(readOnly = true)
-    public List<String> readAllRecruit() throws CustomException {
+    public List<String> readAllRecruit() throws GeneralException {
 
         securityProvider.getCurrentMemberId();
 
@@ -43,10 +43,10 @@ public class RecruitService {
 
     // 상세 직군 전체 조회
     @Transactional(readOnly = true)
-    public List<String> readAllDetailRecruits(String recruitName) throws CustomException {
+    public List<String> readAllDetailRecruits(String recruitName) throws GeneralException {
 
         Recruit recruit = recruitRepository.findByName(recruitName)
-                .orElseThrow(() -> CustomException.of(ErrorCode.RECRUIT_NOT_FOUND));
+                .orElseThrow(() -> GeneralException.of(ErrorCode.RECRUIT_NOT_FOUND));
         Long recruitId = recruit.getId();
 
         return detailRecruitRepository.findDetailRecruitNamesByRecruitId(recruitId);
@@ -54,7 +54,7 @@ public class RecruitService {
 
     // 희망 상세 직군 검색 자동완성
     @Transactional(readOnly = true)
-    public List<String> autocompleteDetail(String recruitName, String term) throws CustomException {
+    public List<String> autocompleteDetail(String recruitName, String term) throws GeneralException {
 
         try {
             securityProvider.getCurrentMemberId();
@@ -62,7 +62,7 @@ public class RecruitService {
             trieUtil.addAutocompleteKeyword(term);
 
             Recruit recruit = recruitRepository.findByName(recruitName) // Recruit name Unique
-                    .orElseThrow(() -> CustomException.of(ErrorCode.RECRUIT_NOT_FOUND));
+                    .orElseThrow(() -> GeneralException.of(ErrorCode.RECRUIT_NOT_FOUND));
 
             Long recruitId = recruit.getId();
 
@@ -72,7 +72,7 @@ public class RecruitService {
             return trieUtil.autocomplete(term);
         } catch (Exception e) {
             log.error("autocompleteDetail error: {}", e.getMessage());
-            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw GeneralException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         } finally {
             trieUtil.deleteAutocompleteKeyword(term);
         }
@@ -80,13 +80,13 @@ public class RecruitService {
 
     // 희망 직군 저장
     @Transactional
-    public DesiredRecruitResponseDto updateDesiredRecruit(DesiredRecruitRequestDto requestDto) throws CustomException {
+    public DesiredRecruitResponseDto updateDesiredRecruit(DesiredRecruitRequestDto requestDto) throws GeneralException {
 
         // 실제 DB에서 영속 상태의 Member 조회
         Member member = securityProvider.getCurrentMember();
 
         if (requestDto.detailRecruitName() == null || requestDto.detailRecruitName().isBlank()) {
-            throw new CustomException(ErrorCode.EMPTY_DESIRED_RECRUIT);
+            throw new GeneralException(ErrorCode.EMPTY_DESIRED_RECRUIT);
         }
 
         member.setDesiredRecruit(requestDto.detailRecruitName());

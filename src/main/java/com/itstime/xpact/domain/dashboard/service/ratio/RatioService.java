@@ -5,7 +5,7 @@ import com.itstime.xpact.domain.dashboard.entity.RecruitCount;
 import com.itstime.xpact.domain.dashboard.repository.RecruitCountRepository;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class RatioService {
     private final ExperienceRepository experienceRepository;
 
     // 직무 카운트 값을 가져와 직무 비율로 변환하는 로직
-    public RatioResponseDto detailRecruitRatio(Long memberId) {
+    public List<RatioResponseDto> detailRecruitRatio(Long memberId) {
         // 직무 카운트 값 가져옴
         Map<String, Integer> ratios = getCounts(memberId);
 
@@ -45,16 +45,16 @@ public class RatioService {
                         Map.Entry::getKey,
                         entry -> Math.round(entry.getValue() / (double) sum * 1000) / 10.0,
                         (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
+                        LinkedHashMap::new));
 
         // 비율이 각각 33.3, 33.3 33.3일 경우 합이 100이 안되는 경우 존재
         // adjustRatio()에서 이를 보정 (100에서 합을 빼고 가장 value가 큰 entry에 해당 차를 더함)
         adjustRatio(result);
 
-        return RatioResponseDto.builder()
-                .ratios(result)
-                .build();
+        return result.entrySet()
+                .stream()
+                .map(RatioResponseDto::of)
+                .toList();
     }
 
     /**
@@ -80,6 +80,11 @@ public class RatioService {
     private RecruitCount setCounts(Long memberId) {
 
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(memberId);
+
+        if(experiences == null || experiences.isEmpty()) {
+            throw GeneralException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+        }
+
         Map<String, Integer> result = new HashMap<>();
         experiences.forEach(e -> {
             if(e.getDetailRecruit() != null) {
@@ -99,19 +104,17 @@ public class RatioService {
      */
     private void adjustRatio(Map<String, Double> result) {
         double diff = Math.round((100.0 - result.values().stream().mapToDouble(Double::doubleValue).sum()) * 10) / 10.0;
-        System.out.println("diff = " + diff);
-
         if(diff > 0) {
             String maxKey = result.entrySet().stream()
                     .max(Map.Entry.comparingByValue())
-                    .orElseThrow(() -> CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR))
+                    .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH))
                     .getKey();
 
             result.put(maxKey, result.get(maxKey) + diff);
         } else if(diff < 0) {
             String minKey = result.entrySet().stream()
                     .min(Map.Entry.comparingByValue())
-                    .orElseThrow(() -> CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR))
+                    .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH))
                     .getKey();
 
             result.put(minKey, result.get(minKey) - diff);

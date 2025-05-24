@@ -5,7 +5,7 @@ import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.CoreSkillRepository;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +58,7 @@ public class CoreSkillService {
                 DetailRecruit detailRecruit = detailRecruitRepository.findByName(detailRecruitName)
                         .orElseThrow(() -> {
                             log.warn("DetailRecruit 조회 실패 : {}", detailRecruitName);
-                            return CustomException.of(ErrorCode.DETAILRECRUIT_NOT_FOUND);
+                            return GeneralException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND);
                         });
                 detailRecruit.setCoreSkill(coreSkillRepository.save(coreSkill));
                 coreSkills.add(coreSkill);

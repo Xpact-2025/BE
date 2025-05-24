@@ -8,7 +8,7 @@ import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -30,11 +30,11 @@ public class QueryExperienceService {
     private static final String OLDEST = "OLDEST";
     private static final String MODIFIED = "modifiedTime";
 
-    public List<ThumbnailExperienceReadResponseDto> readAll(List<String> types, String order) throws CustomException {
+    public List<ThumbnailExperienceReadResponseDto> readAll(List<String> types, String order) throws GeneralException {
 
         // member 조회
         Member member = memberRepository.findById(securityProvider.getCurrentMemberId()).orElseThrow(() ->
-                CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+                GeneralException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         Sort sort;
         if(order.equals(LATEST)) {
@@ -42,7 +42,7 @@ public class QueryExperienceService {
         } else if(order.equals(OLDEST)) {
             sort = Sort.by(Sort.Direction.ASC, MODIFIED);
         } else {
-            throw CustomException.of(ErrorCode.INVALID_ORDER);
+            throw GeneralException.of(ErrorCode.INVALID_ORDER);
         }
 
         if(types.get(0).equalsIgnoreCase("all")) {
@@ -62,13 +62,13 @@ public class QueryExperienceService {
         }
     }
 
-    public DetailExperienceReadResponseDto read(Long experienceId) throws CustomException {
+    public DetailExperienceReadResponseDto read(Long experienceId) throws GeneralException {
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         Long memberId = securityProvider.getCurrentMemberId();
         if(!experience.getMember().getId().equals(memberId))
-            throw new CustomException(ErrorCode.NOT_YOUR_EXPERIENCE);
+            throw new GeneralException(ErrorCode.NOT_YOUR_EXPERIENCE);
 
         return DetailExperienceReadResponseDto.of(experience);
     }

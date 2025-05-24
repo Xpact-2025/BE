@@ -9,7 +9,7 @@ import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class ExperienceService {
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
 
-    public void create(ExperienceCreateRequestDto createRequestDto) throws CustomException {
+    public void create(ExperienceCreateRequestDto createRequestDto) throws GeneralException {
         // member 조회
         Member member = securityProvider.getCurrentMember();
 
@@ -68,7 +68,7 @@ public class ExperienceService {
     }
 
     // keyword, fils 설정하여 set
-    private void saveNonQualification(Experience experience, ExperienceCreateRequestDto createRequestDto) throws CustomException {
+    private void saveNonQualification(Experience experience, ExperienceCreateRequestDto createRequestDto) throws GeneralException {
         // dto의 keywords를 keyword 엔티티로 변경
         if(createRequestDto.getKeywords() != null && !createRequestDto.getKeywords().isEmpty()) {
             List<Keyword> keywords = createRequestDto.getKeywords().stream()
@@ -91,21 +91,21 @@ public class ExperienceService {
         }
     }
 
-    public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws CustomException {
+    public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws GeneralException {
         Long currentMemberId = securityProvider.getCurrentMemberId();
 
         // experience 조회
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         // 저장된 경험을 임시저장으로 돌리는 플로우 막는 로직
         if(Status.SAVE.equals(experience.getMetaData().getStatus()) && Status.DRAFT.equals(Status.valueOf(updateRequestDto.getStatus()))) {
-            throw CustomException.of(ErrorCode.INVALID_SAVE);
+            throw GeneralException.of(ErrorCode.INVALID_SAVE);
         }
 
 
         if(!experience.getMember().getId().equals(currentMemberId))
-            throw CustomException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
+            throw GeneralException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
 
         // enum타입이 될 string 필드 검증 로직 (INVALID한 값이 들어오면 CustomException발생)
         Status.validateStatus(updateRequestDto.getStatus());
@@ -157,10 +157,10 @@ public class ExperienceService {
         Long currentMemberId = securityProvider.getCurrentMemberId();
 
         Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
+                .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         if(!experience.getMember().getId().equals(currentMemberId)) {
-            throw CustomException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
+            throw GeneralException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
         }
 
         experienceRepository.delete(experience);

@@ -1,6 +1,6 @@
 package com.itstime.xpact.domain.experience.common;
 
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 
 public enum Status {
@@ -10,7 +10,7 @@ public enum Status {
         try {
             Status.valueOf(status);
         } catch (Exception e) {
-            throw CustomException.of(ErrorCode.INVALID_STATUS);
+            throw GeneralException.of(ErrorCode.INVALID_STATUS);
         }
     }
 }

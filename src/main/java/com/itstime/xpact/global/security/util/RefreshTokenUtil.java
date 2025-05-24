@@ -1,7 +1,7 @@
 package com.itstime.xpact.global.security.util;
 
 import com.itstime.xpact.global.auth.TokenProvider;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -73,7 +73,7 @@ public class RefreshTokenUtil {
 
         if (cookies == null || cookies.length == 0) {
             log.warn("쿠키가 비어 있습니다.");
-            throw CustomException.of(ErrorCode.EMPTY_COOKIE);
+            throw GeneralException.of(ErrorCode.EMPTY_COOKIE);
         }
 
         for (Cookie cookie : cookies) {
@@ -87,11 +87,11 @@ public class RefreshTokenUtil {
                     return memberId;
                 } else {
                     log.warn("유효하지 않은 Refresh Token입니다.");
-                    throw CustomException.of(ErrorCode.INVALID_JWT_TOKEN);
+                    throw GeneralException.of(ErrorCode.INVALID_JWT_TOKEN);
                 }
             }
         }
         log.warn("Refresh token 쿠키를 찾을 수 없습니다.");
-        throw CustomException.of(ErrorCode.TOKEN_NOT_FOUND);
+        throw GeneralException.of(ErrorCode.TOKEN_NOT_FOUND);
     }
 }

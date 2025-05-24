@@ -1,16 +1,13 @@
 package com.itstime.xpact.global.auth;
 
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
-import com.itstime.xpact.global.exception.CustomException;
-import com.itstime.xpact.global.exception.CustomExceptionHandler;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.response.RestResponse;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -20,8 +17,6 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Slf4j
 public class TokenProvider {
-
-    private final RedisTemplate<String, String> redisTemplate;
 
     private static final String KEY_ROLES = "roles";
 
@@ -79,7 +74,7 @@ public class TokenProvider {
         String memberId = claims.getSubject();
 
         if(!StringUtils.hasText(memberId)) {
-            throw CustomException.of(ErrorCode.FAILED_JWT_INFO);
+            throw GeneralException.of(ErrorCode.FAILED_JWT_INFO);
         }
         return Long.parseLong(memberId);
     }
@@ -94,25 +89,25 @@ public class TokenProvider {
     }
 
     // JWT 검증
-    public RestResponse<?> validationToken(String token) throws CustomException {
+    public RestResponse<?> validationToken(String token) throws GeneralException {
         try {
             final Claims claims = getClaims(token);
             return RestResponse.ok(claims);
         } catch (MalformedJwtException e) {
             log.warn("유효하지 않은 JWT token: {}", e.getMessage());
-            throw CustomException.of(ErrorCode.INVALID_JWT_TOKEN);
+            throw GeneralException.of(ErrorCode.INVALID_JWT_TOKEN);
         } catch (SignatureException e) {
             log.warn("유효하지 않은 서명의 JWT token: {}", e.getMessage());
-            throw CustomException.of(ErrorCode.INVALID_JWT_SIGNATURE);
+            throw GeneralException.of(ErrorCode.INVALID_JWT_SIGNATURE);
         } catch (ExpiredJwtException e) {
             log.warn("만료된 JWT token: {}", e.getMessage());
-            throw CustomException.of(ErrorCode.EXPIRED_JWT_TOKEN);
+            throw GeneralException.of(ErrorCode.EXPIRED_JWT_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.warn("지원하지 않는 JWT token: {}", e.getMessage());
-            throw CustomException.of(ErrorCode.UNSUPPORTED_JWT_TOKEN);
+            throw GeneralException.of(ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException ex) {
             log.warn("Empty JWT token: {}", ex.getMessage());
-            throw CustomException.of(ErrorCode.TOKEN_NOT_FOUND);
+            throw GeneralException.of(ErrorCode.TOKEN_NOT_FOUND);
         }
     }
 }

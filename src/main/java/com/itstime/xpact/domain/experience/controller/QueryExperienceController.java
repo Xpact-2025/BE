@@ -3,7 +3,7 @@ package com.itstime.xpact.domain.experience.controller;
 import com.itstime.xpact.domain.experience.dto.response.DetailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.service.QueryExperienceService;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.response.ErrorResponse;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,7 @@ public class QueryExperienceController {
     public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> readAllExperience(
             @RequestParam(value = "type", defaultValue = "ALL") List<String> types,
             @RequestParam(value = "order", defaultValue = "latest") String order)
-    throws CustomException {
+    throws GeneralException {
 
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.readAll(types, order.toUpperCase())));
     }
@@ -72,7 +72,7 @@ public class QueryExperienceController {
     @GetMapping("/{experience_id}")
     public ResponseEntity<RestResponse<DetailExperienceReadResponseDto>> readExperience(
             @PathVariable("experience_id") Long experienceId)
-    throws CustomException {
+    throws GeneralException {
 
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.read(experienceId)));
     }

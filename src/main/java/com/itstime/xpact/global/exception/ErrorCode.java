@@ -78,15 +78,22 @@ public enum ErrorCode {
 
     // coreSkill
     NOT_FOUND_CORESKILLS(HttpStatus.BAD_REQUEST, "CSE001", "해당 핵심 역량을 불러오는 데에 실패했습니다."),
-    DETAILRECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "CSE002", "찾을 수 없습니다."),
 
     // skill map
     UNLOADED_SKILL_MAP(HttpStatus.BAD_REQUEST, "SME001", "핵심 스킬맵 로드에 실패하였습니다."),
     EXPERIENCES_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "SME002", "입력된 경험이 충분하지 않습니다."),
+    EMPTY_STRENGTH(HttpStatus.NOT_FOUND, "SME003", "핵심역량 중 강점 부분이 저장되지 않았습니다."),
+    EMPTY_WEAKNESS(HttpStatus.NOT_FOUND, "SME004", "핵심역량 중 약점 부분이 저장되지 않았습니다."),
+    FEEDBACK_SAVE_ERROR(HttpStatus.BAD_REQUEST, "SME005", "핵심역량의 강점 및 약점을 저장하는 데에 오류가 발생하였습니다."),
+    SKILLMAP_NOT_FOUND(HttpStatus.NOT_FOUND, "SME006", "저장된 핵심스킬맵이 존재하지 않습니다."),
 
     // Async
     FAILED_GET_RESULT(HttpStatus.BAD_REQUEST, "AE001", "요청에 대한 응답을 얻지 못했습니다."),
     REQUEST_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "AE002", "요청 시간이 초과되었습니다."),
+
+    // json
+    FAILED_DESERIALIZE(HttpStatus.BAD_REQUEST, "JE001", "역직렬화에 실패하였습니다."),
+    FAILED_SERIALIZE(HttpStatus.BAD_REQUEST, "JE002", "직렬화에 실패하였습니다."),
 
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
