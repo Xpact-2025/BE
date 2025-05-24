@@ -1,7 +1,7 @@
 package com.itstime.xpact.global.security.util;
 
 import com.itstime.xpact.global.config.WebClientConfig;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.security.dto.response.KakaoInfoResponseDto;
 import com.itstime.xpact.global.security.dto.response.KakaoTokenDto;
@@ -56,7 +56,7 @@ public class KakaoUtil {
                     .block();
         } catch (WebClientResponseException e) {
             log.error("카카오 서버로 AccessToken 요청 중 오류 : {} ", e.getResponseBodyAsString());
-            throw CustomException.of(ErrorCode.ACCESS_TOKEN_REQUEST_FAILED);
+            throw GeneralException.of(ErrorCode.ACCESS_TOKEN_REQUEST_FAILED);
         }
     }
 
@@ -72,7 +72,7 @@ public class KakaoUtil {
                     .block();
         } catch (WebClientResponseException e) {
             log.error("카카오로부터 사용자 Info 요청 중 오류 : {} ", e.getResponseBodyAsString());
-            throw CustomException.of(ErrorCode.ACCESS_TOKEN_REQUEST_FAILED);
+            throw GeneralException.of(ErrorCode.ACCESS_TOKEN_REQUEST_FAILED);
         }
     }
 

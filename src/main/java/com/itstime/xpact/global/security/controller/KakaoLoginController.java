@@ -1,6 +1,6 @@
 package com.itstime.xpact.global.security.controller;
 
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.response.ErrorResponse;
 import com.itstime.xpact.global.response.RestResponse;
 import com.itstime.xpact.global.security.service.KakaoLoginService;
@@ -63,7 +63,7 @@ public class KakaoLoginController {
     public ResponseEntity<RestResponse<?>> callback(
             @Parameter(description = "카카오로부터 얻은 인증 코드")
             @RequestParam String code,
-            HttpServletResponse response) throws CustomException {
+            HttpServletResponse response) throws GeneralException {
         return ResponseEntity.ok(
                 RestResponse.ok(kakaoLoginService.login(code, response)));
     }

@@ -1,6 +1,7 @@
 package com.itstime.xpact.global.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.itstime.xpact.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,13 @@ public class RestResponse<T> {
         return RestResponse.<Void>builder()
                 .httpStatus(200)
                 .message("success")
+                .build();
+    }
+
+    public static RestResponse<Void> onFailure(ErrorCode errorCode) {
+        return RestResponse.<Void>builder()
+                .httpStatus(200)
+                .message(errorCode.getMessage())
                 .build();
     }
 }

@@ -3,7 +3,7 @@ package com.itstime.xpact.domain.experience.controller;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.experience.service.ExperienceService;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.response.ErrorResponse;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +55,7 @@ public class ExperienceController {
     @PostMapping("")
     public ResponseEntity<RestResponse<?>> createExperience(
             @RequestBody ExperienceCreateRequestDto createRequestDto)
-    throws CustomException {
+    throws GeneralException {
 
         experienceService.create(createRequestDto);
         return ResponseEntity.ok(RestResponse.ok());
@@ -112,7 +112,7 @@ public class ExperienceController {
     public ResponseEntity<RestResponse<?>> updateExperience(
             @PathVariable("experience_id") Long experienceId,
             @RequestBody ExperienceUpdateRequestDto experienceUpdateRequestDto)
-    throws CustomException {
+    throws GeneralException {
 
         experienceService.update(experienceId, experienceUpdateRequestDto);
         return ResponseEntity.ok(RestResponse.ok());
@@ -144,7 +144,7 @@ public class ExperienceController {
     @DeleteMapping("/{experience_id}")
     public ResponseEntity<RestResponse<?>> deleteExperience(
             @PathVariable("experience_id") Long experienceId)
-    throws CustomException {
+    throws GeneralException {
 
         experienceService.delete(experienceId);
         return ResponseEntity.ok(RestResponse.ok());

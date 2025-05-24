@@ -6,7 +6,7 @@ import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
@@ -113,6 +113,6 @@ public class TimeService {
     }
 
     private void validateDate(int year, int month) {
-        if(year < 1 || month < 1 || month > 12) throw CustomException.of(ErrorCode.INVALID_DATE);
+        if(year < 1 || month < 1 || month > 12) throw GeneralException.of(ErrorCode.INVALID_DATE);
     }
 }

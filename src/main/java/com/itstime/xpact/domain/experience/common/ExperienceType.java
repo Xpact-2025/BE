@@ -1,6 +1,6 @@
 package com.itstime.xpact.domain.experience.common;
 
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 
 import java.util.Set;
@@ -22,7 +22,7 @@ public enum ExperienceType {
         try {
             ExperienceType.valueOf(experienceType);
         } catch (Exception e) {
-            throw CustomException.of(ErrorCode.INVALID_EXPERIENCE_TYPE);
+            throw GeneralException.of(ErrorCode.INVALID_EXPERIENCE_TYPE);
         }
     }
 

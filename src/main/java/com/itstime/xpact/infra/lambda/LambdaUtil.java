@@ -2,7 +2,7 @@ package com.itstime.xpact.infra.lambda;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,7 +54,7 @@ public class LambdaUtil {
 
         } catch(LambdaException | JsonProcessingException e) {
             System.out.println(e.getMessage());
-            throw CustomException.of(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw GeneralException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 }

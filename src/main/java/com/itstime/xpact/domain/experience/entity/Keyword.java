@@ -1,7 +1,7 @@
 package com.itstime.xpact.domain.experience.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,12 +33,12 @@ public class Keyword extends BaseEntity {
         if(keywords == null || keywords.isEmpty()) return;
 
         if(keywords.size() > 5) {
-            throw CustomException.of(ErrorCode.KEYWORD_EXCEEDED);
+            throw GeneralException.of(ErrorCode.KEYWORD_EXCEEDED);
         }
 
         keywords.forEach(keyword -> {
             if(keyword.length() > 20) {
-                throw CustomException.of(ErrorCode.KEYWORD_TOO_LONG);
+                throw GeneralException.of(ErrorCode.KEYWORD_TOO_LONG);
             }
         });
     }

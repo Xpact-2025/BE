@@ -2,7 +2,7 @@ package com.itstime.xpact.domain.dashboard.controller;
 
 import com.itstime.xpact.domain.dashboard.dto.response.*;
 import com.itstime.xpact.domain.dashboard.service.DashboardService;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.response.ErrorResponse;
 import com.itstime.xpact.global.response.RestResponse;
@@ -49,7 +49,7 @@ public class DashboardController {
             content = @Content(schema = @Schema(implementation = MapResponseDto.class)))
     @PostMapping("/skills")
     public DeferredResult<ResponseEntity<?>> evaluateScore(
-            @RequestHeader("Authorization") String token) throws CustomException {
+            @RequestHeader("Authorization") String token) throws GeneralException {
 
         DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>(20_000L);
 

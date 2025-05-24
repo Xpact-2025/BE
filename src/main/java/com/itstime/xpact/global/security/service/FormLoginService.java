@@ -5,14 +5,13 @@ import com.itstime.xpact.domain.member.common.Type;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.TokenProvider;
-import com.itstime.xpact.global.exception.CustomException;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.security.common.LoginStrategy;
 import com.itstime.xpact.global.security.dto.request.LoginRequestDto;
 import com.itstime.xpact.global.security.dto.request.SignupRequestDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
 import com.itstime.xpact.global.security.dto.response.SignupResponseDto;
-import com.itstime.xpact.global.security.util.KakaoUtil;
 import com.itstime.xpact.global.security.util.RefreshTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,12 +39,12 @@ public class FormLoginService implements LoginStrategy {
 
     // 회원 가입 서비스
     @Transactional
-    public SignupResponseDto register(SignupRequestDto requestDto) throws CustomException {
+    public SignupResponseDto register(SignupRequestDto requestDto) throws GeneralException {
 
         // 회원 가입 여부 확인
         if (memberRepository.existsByEmail(requestDto.email())) {
             log.warn("이미 존재하는 회원입니다.");
-            throw CustomException.of(ErrorCode.MEMBER_ALREADY_EXISTS);
+            throw GeneralException.of(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
 
         log.info("{" + requestDto.email() + "} :  회원 가입 시작");
@@ -70,17 +69,17 @@ public class FormLoginService implements LoginStrategy {
     public LoginResponseDto generalLogin(
             LoginRequestDto requestDto,
             HttpServletResponse httpResponse
-    ) throws CustomException{
+    ) throws GeneralException {
 
         // 가입된 회원인지 조회
         log.info(requestDto.email() + "의 회원 조회를 시작합니다.");
         Member member = memberRepository.findByEmail(requestDto.email())
-                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+                .orElseThrow(() -> GeneralException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         // 비밀번호 검증
         log.info("비밀번호 검증을 시작합니다.");
         if (!passwordEncoder.matches(requestDto.password(), member.getPassword())) {
-            throw new CustomException(ErrorCode.UNMATCHED_PASSWORD);
+            throw new GeneralException(ErrorCode.UNMATCHED_PASSWORD);
         }
         log.info("로그인에 성공하였습니다.");
 
@@ -111,12 +110,12 @@ public class FormLoginService implements LoginStrategy {
     @Transactional
     public String refresh(
             HttpServletRequest request, HttpServletResponse response
-    ) throws CustomException {
+    ) throws GeneralException {
         Long memberId = refreshTokenUtil.getMemberIdFromCookie(request);
 
         log.info(memberId + "의 회원을 조회합니다.");
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> CustomException.of(ErrorCode.MEMBER_NOT_EXISTS));
+                .orElseThrow(() -> GeneralException.of(ErrorCode.MEMBER_NOT_EXISTS));
 
         log.info("Access Token을 재발급합니다.");
         return tokenProvider.generateAccessToken(member);
