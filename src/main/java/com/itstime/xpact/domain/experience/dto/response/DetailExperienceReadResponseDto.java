@@ -116,7 +116,6 @@ public class DetailExperienceReadResponseDto {
                 .publisher(null)
                 .simpleDescription(null)
                 .keywords(experience.getKeywords().stream().map(Keyword::getName).toList())
-                .files(Experience.isNeedFiles(experience.getMetaData().getExperienceType().toString())
-                        ? experience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()) : null);
+                .files(experience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()));
     }
 }
