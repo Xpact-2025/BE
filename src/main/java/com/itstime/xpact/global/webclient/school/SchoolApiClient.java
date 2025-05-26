@@ -1,4 +1,4 @@
-package com.itstime.xpact.global.webclient;
+package com.itstime.xpact.global.webclient.school;
 
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
 import com.itstime.xpact.global.exception.GeneralException;
