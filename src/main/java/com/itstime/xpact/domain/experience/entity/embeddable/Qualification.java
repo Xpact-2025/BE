@@ -16,10 +16,4 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Qualification {
 
-    @Column(name = "qualification")
-    private String qualification;
-    @Column(name = "publisher")
-    private String publisher;
-    @Column(name = "simple_description", length = 512)
-    private String simpleDescription;
 }

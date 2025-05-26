@@ -31,11 +31,33 @@ public class Experience extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Embedded // status, formType, ExperienceType 포함
-    private MetaData metaData;
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ExperienceType experienceType;
 
     @Column(name = "title")
     private String title;
+
+    @Column(name = "is_ended")
+    private Boolean isEnded;
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
+
+    @Column(name = "sub_title")
+    private String subTitle;
+
+    @Column(name = "form_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private FormType formType;
 
     @Embedded
     private StarForm starForm;
@@ -43,8 +65,15 @@ public class Experience extends BaseEntity {
     @Embedded
     private SimpleForm simpleForm;
 
-    @Embedded
-    private Qualification qualification;
+    @Column(name = "qualification")
+    private String qualification;
+    @Column(name = "publisher")
+    private String publisher;
+    @Column(name = "simple_description", length = 512)
+    private String simpleDescription;
+
+//    @Embedded
+//    private Qualification qualification;
 
 
     @Setter
@@ -68,15 +97,6 @@ public class Experience extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_recruit_id")
     private DetailRecruit detailRecruit;
-
-    @Column(name = "is_ended")
-    private Boolean isEnded;
-
-    @Column(name = "start_date")
-    private LocalDate startDate;
-
-    @Column(name = "end_date")
-    private LocalDate endDate;
 
     public void setKeywords(List<Keyword> keywords) {
         this.keywords.clear();
@@ -145,20 +165,6 @@ public class Experience extends BaseEntity {
                         .simpleDescription(createRequestDto.getSimpleDescription()).build())
                 .keywords(null)
                 .build();
-    }
-
-    // 해당 experience의 유형이 파일을 필요로 하지 않는 유형인지 확인
-    public static boolean isNeedFiles(String experienceType) {
-        return !ExperienceType.NOT_NEED_FILE.contains(ExperienceType.valueOf(experienceType));
-    }
-
-    // 해당 experience의 유형이 warrant를 필요로 하는 유형인지 확인
-    public static boolean isNeedWarrant(String experienceType) {
-        return ExperienceType.NEED_WARRNT.contains(ExperienceType.valueOf(experienceType));
-    }
-
-    public static boolean isQualification(String experienceType) {
-        return ExperienceType.IS_QUALIFICATION.contains(ExperienceType.valueOf(experienceType));
     }
 
     public void updateToSimpleForm(ExperienceUpdateRequestDto updateRequestDto) {
