@@ -1,9 +1,7 @@
 package com.itstime.xpact.domain.dashboard.service;
 
-import com.itstime.xpact.domain.dashboard.dto.response.*;
 import com.itstime.xpact.domain.dashboard.controller.HistoryOldResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
-import com.itstime.xpact.domain.dashboard.dto.response.MapResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.RatioResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.dashboard.service.ratio.RatioService;
@@ -31,10 +29,10 @@ public class DashboardService {
     private final RatioService ratioService;
     private final TimeService timeService;
 
-    // 핵심스킬 맵 점수
-    public CompletableFuture<MapResponseDto> evaluateScore() {
+    // 핵심스킬 맵
+    public CompletableFuture<?> evaluate() {
         Member member = securityProvider.getCurrentMember();
-        return skillmapService.performEvaluation(member);
+        return skillmapService.evaluate(member);
     }
 
     // 직무 비율
@@ -70,21 +68,5 @@ public class DashboardService {
         Member member = securityProvider.getCurrentMember();
 
         return timeService.getTimeLine(member, startLine, endLine);
-    }
-
-    // 피드백 부분 - 강점
-    public CompletableFuture<FeedbackResponseDto> getStrengthFeedback() {
-
-        Member member = securityProvider.getCurrentMember();
-
-        return skillmapService.getFeedbackStrength(member);
-    }
-
-    // 피드백 부분 - 단점
-    public CompletableFuture<FeedbackResponseDto> getWeaknessFeedback() {
-
-        Member member = securityProvider.getCurrentMember();
-
-        return skillmapService.getFeedbackWeakness(member);
     }
 }

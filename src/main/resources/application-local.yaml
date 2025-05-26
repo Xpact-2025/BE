@@ -38,6 +38,9 @@ external:
     school:
       service-key: ${SCHOOL_REST_API_KEY}
       base-url: "http://openapi.academyinfo.go.kr"
+  lambda:
+    function:
+      base-url: ${XPACT_APT_GATEWAY}
 
 aws:
   credentials:
