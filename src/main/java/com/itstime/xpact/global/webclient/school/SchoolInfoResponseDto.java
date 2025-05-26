@@ -1,4 +1,4 @@
-package com.itstime.xpact.global.webclient;
+package com.itstime.xpact.global.webclient.school;
 
 import jakarta.xml.bind.annotation.*;
 import lombok.Getter;

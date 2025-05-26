@@ -23,6 +23,9 @@ public class WebClientConfig {
     @Value("${spring.ai.openai.api-key}")
     private String openAiKey;
 
+    @Value("${external.lambda.function.base-url}")
+    private String lambdaFunctionUrl;
+
     @Bean
     public WebClient schoolWebClient() {
 
@@ -63,13 +66,13 @@ public class WebClientConfig {
         };
     }
 
-    // open AI WebClient
+    // Lambda function WebClient
     @Bean
-    public WebClient openAiWebClient() {
+    public WebClient lambdaWebClient() {
         return WebClient.builder()
-                .baseUrl("https://api.openai.com/v1")
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + openAiKey)
+                .filter(logRequest())
+                .baseUrl(lambdaFunctionUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
 }
