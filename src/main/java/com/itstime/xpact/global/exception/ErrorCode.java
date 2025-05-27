@@ -95,6 +95,9 @@ public enum ErrorCode {
     FAILED_DESERIALIZE(HttpStatus.BAD_REQUEST, "JE001", "역직렬화에 실패하였습니다."),
     FAILED_SERIALIZE(HttpStatus.BAD_REQUEST, "JE002", "직렬화에 실패하였습니다."),
 
+    // trie
+    NO_SEARCH_RESULT(HttpStatus.NOT_FOUND, "TRE001", "검색 결과 조회된 데이터가 없습니다."),
+
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
     ;

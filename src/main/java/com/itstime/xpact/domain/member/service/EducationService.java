@@ -9,6 +9,7 @@ import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.EducationRepository;
 import com.itstime.xpact.domain.member.repository.SchoolCustomRepositoryImpl;
 import com.itstime.xpact.domain.member.util.TrieUtil;
+import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -40,16 +41,21 @@ public class EducationService {
     public List<String> autocompleteName(String term) throws GeneralException {
 
         try {
-            // Trie의 keyword에 검색어 넣기
-            trieUtil.addAutocompleteKeyword(term);
-
             // DB에 있는 School name 전체 load
             List<String> schoolNames = schoolCustomRepository.findAllSchoolNames();
             trieUtil.loadDatasIntoTrie(schoolNames);
 
             // prefix와 일치 반환
-            return trieUtil.autocomplete(term);
+            List<String> results = trieUtil.autocomplete(term);
+            if (results.isEmpty()) {
+                throw CustomException.of(ErrorCode.NO_SEARCH_RESULT);
+            }
+            return results;
+        } catch (CustomException e) {
+            // CustomException으로 1차 필터링
+            throw e;
         } catch (Exception e) {
+            log.error("자동완성 중 내부 오류", e);
             throw GeneralException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         } finally {
             // Trie 구조 다시 비우기
@@ -69,17 +75,22 @@ public class EducationService {
     public List<String> searchMajor(String schoolName, String term) throws GeneralException {
 
         try {
-            // Trie의 keyword에 검색어 넣기
-            trieUtil.addAutocompleteKeyword(term);
-
             // DB에 있는 해당 schoolName의 학과명 전체 load
             List<String> majorNames = schoolCustomRepository.findMajorBySchoolName(schoolName);
             trieUtil.loadDatasIntoTrie(majorNames);
 
             // prefix와 일치 반환
-            return trieUtil.autocomplete(term);
-        } catch (Exception e) {
-            throw GeneralException.of(ErrorCode.INTERNAL_SERVER_ERROR);
+            List<String> results = trieUtil.autocomplete(term);
+            if (results.isEmpty()) {
+                throw CustomException.of(ErrorCode.NO_SEARCH_RESULT);
+            }
+            return results;
+        } catch (CustomException e) {
+                // CustomException으로 1차 필터링
+                throw e;
+            } catch (Exception e) {
+                log.error("자동완성 중 내부 오류", e);
+                throw GeneralException.of(ErrorCode.INTERNAL_SERVER_ERROR);
         } finally {
             // Trie 구조 다시 비우기
             trieUtil.deleteAutocompleteKeyword(term);
