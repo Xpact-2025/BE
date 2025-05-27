@@ -8,6 +8,7 @@ import com.itstime.xpact.domain.recruit.entity.Recruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.domain.recruit.repository.RecruitRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
+import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.infra.lambda.LambdaUtil;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
@@ -59,8 +60,6 @@ public class RecruitService {
         try {
             securityProvider.getCurrentMemberId();
 
-            trieUtil.addAutocompleteKeyword(term);
-
             Recruit recruit = recruitRepository.findByName(recruitName) // Recruit name Unique
                     .orElseThrow(() -> GeneralException.of(ErrorCode.RECRUIT_NOT_FOUND));
 
@@ -69,7 +68,14 @@ public class RecruitService {
             List<String> detailRecruitNames = detailRecruitRepository.findDetailRecruitNamesByRecruitId(recruitId);
             trieUtil.loadDatasIntoTrie(detailRecruitNames);
 
-            return trieUtil.autocomplete(term);
+            // prefix와 일치 반환
+            List<String> results = trieUtil.autocomplete(term);
+            if (results.isEmpty()) {
+                throw CustomException.of(ErrorCode.NO_SEARCH_RESULT);
+            }
+            return results;
+        } catch (CustomException e) {
+            throw e;
         } catch (Exception e) {
             log.error("autocompleteDetail error: {}", e.getMessage());
             throw GeneralException.of(ErrorCode.INTERNAL_SERVER_ERROR);
