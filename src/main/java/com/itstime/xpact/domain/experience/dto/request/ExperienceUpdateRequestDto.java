@@ -1,12 +1,7 @@
 package com.itstime.xpact.domain.experience.dto.request;
 
-import com.itstime.xpact.domain.experience.common.ExperienceType;
-import com.itstime.xpact.domain.experience.common.FormType;
-import com.itstime.xpact.domain.experience.common.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,10 +31,12 @@ public class ExperienceUpdateRequestDto {
     @Schema(description = "기간", example = "수상일/취득일을 입력하세요")
     private LocalDate issueDate;
 
-    private List<ExperienceCreateRequestDto.SubExperience> subExps;
+    private List<ExperienceUpdateRequestDto.SubExperience> subExps;
 
     @Getter
     public static class SubExperience {
+        @Schema(description = "subExperience의 id값", example = "1")
+        private Long subExperienceId;
         @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식)", example = "STAR_FORM")
         private String formType;
         @Schema(description = "경험 저장 방식 지정 (임시저장 or 저장)", example = "SAVE", allowableValues = {"SAVE", "DRAFT"})
