@@ -17,6 +17,8 @@ public class ExperienceUpdateRequestDto {
                     "PROJECT", "CERTIFICATES", "ACADEMIC_CLUB", "EDUCATION",
                     "PRIZE", "VOLUNTEER_WORK", "STUDY_ABROAD", "ETC"})
     private String experienceType;
+    @Schema(description = "경험 저장 방식 지정 (임시저장 or 저장)", example = "SAVE", allowableValues = {"SAVE", "DRAFT"})
+    private String status;
     @Schema(description = "경험 제목", example = "제목을 입력하세요")
     private String title;
     @Schema(description = "시작 일시", example = "2025-03-27")
@@ -31,16 +33,14 @@ public class ExperienceUpdateRequestDto {
     @Schema(description = "기간", example = "수상일/취득일을 입력하세요")
     private LocalDate issueDate;
 
-    private List<ExperienceUpdateRequestDto.SubExperience> subExps;
+    private List<ExperienceUpdateRequestDto.SubExperienceRequestDto> subExperiences;
 
     @Getter
-    public static class SubExperience {
+    public static class SubExperienceRequestDto {
         @Schema(description = "subExperience의 id값", example = "1")
         private Long subExperienceId;
         @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식)", example = "STAR_FORM")
         private String formType;
-        @Schema(description = "경험 저장 방식 지정 (임시저장 or 저장)", example = "SAVE", allowableValues = {"SAVE", "DRAFT"})
-        private String status;
         @Schema(description = "세부 경험")
         private String subTitle;
 

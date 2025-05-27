@@ -20,8 +20,9 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 public class DetailExperienceReadResponseDto {
 
     // 공통 부분
-    private Long groupId;
+    private Long experienceId;
     private ExperienceType experienceType;
+    private Status status;
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -30,14 +31,13 @@ public class DetailExperienceReadResponseDto {
     private String publisher;
     private LocalDate issueDate;
 
-    List<SubExperienceResponseDto> subExps;
+    List<SubExperienceResponseDto> subExperiencesResponseDto;
 
     @Getter
     @Builder
     public static class SubExperienceResponseDto {
-        private Long experienceId;
+        private Long subExperienceId;
         private FormType formType;
-        private Status status;
         private String subTitle;
 
         // STAR 양식 부분
@@ -61,69 +61,65 @@ public class DetailExperienceReadResponseDto {
      Experience 엔티티를 받아와서 Dto형식으로 변환
      필드가 null값이 들어가면 `JsonInclude.Include.NON_NULL`설정을 통해 응답으로 무시됨
      */
-    public static DetailExperienceReadResponseDto of(List<Experience> experiences, Long groupId) {
-        Experience commonExperience = experiences.get(0);
+    public static DetailExperienceReadResponseDto of(List<SubExperience> subExperiences, Experience experience) {
         DetailExperienceReadResponseDtoBuilder dto;
-        if (IS_QUALIFICATION.contains(commonExperience.getExperienceType())) {
+        if (IS_QUALIFICATION.contains(experience.getExperienceType())) {
             dto = DetailExperienceReadResponseDto.builder()
-                    .groupId(groupId)
-                    .experienceType(commonExperience.getExperienceType())
-                    .qualification(commonExperience.getQualification())
-                    .publisher(commonExperience.getPublisher())
-                    .issueDate(commonExperience.getEndDate());
+                    .experienceId(experience.getId())
+                    .experienceType(experience.getExperienceType())
+                    .qualification(experience.getQualification())
+                    .publisher(experience.getPublisher())
+                    .issueDate(experience.getEndDate());
         } else {
             dto = DetailExperienceReadResponseDto.builder()
-                    .groupId(groupId)
-                    .experienceType(commonExperience.getExperienceType())
-                    .title(commonExperience.getTitle())
-                    .startDate(commonExperience.getStartDate())
-                    .endDate(commonExperience.getEndDate());
+                    .experienceId(experience.getId())
+                    .experienceType(experience.getExperienceType())
+                    .title(experience.getTitle())
+                    .startDate(experience.getStartDate())
+                    .endDate(experience.getEndDate());
         }
 
-        List<SubExperienceResponseDto> subExperienceResponseDtos = experiences.stream()
-                .map(experience -> {
+        List<SubExperienceResponseDto> subExperienceResponseDtos = subExperiences.stream()
+                .map(subExperience -> {
                     SubExperienceResponseDto subExperienceResponseDto = null;
                     if(IS_QUALIFICATION.contains(experience.getExperienceType())) {
                         subExperienceResponseDto = SubExperienceResponseDto.builder()
-                                .experienceId(experience.getId())
-                                .formType(experience.getFormType())
-                                .status(experience.getStatus())
-                                .subTitle(experience.getSubTitle())
-                                .simpleDescription(experience.getSimpleDescription())
-                                .keywords(experience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
+                                .subExperienceId(subExperience.getId())
+                                .formType(subExperience.getFormType())
+                                .subTitle(subExperience.getSubTitle())
+                                .simpleDescription(subExperience.getSimpleDescription())
+                                .keywords(subExperience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
                                 .build();
                     }
                     else {
-                        switch (experience.getFormType()) {
+                        switch (subExperience.getFormType()) {
                             case STAR_FORM -> subExperienceResponseDto = SubExperienceResponseDto.builder()
-                                    .experienceId(experience.getId())
-                                    .formType(experience.getFormType())
-                                    .status(experience.getStatus())
-                                    .subTitle(experience.getSubTitle())
-                                    .situation(experience.getStarForm().getSituation())
-                                    .task(experience.getStarForm().getTask())
-                                    .action(experience.getStarForm().getAction())
-                                    .result(experience.getStarForm().getResult())
-                                    .keywords(experience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
-                                    .files(experience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()))
+                                    .subExperienceId(subExperience.getId())
+                                    .formType(subExperience.getFormType())
+                                    .subTitle(subExperience.getSubTitle())
+                                    .situation(subExperience.getStarForm().getSituation())
+                                    .task(subExperience.getStarForm().getTask())
+                                    .action(subExperience.getStarForm().getAction())
+                                    .result(subExperience.getStarForm().getResult())
+                                    .keywords(subExperience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
+                                    .files(subExperience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()))
                                     .build();
 
                             case SIMPLE_FORM -> subExperienceResponseDto = SubExperienceResponseDto.builder()
-                                    .experienceId(experience.getId())
-                                    .formType(experience.getFormType())
-                                    .status(experience.getStatus())
-                                    .subTitle(experience.getSubTitle())
-                                    .role(experience.getSimpleForm().getRole())
-                                    .perform(experience.getSimpleForm().getPerform())
-                                    .keywords(experience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
-                                    .files(experience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()))
+                                    .subExperienceId(subExperience.getId())
+                                    .formType(subExperience.getFormType())
+                                    .subTitle(subExperience.getSubTitle())
+                                    .role(subExperience.getSimpleForm().getRole())
+                                    .perform(subExperience.getSimpleForm().getPerform())
+                                    .keywords(subExperience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
+                                    .files(subExperience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()))
                                     .build();
                         }
                     }
                     return subExperienceResponseDto;
                 }).toList();
 
-        dto.subExps(subExperienceResponseDtos).build();
+        dto.subExperiencesResponseDto(subExperienceResponseDtos).build();
         return dto.build();
     }
 }

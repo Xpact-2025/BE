@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -18,10 +19,11 @@ public class ThumbnailExperienceReadResponseDto {
     private ExperienceType experienceType;
     private LocalDateTime draftTime;
     private Status status;
+    private List<String> keywords;
 
-    public static ThumbnailExperienceReadResponseDto of(Long groupId, Experience experience) {
+    public static ThumbnailExperienceReadResponseDto of(Experience experience) {
         return ThumbnailExperienceReadResponseDto.builder()
-                .id(groupId)
+                .id(experience.getId())
                 .title(experience.getTitle() != null ? experience.getTitle() : experience.getQualification())
                 .experienceType(experience.getExperienceType())
                 .draftTime(experience.getStatus().equals(Status.DRAFT) ? experience.getModifiedTime() : null)
