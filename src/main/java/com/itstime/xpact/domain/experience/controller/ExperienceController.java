@@ -108,13 +108,13 @@ public class ExperienceController {
             ))
     })
     @Operation(summary = "경험 수정", description = "사용자가 특정 필드를 수정하여 해당 경험을 수정")
-    @PatchMapping("/{experience_id}")
+    @PatchMapping("/{group_id}")
     public ResponseEntity<RestResponse<?>> updateExperience(
-            @PathVariable("experience_id") Long experienceId,
+            @PathVariable("group_id") Long groupId,
             @RequestBody ExperienceUpdateRequestDto experienceUpdateRequestDto)
     throws GeneralException {
 
-        experienceService.update(experienceId, experienceUpdateRequestDto);
+        experienceService.update(groupId, experienceUpdateRequestDto);
         return ResponseEntity.ok(RestResponse.ok());
     }
 

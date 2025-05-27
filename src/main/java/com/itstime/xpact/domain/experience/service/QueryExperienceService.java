@@ -67,7 +67,7 @@ public class QueryExperienceService {
                 .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         Long memberId = securityProvider.getCurrentMemberId();
-        if(!experience.getMember().getId().equals(memberId))
+        if(!experience.getGroupExperience().getMember().getId().equals(memberId))
             throw new GeneralException(ErrorCode.NOT_YOUR_EXPERIENCE);
 
         return DetailExperienceReadResponseDto.of(experience);

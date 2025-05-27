@@ -5,11 +5,14 @@ import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.QExperience;
 import com.itstime.xpact.domain.experience.entity.QKeyword;
+import com.itstime.xpact.domain.member.entity.Member;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,6 +22,19 @@ import java.util.List;
 public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepository {
 
     private final JPAQueryFactory queryFactory;
+
+    public List<Experience> findAllByMember(Member member, Sort sort) {
+        QExperience experience = QExperience.experience;
+
+        return queryFactory.selectFrom(experience)
+                .where(experience.id.in(
+                        JPAExpressions
+                                .select(experience.id.min())
+                                .from(experience)
+                                .where(experience.groupExperience.member.eq(member))
+                                .groupBy(experience.title)
+                )).fetch();
+    }
 
     public List<Experience> findAllByMemberIdAndType(Long memberId, String order, List<ExperienceType> types) {
         QExperience experience = QExperience.experience;
@@ -32,12 +48,15 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         BooleanBuilder builder = new BooleanBuilder();
         for (ExperienceType type : types) {
-            builder.or(experience.metaData.experienceType.eq(type));
+            builder.or(experience.experienceType.eq(type));
         }
 
         return queryFactory.selectFrom(experience)
-                .where(experience.member.id.eq(memberId))
-                .where(builder)
+                .where(experience.groupExperience.member.id.eq(memberId))
+                .where(builder.and(experience.groupExperience.member.id.in(JPAExpressions
+                        .select(experience.id.min())
+                        .from(experience)
+                        .where(experience.groupExperience.member.type.eq(experience.groupExperience.member.type)))))
                 .orderBy(orderSpecifier)
                 .fetch();
     }
@@ -47,7 +66,7 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         return queryFactory.select(experience.summary)
                 .from(experience)
-                .where(experience.metaData.status.eq(Status.SAVE)
+                .where(experience.status.eq(Status.SAVE)
                         .and(experience.summary.isNotEmpty()))
                 .fetch();
     }
