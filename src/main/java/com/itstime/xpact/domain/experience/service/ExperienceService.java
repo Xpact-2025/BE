@@ -6,7 +6,6 @@ import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDt
 import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.experience.entity.*;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
-import com.itstime.xpact.domain.experience.repository.GroupExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.GeneralException;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -29,96 +27,84 @@ import java.util.stream.Collectors;
 @Transactional
 public class ExperienceService {
 
-    private final GroupExperienceRepository groupExperienceRepository;
     private final ExperienceRepository experienceRepository;
     private final ExperienceConverter experienceConverter;
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
 
     public void create(ExperienceCreateRequestDto createRequestDto) throws GeneralException {
-        // member 조회
         Member member = securityProvider.getCurrentMember();
-        List<Experience> experiences = experienceConverter.toEntity(createRequestDto);
-        setMapping(member, experiences);
-        experienceRepository.saveAll(experiences);
+        Experience experience = experienceConverter.createExperience(createRequestDto);
+        setMapping(member, experience);
+        experienceRepository.save(experience);
 
-        experiences.stream()
-                .filter(experience -> experience.getStatus().equals(Status.SAVE))
-                .forEach(this::setSummaryAndDetailRecruit);
+        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience);
     }
 
-    public void update(Long groupId, ExperienceUpdateRequestDto updateRequestDto) throws GeneralException {
+    private void setMapping(Member member, Experience experience) {
+        experience.setMember(member);
+        member.getExperiences().add(experience);
+    }
+
+    public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws GeneralException {
         Member member = securityProvider.getCurrentMember();
-        GroupExperience groupExperience = groupExperienceRepository.findById(groupId)
-                .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
-        validateOwner(member, groupExperience);
+        Experience experience = experienceRepository.findById(experienceId).orElseThrow(() ->
+                GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
-        // 영속화된 experience -> Map으로 만들어 조회를 O(1)으로 만듦
-        List<Experience> experiences = experienceRepository.findByGroupExperience(groupExperience);
-        Map<Long, Experience> existingExperiences = experiences.stream()
-                .collect(Collectors.toMap(Experience::getId, experience -> experience));
+        validateOwner(member, experience);
 
-        // newExperiences -> 수정된 experience
-        List<Experience> updatedExperiences = updateRequestDto.getSubExps().stream()
-                .map(subExperience ->
-                        experienceConverter.updateEntity(existingExperiences, updateRequestDto, subExperience))
+        // update experience
+        experience.updateExperience(updateRequestDto);
+
+        Map<Long, SubExperience> subExperienceMap = experience.getSubExperiences().stream()
+                .collect(Collectors.toMap(SubExperience::getId, subExperience -> subExperience));
+
+        // update subExperience
+        List<SubExperience> updatedSubExperiences = updateRequestDto.getSubExperiences().stream()
+                .map(subExperienceDto ->
+                        experienceConverter.updateSubExperience(subExperienceMap, updateRequestDto, subExperienceDto))
                 .toList();
 
-        // groupExperience - experiences mapping
-        setMapping(updatedExperiences, groupExperience);
+        // mapping
+        setMapping(updatedSubExperiences, experience);
 
-        updatedExperiences.stream()
-                .filter(experience -> experience.getStatus().equals(Status.SAVE))
-                .forEach(this::setSummaryAndDetailRecruit);
+        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience);
 
-        experienceRepository.saveAll(updatedExperiences);
+        experienceRepository.save(experience);
     }
 
-    private void validateOwner(Member member, GroupExperience groupExperience) {
-        if(!groupExperience.getMember().getId().equals(member.getId())){
+    private void validateOwner(Member member, Experience experience) {
+        if(!experience.getMember().getId().equals(member.getId())){
             throw GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS);
         }
     }
 
-    // 경험 생성에서 사용됨
-    private void setMapping(Member member, List<Experience> experiences) {
-        GroupExperience groupExperience = GroupExperience.builder().member(member).experiences(experiences).build();
-        member.getGroupExperiences().add(groupExperience);
-
-        experiences.forEach(experience -> experience.setGroupExperience(groupExperience));
-
-        groupExperienceRepository.save(groupExperience);
-    }
-
     // 경험 수정에서 사용됨
-    private void setMapping(List<Experience> experiences, GroupExperience groupExperience) {
-        groupExperience.getExperiences().clear();
-        groupExperience.getExperiences().addAll(experiences);
-
-        experiences.forEach(experience -> experience.setGroupExperience(groupExperience));
+    private void setMapping(List<SubExperience> subExperiences, Experience experience) {
+        experience.getSubExperiences().clear();
+        experience.getSubExperiences().addAll(subExperiences);
+        subExperiences.forEach(subExperience -> subExperience.setExperience(experience));
     }
 
-    public void delete(Long groupExperienceId) {
+    public void delete(Long experienceId) {
         Long currentMemberId = securityProvider.getCurrentMemberId();
 
-        GroupExperience groupExperience = groupExperienceRepository.findById(groupExperienceId)
+        Experience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
-        if(!groupExperience.getMember().getId().equals(currentMemberId)) {
+        if(!experience.getMember().getId().equals(currentMemberId)) {
             throw GeneralException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
         }
+        experienceRepository.delete(experience);
+    }
 
-        groupExperienceRepository.delete(groupExperience);
+    public void deleteAll() {
+        Member member = securityProvider.getCurrentMember();
     }
 
     private void setSummaryAndDetailRecruit(Experience experience) {
         openAiService.summarizeExperience(experience);
         openAiService.getDetailRecruitFromExperience(experience);
-    }
-
-    public void deleteAll() {
-        Member member = securityProvider.getCurrentMember();
-        groupExperienceRepository.deleteByMember(member);
     }
 }

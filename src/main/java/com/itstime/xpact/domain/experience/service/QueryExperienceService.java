@@ -4,11 +4,9 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.dto.response.DetailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
-import com.itstime.xpact.domain.experience.entity.GroupExperience;
+import com.itstime.xpact.domain.experience.entity.SubExperience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
-import com.itstime.xpact.domain.experience.repository.GroupExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
-import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
@@ -24,7 +22,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class QueryExperienceService {
 
-    private final GroupExperienceRepository groupExperienceRepository;
     private final ExperienceRepository experienceRepository;
     private final SecurityProvider securityProvider;
 
@@ -45,10 +42,7 @@ public class QueryExperienceService {
 
             return experienceRepository.findAllByMember(member, sort)
                     .stream()
-                    .map(experience -> {
-                        Long groupId = experience.getGroupExperience().getId();
-                        return ThumbnailExperienceReadResponseDto.of(groupId, experience);
-                    })
+                    .map(ThumbnailExperienceReadResponseDto::of)
                     .toList();
         } else {
             List<ExperienceType> experienceTypes = types.stream()
@@ -57,36 +51,30 @@ public class QueryExperienceService {
 
             return experienceRepository.findAllByMemberAndType(member, order, experienceTypes)
                     .stream()
-                    .map(experience -> {
-                        Long groupId = experience.getGroupExperience().getId();
-                        return ThumbnailExperienceReadResponseDto.of(groupId, experience);
-                    })
+                    .map(ThumbnailExperienceReadResponseDto::of)
                     .toList();
         }
     }
 
-    public DetailExperienceReadResponseDto read(Long groupId) throws GeneralException {
-        GroupExperience groupExperience = groupExperienceRepository.findById(groupId).orElseThrow(() ->
+    public DetailExperienceReadResponseDto read(Long experienceId) throws GeneralException {
+        Experience experience = experienceRepository.findById(experienceId).orElseThrow(() ->
                 GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         Member member = securityProvider.getCurrentMember();
-        if(!groupExperience.getMember().equals(member)) {
+        if(!experience.getMember().equals(member)) {
             throw new GeneralException(ErrorCode.NOT_YOUR_EXPERIENCE);
         }
 
-        List<Experience> experiences = groupExperience.getExperiences();
+        List<SubExperience> subExperiences = experience.getSubExperiences();
 
-        return DetailExperienceReadResponseDto.of(experiences, groupId);
+        return DetailExperienceReadResponseDto.of(subExperiences, experience);
     }
 
     public List<ThumbnailExperienceReadResponseDto> query(String query) {
         Member member = securityProvider.getCurrentMember();
 
         return experienceRepository.queryExperience(member, query).stream()
-                .map(experience -> {
-                    Long groupId = experience.getGroupExperience().getId();
-                    return ThumbnailExperienceReadResponseDto.of(groupId, experience);
-                })
+                .map(ThumbnailExperienceReadResponseDto::of)
                 .toList();
     }
 }

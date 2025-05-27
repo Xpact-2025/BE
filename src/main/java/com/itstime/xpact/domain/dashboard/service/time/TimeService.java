@@ -36,8 +36,7 @@ public class TimeService {
 
         // member -> experience 가 아닌, member -> groupExperience -> experience의 흐름이므로
         // member에 대한 experiences를 조회하는 로직 수정
-        return member.getGroupExperiences().stream()
-                .flatMap(groupExperience -> groupExperience.getExperiences().stream())
+        return member.getExperiences().stream()
                 .filter(experience ->
                 {
                     LocalDate expStart = experience.getStartDate();
