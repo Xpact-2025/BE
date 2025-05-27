@@ -108,13 +108,13 @@ public class ExperienceController {
             ))
     })
     @Operation(summary = "경험 수정", description = "사용자가 특정 필드를 수정하여 해당 경험을 수정")
-    @PatchMapping("/{group_id}")
+    @PatchMapping("/{experience_id}")
     public ResponseEntity<RestResponse<?>> updateExperience(
-            @PathVariable("group_id") Long groupId,
+            @PathVariable("experience_id") Long experienceId,
             @RequestBody ExperienceUpdateRequestDto experienceUpdateRequestDto)
     throws GeneralException {
 
-        experienceService.update(groupId, experienceUpdateRequestDto);
+        experienceService.update(experienceId, experienceUpdateRequestDto);
         return ResponseEntity.ok(RestResponse.ok());
     }
 
@@ -141,12 +141,12 @@ public class ExperienceController {
             ))
     })
     @Operation(summary = "경험 삭제", description = "사용자가 특정 경험을 삭제")
-    @DeleteMapping("/{group_id}")
+    @DeleteMapping("/{experience_id}")
     public ResponseEntity<RestResponse<?>> deleteExperience(
-            @PathVariable("group_id") Long groupId)
+            @PathVariable("experience_id") Long experienceId)
     throws GeneralException {
 
-        experienceService.delete(groupId);
+        experienceService.delete(experienceId);
         return ResponseEntity.ok(RestResponse.ok());
     }
 }
