@@ -45,7 +45,10 @@ public class QueryExperienceService {
 
             return experienceRepository.findAllByMember(member, sort)
                     .stream()
-                    .map(ThumbnailExperienceReadResponseDto::of)
+                    .map(experience -> {
+                        Long groupId = experience.getGroupExperience().getId();
+                        return ThumbnailExperienceReadResponseDto.of(groupId, experience);
+                    })
                     .toList();
         } else {
             List<ExperienceType> experienceTypes = types.stream()
@@ -54,7 +57,10 @@ public class QueryExperienceService {
 
             return experienceRepository.findAllByMemberAndType(member, order, experienceTypes)
                     .stream()
-                    .map(ThumbnailExperienceReadResponseDto::of)
+                    .map(experience -> {
+                        Long groupId = experience.getGroupExperience().getId();
+                        return ThumbnailExperienceReadResponseDto.of(groupId, experience);
+                    })
                     .toList();
         }
     }
@@ -74,8 +80,13 @@ public class QueryExperienceService {
     }
 
     public List<ThumbnailExperienceReadResponseDto> query(String query) {
-        return experienceRepository.queryExperience(query).stream()
-                .map(ThumbnailExperienceReadResponseDto::of)
+        Member member = securityProvider.getCurrentMember();
+
+        return experienceRepository.queryExperience(member, query).stream()
+                .map(experience -> {
+                    Long groupId = experience.getGroupExperience().getId();
+                    return ThumbnailExperienceReadResponseDto.of(groupId, experience);
+                })
                 .toList();
     }
 }

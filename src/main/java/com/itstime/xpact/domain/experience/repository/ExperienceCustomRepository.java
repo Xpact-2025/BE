@@ -13,7 +13,7 @@ public interface ExperienceCustomRepository {
 
     List<String> findSummaryByMemberId(Long memberId);
 
-    List<Experience> queryExperience(String query);
+    List<Experience> queryExperience(Member member, String query);
 
     List<Experience> findAllByMember(Member member, Sort sort);
 }

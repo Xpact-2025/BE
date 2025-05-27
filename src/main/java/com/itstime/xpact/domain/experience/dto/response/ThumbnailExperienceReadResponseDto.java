@@ -19,9 +19,9 @@ public class ThumbnailExperienceReadResponseDto {
     private LocalDateTime draftTime;
     private Status status;
 
-    public static ThumbnailExperienceReadResponseDto of(Experience experience) {
+    public static ThumbnailExperienceReadResponseDto of(Long groupId, Experience experience) {
         return ThumbnailExperienceReadResponseDto.builder()
-                .id(experience.getId())
+                .id(groupId)
                 .title(experience.getTitle() != null ? experience.getTitle() : experience.getQualification())
                 .experienceType(experience.getExperienceType())
                 .draftTime(experience.getStatus().equals(Status.DRAFT) ? experience.getModifiedTime() : null)

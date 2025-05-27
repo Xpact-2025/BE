@@ -74,7 +74,7 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
                 .fetch();
     }
 
-    public List<Experience> queryExperience(String query) {
+    public List<Experience> queryExperience(Member member, String query) {
         QExperience experience = QExperience.experience;
         QKeyword keyword = QKeyword.keyword;
 
@@ -87,10 +87,16 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
             );
         }
 
+        List<Long> ids = queryFactory.select(experience.id.min())
+                .from(experience)
+                .leftJoin(experience.keywords, keyword)
+                .where(condition.and(experience.groupExperience.member.eq(member)))
+                .groupBy(experience.groupExperience.id)
+                .fetch();
+
         return queryFactory.selectFrom(experience)
                 .leftJoin(experience.keywords, keyword).fetchJoin()
-                .where(condition)
-                .distinct()
+                .where(experience.id.in(ids))
                 .fetch();
     }
 }
