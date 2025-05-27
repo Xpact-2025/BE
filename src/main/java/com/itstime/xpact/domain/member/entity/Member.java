@@ -1,7 +1,7 @@
 package com.itstime.xpact.domain.member.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
-import com.itstime.xpact.domain.experience.entity.GroupExperience;
+import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
@@ -76,7 +76,7 @@ public class Member extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GroupExperience> groupExperiences = new ArrayList<>();
+    private List<Experience> experiences = new ArrayList<>();
 
     @Builder
     public Member(String name, String email, String password, LocalDate birthDate, Integer age, Type type, Role role) {

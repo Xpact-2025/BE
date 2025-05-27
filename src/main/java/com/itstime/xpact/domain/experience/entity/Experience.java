@@ -3,10 +3,9 @@ package com.itstime.xpact.domain.experience.entity;
 import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.experience.common.ExperienceType;
-import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
-import com.itstime.xpact.domain.experience.entity.embeddable.*;
+import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import jakarta.persistence.*;
 import lombok.*;
@@ -51,58 +50,30 @@ public class Experience extends BaseEntity {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-
-    @Column(name = "sub_title")
-    private String subTitle;
-
-    @Column(name = "form_type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private FormType formType;
-
-    @Embedded
-    private StarForm starForm;
-
-    @Embedded
-    private SimpleForm simpleForm;
-
     @Column(name = "qualification")
     private String qualification;
+
     @Column(name = "publisher")
     private String publisher;
-    @Column(name = "simple_description", length = 512)
-    private String simpleDescription;
 
     @Setter
     @Column(name = "summary", length = 512)
     private String summary;
 
     @Builder.Default
-    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Keyword> keywords = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "experience", cascade =  CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<File> files = new ArrayList<>();
+    @OneToMany(mappedBy = "experience", cascade =   CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<SubExperience> subExperiences = new ArrayList<>();
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_experience_id")
-    private GroupExperience groupExperience;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_recruit_id")
     private DetailRecruit detailRecruit;
 
-    public void setKeywords(List<Keyword> keywords) {
-        this.keywords.clear();
-        this.keywords.addAll(keywords);
-    }
-
-    public void setFiles(List<File> files) {
-        this.files.clear();
-        this.files.addAll(files);
-    }
 
 
     public static TimelineResponseDto toTimeLineDto(Experience experience) {
@@ -114,7 +85,7 @@ public class Experience extends BaseEntity {
                     .build();
     }
 
-    public void updateCommonFields(ExperienceUpdateRequestDto updateRequestDto) {
+    public void updateExperience(ExperienceUpdateRequestDto updateRequestDto) {
         if(IS_QUALIFICATION.contains(ExperienceType.valueOf(updateRequestDto.getExperienceType()))) {
             this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
             this.qualification = updateRequestDto.getQualification();
@@ -128,38 +99,6 @@ public class Experience extends BaseEntity {
             this.startDate = updateRequestDto.getStartDate();
             this.endDate = updateRequestDto.getEndDate();
             this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
-        }
-    }
-
-    public void updateSubFields(ExperienceUpdateRequestDto.SubExperience targetExperience, ExperienceType experienceType) {
-        if(IS_QUALIFICATION.contains(experienceType)) {
-            this.subTitle = targetExperience.getSubTitle();
-            this.formType = FormType.STAR_FORM;
-            this.simpleDescription = targetExperience.getSimpleDescription();
-            this.status = Status.valueOf(targetExperience.getStatus());
-        } else {
-            switch (FormType.valueOf(targetExperience.getFormType())) {
-                case STAR_FORM -> {
-                    this.subTitle = targetExperience.getSubTitle();
-                    this.status = Status.valueOf(targetExperience.getStatus());
-                    this.formType = FormType.STAR_FORM;
-                    this.starForm = StarForm.builder()
-                            .situation(targetExperience.getSituation())
-                            .task(targetExperience.getTask())
-                            .action(targetExperience.getAction())
-                            .result(targetExperience.getResult())
-                            .build();
-                }
-                case SIMPLE_FORM -> {
-                    this.subTitle = targetExperience.getSubTitle();
-                    this.status = Status.valueOf(targetExperience.getStatus());
-                    this.formType = FormType.SIMPLE_FORM;
-                    this.simpleForm = SimpleForm.builder()
-                            .perform(targetExperience.getPerform())
-                            .role(targetExperience.getRole())
-                            .build();
-                }
-            }
         }
     }
 }
