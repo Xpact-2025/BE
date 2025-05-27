@@ -32,11 +32,12 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
                                 .select(experience.id.min())
                                 .from(experience)
                                 .where(experience.groupExperience.member.eq(member))
-                                .groupBy(experience.title)
-                )).fetch();
+                                .groupBy(experience.groupExperience.id)
+                                .limit(1)))
+                .fetch();
     }
 
-    public List<Experience> findAllByMemberIdAndType(Long memberId, String order, List<ExperienceType> types) {
+    public List<Experience> findAllByMemberAndType(Member member, String order, List<ExperienceType> types) {
         QExperience experience = QExperience.experience;
 
         OrderSpecifier<?> orderSpecifier = null;
@@ -51,12 +52,14 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
             builder.or(experience.experienceType.eq(type));
         }
 
+        List<Long> ids = queryFactory.select(experience.id.min())
+                .from(experience)
+                .where(experience.groupExperience.member.eq(member).and(builder))
+                .groupBy(experience.groupExperience.id)
+                .fetch();
+
         return queryFactory.selectFrom(experience)
-                .where(experience.groupExperience.member.id.eq(memberId))
-                .where(builder.and(experience.groupExperience.member.id.in(JPAExpressions
-                        .select(experience.id.min())
-                        .from(experience)
-                        .where(experience.groupExperience.member.type.eq(experience.groupExperience.member.type)))))
+                .where(experience.id.in(ids))
                 .orderBy(orderSpecifier)
                 .fetch();
     }

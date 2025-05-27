@@ -24,28 +24,22 @@ public class QueryExperienceService {
 
     private final ExperienceRepository experienceRepository;
     private final SecurityProvider securityProvider;
-    private final MemberRepository memberRepository;
 
     private static final String LATEST = "LATEST";
     private static final String OLDEST = "OLDEST";
     private static final String MODIFIED = "modifiedTime";
 
     public List<ThumbnailExperienceReadResponseDto> readAll(List<String> types, String order) throws GeneralException {
-
         // member 조회
-        Member member = memberRepository.findById(securityProvider.getCurrentMemberId()).orElseThrow(() ->
-                GeneralException.of(ErrorCode.MEMBER_NOT_EXISTS));
-
-        Sort sort;
-        if(order.equals(LATEST)) {
-            sort = Sort.by(Sort.Direction.DESC, MODIFIED);
-        } else if(order.equals(OLDEST)) {
-            sort = Sort.by(Sort.Direction.ASC, MODIFIED);
-        } else {
-            throw GeneralException.of(ErrorCode.INVALID_ORDER);
-        }
+        Member member = securityProvider.getCurrentMember();
 
         if(types.get(0).equalsIgnoreCase("all")) {
+            Sort sort = null;
+            switch (order) {
+                case OLDEST -> sort = Sort.by(Sort.Direction.ASC, MODIFIED);
+                case LATEST -> sort = Sort.by(Sort.Direction.DESC, MODIFIED);
+            }
+
             return experienceRepository.findAllByMember(member, sort)
                     .stream()
                     .map(ThumbnailExperienceReadResponseDto::of)
@@ -55,7 +49,7 @@ public class QueryExperienceService {
                     .map(type -> ExperienceType.valueOf(type.toUpperCase()))
                     .toList();
 
-            return experienceRepository.findAllByMemberIdAndType(member.getId(), order, experienceTypes)
+            return experienceRepository.findAllByMemberAndType(member, order, experienceTypes)
                     .stream()
                     .map(ThumbnailExperienceReadResponseDto::of)
                     .toList();
