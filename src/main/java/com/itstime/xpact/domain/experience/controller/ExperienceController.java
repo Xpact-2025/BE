@@ -141,12 +141,12 @@ public class ExperienceController {
             ))
     })
     @Operation(summary = "경험 삭제", description = "사용자가 특정 경험을 삭제")
-    @DeleteMapping("/{experience_id}")
+    @DeleteMapping("/{group_id}")
     public ResponseEntity<RestResponse<?>> deleteExperience(
-            @PathVariable("experience_id") Long experienceId)
+            @PathVariable("group_id") Long groupId)
     throws GeneralException {
 
-        experienceService.delete(experienceId);
+        experienceService.delete(groupId);
         return ResponseEntity.ok(RestResponse.ok());
     }
 }
