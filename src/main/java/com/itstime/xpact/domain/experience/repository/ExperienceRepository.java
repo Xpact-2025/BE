@@ -33,9 +33,5 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
             "GROUP BY DATE ")
     List<Object[]> countByDay(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Member member);
 
-    @Modifying
-    @Query("DELETE FROM Experience e WHERE e.groupExperience.member = :member ")
-    void deleteAllByMember(Member member);
-
     List<Experience> findByGroupExperience(GroupExperience groupExperience);
 }
