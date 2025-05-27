@@ -1,7 +1,6 @@
 package com.itstime.xpact.domain.member.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
-import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.GroupExperience;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;

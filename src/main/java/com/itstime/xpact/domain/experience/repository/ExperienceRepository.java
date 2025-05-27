@@ -3,7 +3,6 @@ package com.itstime.xpact.domain.experience.repository;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.GroupExperience;
 import com.itstime.xpact.domain.member.entity.Member;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,9 +36,6 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
     @Modifying
     @Query("DELETE FROM Experience e WHERE e.groupExperience.member = :member ")
     void deleteAllByMember(Member member);
-
-    @Query("SELECT e FROM Experience e WHERE e.id IN :subExperienceIds ")
-    List<Experience> findByIds(List<Long> subExperienceIds);
 
     List<Experience> findByGroupExperience(GroupExperience groupExperience);
 }

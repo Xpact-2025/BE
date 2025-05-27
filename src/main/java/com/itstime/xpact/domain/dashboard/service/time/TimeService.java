@@ -4,7 +4,6 @@ import com.itstime.xpact.domain.dashboard.controller.HistoryOldResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
-import com.itstime.xpact.domain.experience.entity.GroupExperience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.exception.GeneralException;
