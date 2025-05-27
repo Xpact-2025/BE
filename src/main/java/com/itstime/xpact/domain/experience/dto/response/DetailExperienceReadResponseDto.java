@@ -35,6 +35,7 @@ public class DetailExperienceReadResponseDto {
     @Getter
     @Builder
     public static class SubExperienceResponseDto {
+        private Long experienceId;
         private FormType formType;
         private Status status;
         private String subTitle;
@@ -84,6 +85,7 @@ public class DetailExperienceReadResponseDto {
                     SubExperienceResponseDto subExperienceResponseDto = null;
                     if(IS_QUALIFICATION.contains(experience.getExperienceType())) {
                         subExperienceResponseDto = SubExperienceResponseDto.builder()
+                                .experienceId(experience.getId())
                                 .formType(experience.getFormType())
                                 .status(experience.getStatus())
                                 .subTitle(experience.getSubTitle())
@@ -94,6 +96,7 @@ public class DetailExperienceReadResponseDto {
                     else {
                         switch (experience.getFormType()) {
                             case STAR_FORM -> subExperienceResponseDto = SubExperienceResponseDto.builder()
+                                    .experienceId(experience.getId())
                                     .formType(experience.getFormType())
                                     .status(experience.getStatus())
                                     .subTitle(experience.getSubTitle())
@@ -106,6 +109,7 @@ public class DetailExperienceReadResponseDto {
                                     .build();
 
                             case SIMPLE_FORM -> subExperienceResponseDto = SubExperienceResponseDto.builder()
+                                    .experienceId(experience.getId())
                                     .formType(experience.getFormType())
                                     .status(experience.getStatus())
                                     .subTitle(experience.getSubTitle())
