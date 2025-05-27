@@ -4,7 +4,9 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.dto.response.DetailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceReadResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.experience.entity.GroupExperience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
+import com.itstime.xpact.domain.experience.repository.GroupExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
@@ -22,6 +24,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class QueryExperienceService {
 
+    private final GroupExperienceRepository groupExperienceRepository;
     private final ExperienceRepository experienceRepository;
     private final SecurityProvider securityProvider;
 
@@ -56,15 +59,18 @@ public class QueryExperienceService {
         }
     }
 
-    public DetailExperienceReadResponseDto read(Long experienceId) throws GeneralException {
-        Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
+    public DetailExperienceReadResponseDto read(Long groupId) throws GeneralException {
+        GroupExperience groupExperience = groupExperienceRepository.findById(groupId).orElseThrow(() ->
+                GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
-        Long memberId = securityProvider.getCurrentMemberId();
-        if(!experience.getGroupExperience().getMember().getId().equals(memberId))
+        Member member = securityProvider.getCurrentMember();
+        if(!groupExperience.getMember().equals(member)) {
             throw new GeneralException(ErrorCode.NOT_YOUR_EXPERIENCE);
+        }
 
-        return DetailExperienceReadResponseDto.of(experience);
+        List<Experience> experiences = groupExperience.getExperiences();
+
+        return DetailExperienceReadResponseDto.of(experiences, groupId);
     }
 
     public List<ThumbnailExperienceReadResponseDto> query(String query) {

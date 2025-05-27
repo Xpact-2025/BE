@@ -69,12 +69,12 @@ public class QueryExperienceController {
             ))
     })
     @Operation(summary = "특정 경험 상세 조회", description = "사용자가 특정 경험을 클릭했을 때, 해당 경험에 대한 모든 정보를 조회")
-    @GetMapping("/{experience_id}")
+    @GetMapping("/{group_id}")
     public ResponseEntity<RestResponse<DetailExperienceReadResponseDto>> readExperience(
-            @PathVariable("experience_id") Long experienceId)
+            @PathVariable("group_id") Long groupId)
     throws GeneralException {
 
-        return ResponseEntity.ok(RestResponse.ok(queryExperienceService.read(experienceId)));
+        return ResponseEntity.ok(RestResponse.ok(queryExperienceService.read(groupId)));
     }
 
     @Operation(summary = "경험 검색", description = "경험의 제목과 키워드를 통한 검색 기능 제공")
