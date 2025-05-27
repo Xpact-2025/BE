@@ -4,15 +4,19 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
+import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.File;
 import com.itstime.xpact.domain.experience.entity.Keyword;
 import com.itstime.xpact.domain.experience.entity.embeddable.SimpleForm;
 import com.itstime.xpact.domain.experience.entity.embeddable.StarForm;
+import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.exception.GeneralException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALIFICATION;
 
@@ -64,6 +68,8 @@ public class ExperienceConverter {
             experience = experienceBuilder
                     .subTitle(subExperience.getSubTitle())
                     .simpleDescription(subExperience.getSimpleDescription())
+                    .status(Status.valueOf(subExperience.getStatus()))
+                    .formType(FormType.STAR_FORM)
                     .build();
         } else {
             switch (FormType.valueOf(subExperience.getFormType())) {
@@ -99,6 +105,36 @@ public class ExperienceConverter {
                             .experience(experience)
                             .build()).toList());
 
+        experience.setFiles(subExperience.getFiles().stream()
+                .map(url -> File.builder()
+                        .fileUrl(url)
+                        .experience(experience)
+                        .build()).toList());
+    }
+
+    public Experience updateEntity(Map<Long, Experience> existingExperiences, ExperienceUpdateRequestDto updateRequestDto, ExperienceUpdateRequestDto.SubExperience targetExperience) {
+        Experience experience = existingExperiences.getOrDefault(targetExperience.getSubExperienceId(), new Experience());
+        experience.updateCommonFields(updateRequestDto);
+
+        experience.updateSubFields(targetExperience, ExperienceType.valueOf(updateRequestDto.getExperienceType()));
+        setKeywordsAndFiles(experience, targetExperience);
+
+        if(Status.SAVE.equals(experience.getStatus()) && Status.DRAFT.equals(Status.valueOf(targetExperience.getStatus()))){
+            throw GeneralException.of(ErrorCode.INVALID_SAVE);
+        }
+
+        return experience;
+    }
+
+    private void setKeywordsAndFiles(Experience experience, ExperienceUpdateRequestDto.SubExperience subExperience) {
+        experience.getKeywords().clear();
+        experience.setKeywords(subExperience.getKeywords().stream()
+                .map(str -> Keyword.builder()
+                        .name(str)
+                        .experience(experience)
+                        .build()).toList());
+
+        experience.getFiles().clear();
         experience.setFiles(subExperience.getFiles().stream()
                 .map(url -> File.builder()
                         .fileUrl(url)
