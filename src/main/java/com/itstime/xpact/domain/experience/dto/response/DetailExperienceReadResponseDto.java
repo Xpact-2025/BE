@@ -54,12 +54,12 @@ public class DetailExperienceReadResponseDto {
      */
     public static DetailExperienceReadResponseDto of(Experience experience) {
         DetailExperienceReadResponseDto dto = null;
-        if(IS_QUALIFICATION.contains(experience.getMetaData().getExperienceType())) {
+        if(IS_QUALIFICATION.contains(experience.getExperienceType())) {
             dto = DetailExperienceReadResponseDto.builder()
                     .id(experience.getId())
-                    .status(experience.getMetaData().getStatus())
+                    .status(experience.getStatus())
                     .formType(null)
-                    .experienceType(experience.getMetaData().getExperienceType())
+                    .experienceType(experience.getExperienceType())
                     .isEnded(experience.getIsEnded())
                     .startDate(null)
                     .endDate(null)
@@ -70,8 +70,8 @@ public class DetailExperienceReadResponseDto {
                     .result(null)
                     .role(null)
                     .perform(null)
-                    .qualification(experience.getQualification().getQualification())
-                    .publisher(experience.getQualification().getPublisher())
+                    .qualification(experience.getQualification())
+                    .publisher(experience.getPublisher())
                     .issueDate(experience.getEndDate())
                     .simpleDescription(null)
                     .keywords(null)
@@ -80,7 +80,7 @@ public class DetailExperienceReadResponseDto {
         }
         else {
              DetailExperienceReadResponseDtoBuilder commonFields = getCommonFields(experience);
-            switch (experience.getMetaData().getFormType()) {
+            switch (experience.getFormType()) {
                 case STAR_FORM -> dto = commonFields
                             .situation(experience.getStarForm().getSituation())
                             .task(experience.getStarForm().getTask())
@@ -105,9 +105,9 @@ public class DetailExperienceReadResponseDto {
     private static DetailExperienceReadResponseDtoBuilder getCommonFields(Experience experience) {
         return DetailExperienceReadResponseDto.builder()
                 .id(experience.getId())
-                .status(experience.getMetaData().getStatus())
-                .formType(experience.getMetaData().getFormType())
-                .experienceType(experience.getMetaData().getExperienceType())
+                .status(experience.getStatus())
+                .formType(experience.getFormType())
+                .experienceType(experience.getExperienceType())
                 .isEnded(experience.getIsEnded())
                 .startDate(experience.getStartDate())
                 .endDate(experience.getEndDate())
