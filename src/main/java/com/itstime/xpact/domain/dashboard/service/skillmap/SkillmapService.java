@@ -32,6 +32,11 @@ public class SkillmapService {
 
     private final LambdaOpenAiClient lambdaOpenAiClient;
 
+    /*
+    사용자의 모든 경험 요약과, 사용자의 희망 직무에대한 다섯가지 핵심 역량을 입력값으로 사용하여
+    각 다섯가지 역량에 맞는 점수를 매기고, AWS람다를 호출하여 분석을 진행
+    결과값은 redis에 저장하여, 대시보드 새로고침 시 연산이 반복되지 않도록 방지
+     */
     public CompletableFuture<SkillMapResponseDto> evaluate(Member member) {
 
         // Redis 캐시 먼저 조회
@@ -53,9 +58,11 @@ public class SkillmapService {
         CoreSkill coreSkill = detailRecruitRepository.findCoreSkillById(detailRecruit.getId())
                 .orElseThrow(() -> CustomException.of(ErrorCode.NOT_FOUND_CORESKILLS));
 
+        // 사용자의 모든 경험의 요약을 한줄씩 만듭니다.
         String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
                 .collect(Collectors.joining("\n"));
 
+        // 사용자의 희망직무의 핵심역량을 조회하여 List형태로 받습니다.
         List<String> coreSkillList = coreSkill.getCoreSKills();
 
         // experiences가 null이거나 비어있는 경우 예외 처리
@@ -63,11 +70,15 @@ public class SkillmapService {
             throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
         }
 
+        // 경험 요약과 핵심역량으로 보낼 요청 dto를 생성합니다.
         OpenAiRequestDto requestDto = OpenAiRequestDto.builder()
                 .experiences(experiences)
                 .coreSkills(coreSkillList)
                 .build();
 
+        /*
+        lambda를 호출하여 openAi요청을 처리함
+        */
         return lambdaOpenAiClient.requestEvaluation(requestDto)
                 .thenApply(resultDto -> {
                     CoreSkillMap coreSkillMap = CoreSkillMap.builder()

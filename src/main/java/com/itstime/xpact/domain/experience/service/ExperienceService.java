@@ -104,6 +104,11 @@ public class ExperienceService {
         experienceRepository.deleteAllByMember(member);
     }
 
+    /*
+    experience를 통해 openai에 비동기 요청을 보내는 메서드
+    experience -> 요약 및 직무 종류를 도출하여 expericne 엔티티에 저장
+    도출된 데이터는 대시보드를 구현하는데 사용됨
+    */
     private void setSummaryAndDetailRecruit(Experience experience) {
         openAiService.summarizeExperience(experience);
         openAiService.getDetailRecruitFromExperience(experience);
