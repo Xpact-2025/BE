@@ -30,4 +30,6 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
             "WHERE e.createdTime >= :startDate AND e.createdTime < :endDate AND e.member = :member " +
             "GROUP BY DATE ")
     List<Object[]> countByDay(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Member member);
+
+    void deleteAllByMember(Member member);
 }

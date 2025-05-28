@@ -101,6 +101,7 @@ public class ExperienceService {
 
     public void deleteAll() {
         Member member = securityProvider.getCurrentMember();
+        experienceRepository.deleteAllByMember(member);
     }
 
     private void setSummaryAndDetailRecruit(Experience experience) {

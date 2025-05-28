@@ -28,6 +28,7 @@ public class DemoDataService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void saveExp() throws IOException {
+        experienceService.deleteAll();
         objectMapper.registerModule(new JavaTimeModule());
 
         List<ExperienceCreateRequestDto> experienceCreateRequestDtos = objectMapper.readValue(
