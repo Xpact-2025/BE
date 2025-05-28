@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class File extends BaseEntity {
 
     @Id
+    @Column(name = "file_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
