@@ -10,6 +10,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -32,7 +33,8 @@ public class ThumbnailExperienceWithkeywordResponseDto {
                 .keywords(experience.getSubExperiences().stream()
                         .flatMap(subExperience -> subExperience.getKeywords().stream())
                         .map(Keyword::getName)
-                        .toList())
+                        .collect(Collectors.toSet())
+                        .stream().toList())
                 .build();
     }
 }
