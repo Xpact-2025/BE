@@ -39,8 +39,10 @@ public class OpenAiServiceImpl implements OpenAiService {
         String summary = response.getResult().getOutput().getText();
         log.info("summary : {}", summary);
 
-        experience.setSummary(summary);
-        experienceRepository.save(experience);
+        Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow();
+
+        fresh.setSummary(summary);
+        experienceRepository.save(fresh);
     }
 
     public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
@@ -102,8 +104,9 @@ public class OpenAiServiceImpl implements OpenAiService {
         DetailRecruit detailRecruit = detailRecruitRepository.findByName(result).orElseThrow(() ->
                 GeneralException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND));
 
-        experience.setDetailRecruit(detailRecruit);
-        experienceRepository.save(experience);
+        Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow();
+        fresh.setDetailRecruit(detailRecruit);
+        experienceRepository.save(fresh);
     }
 
     private String detailRecruitToString() {

@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
 import com.itstime.xpact.domain.experience.service.ExperienceService;
-import com.itstime.xpact.global.auth.SecurityProvider;
-import jakarta.annotation.Priority;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,6 +25,7 @@ public class DemoDataService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void saveExp() throws IOException {
+        experienceService.deleteAll();
         objectMapper.registerModule(new JavaTimeModule());
 
         List<ExperienceCreateRequestDto> experienceCreateRequestDtos = objectMapper.readValue(

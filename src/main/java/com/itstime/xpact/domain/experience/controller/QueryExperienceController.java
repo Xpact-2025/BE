@@ -1,7 +1,8 @@
 package com.itstime.xpact.domain.experience.controller;
 
-import com.itstime.xpact.domain.experience.dto.response.DetailExperienceReadResponseDto;
-import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceReadResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.DetailExperienceResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceWithkeywordResponseDto;
 import com.itstime.xpact.domain.experience.service.QueryExperienceService;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.response.ErrorResponse;
@@ -42,7 +43,7 @@ public class QueryExperienceController {
     })
     @Operation(summary = "사용자의 모든 경험 조회", description = "사용자가 작성한 모든 경험을 조회 (임시저장, 저장 모두 조회), (페이지 처리 X), (상세 조회 X)")
     @GetMapping("")
-    public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> readAllExperience(
+    public ResponseEntity<RestResponse<List<ThumbnailExperienceWithkeywordResponseDto>>> readAllExperience(
             @RequestParam(value = "type", defaultValue = "ALL") List<String> types,
             @RequestParam(value = "order", defaultValue = "latest") String order)
     throws GeneralException {
@@ -70,7 +71,7 @@ public class QueryExperienceController {
     })
     @Operation(summary = "특정 경험 상세 조회", description = "사용자가 특정 경험을 클릭했을 때, 해당 경험에 대한 모든 정보를 조회")
     @GetMapping("/{experience_id}")
-    public ResponseEntity<RestResponse<DetailExperienceReadResponseDto>> readExperience(
+    public ResponseEntity<RestResponse<DetailExperienceResponseDto>> readExperience(
             @PathVariable("experience_id") Long experienceId)
     throws GeneralException {
 
@@ -79,7 +80,7 @@ public class QueryExperienceController {
 
     @Operation(summary = "경험 검색", description = "경험의 제목과 키워드를 통한 검색 기능 제공")
     @GetMapping("/search")
-    public ResponseEntity<RestResponse<List<ThumbnailExperienceReadResponseDto>>> queryExperience(
+    public ResponseEntity<RestResponse<List<ThumbnailExperienceResponseDto>>> queryExperience(
             @RequestParam("query") @Nullable String query) {
 
         return ResponseEntity.ok(RestResponse.ok(queryExperienceService.query(query)));

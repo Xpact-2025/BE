@@ -26,8 +26,8 @@ public class Keyword extends BaseEntity {
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "experience_id")
-    private Experience experience;
+    @JoinColumn(name = "sub_experience_id")
+    private SubExperience subExperience;
 
     public static void validateKeyword(List<String> keywords) {
         if(keywords == null || keywords.isEmpty()) return;
