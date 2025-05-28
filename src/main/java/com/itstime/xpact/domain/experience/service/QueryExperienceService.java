@@ -1,8 +1,9 @@
 package com.itstime.xpact.domain.experience.service;
 
 import com.itstime.xpact.domain.experience.common.ExperienceType;
-import com.itstime.xpact.domain.experience.dto.response.DetailExperienceReadResponseDto;
-import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceReadResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.DetailExperienceResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceResponseDto;
+import com.itstime.xpact.domain.experience.dto.response.ThumbnailExperienceWithkeywordResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.SubExperience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
@@ -29,7 +30,7 @@ public class QueryExperienceService {
     private static final String OLDEST = "OLDEST";
     private static final String MODIFIED = "modifiedTime";
 
-    public List<ThumbnailExperienceReadResponseDto> readAll(List<String> types, String order) throws GeneralException {
+    public List<ThumbnailExperienceWithkeywordResponseDto> readAll(List<String> types, String order) throws GeneralException {
         // member 조회
         Member member = securityProvider.getCurrentMember();
 
@@ -42,7 +43,7 @@ public class QueryExperienceService {
 
             return experienceRepository.findAllByMember(member, sort)
                     .stream()
-                    .map(ThumbnailExperienceReadResponseDto::of)
+                    .map(ThumbnailExperienceWithkeywordResponseDto::of)
                     .toList();
         } else {
             List<ExperienceType> experienceTypes = types.stream()
@@ -51,12 +52,12 @@ public class QueryExperienceService {
 
             return experienceRepository.findAllByMemberAndType(member, order, experienceTypes)
                     .stream()
-                    .map(ThumbnailExperienceReadResponseDto::of)
+                    .map(ThumbnailExperienceWithkeywordResponseDto::of)
                     .toList();
         }
     }
 
-    public DetailExperienceReadResponseDto read(Long experienceId) throws GeneralException {
+    public DetailExperienceResponseDto read(Long experienceId) throws GeneralException {
         Experience experience = experienceRepository.findById(experienceId).orElseThrow(() ->
                 GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
@@ -67,14 +68,14 @@ public class QueryExperienceService {
 
         List<SubExperience> subExperiences = experience.getSubExperiences();
 
-        return DetailExperienceReadResponseDto.of(subExperiences, experience);
+        return DetailExperienceResponseDto.of(subExperiences, experience);
     }
 
-    public List<ThumbnailExperienceReadResponseDto> query(String query) {
+    public List<ThumbnailExperienceResponseDto> query(String query) {
         Member member = securityProvider.getCurrentMember();
 
         return experienceRepository.queryExperience(member, query).stream()
-                .map(ThumbnailExperienceReadResponseDto::of)
+                .map(ThumbnailExperienceResponseDto::of)
                 .toList();
     }
 }

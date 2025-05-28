@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ThumbnailExperienceReadResponseDto {
+public class ThumbnailExperienceResponseDto {
     private Long id;
     private String title;
     private ExperienceType experienceType;
@@ -21,8 +21,8 @@ public class ThumbnailExperienceReadResponseDto {
     private Status status;
     private List<String> keywords;
 
-    public static ThumbnailExperienceReadResponseDto of(Experience experience) {
-        return ThumbnailExperienceReadResponseDto.builder()
+    public static ThumbnailExperienceResponseDto of(Experience experience) {
+        return ThumbnailExperienceResponseDto.builder()
                 .id(experience.getId())
                 .title(experience.getTitle() != null ? experience.getTitle() : experience.getQualification())
                 .experienceType(experience.getExperienceType())

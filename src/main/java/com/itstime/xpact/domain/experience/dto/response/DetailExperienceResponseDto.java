@@ -17,7 +17,7 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DetailExperienceReadResponseDto {
+public class DetailExperienceResponseDto {
 
     // 공통 부분
     private Long experienceId;
@@ -61,17 +61,17 @@ public class DetailExperienceReadResponseDto {
      Experience 엔티티를 받아와서 Dto형식으로 변환
      필드가 null값이 들어가면 `JsonInclude.Include.NON_NULL`설정을 통해 응답으로 무시됨
      */
-    public static DetailExperienceReadResponseDto of(List<SubExperience> subExperiences, Experience experience) {
-        DetailExperienceReadResponseDtoBuilder dto;
+    public static DetailExperienceResponseDto of(List<SubExperience> subExperiences, Experience experience) {
+        DetailExperienceResponseDtoBuilder dto;
         if (IS_QUALIFICATION.contains(experience.getExperienceType())) {
-            dto = DetailExperienceReadResponseDto.builder()
+            dto = DetailExperienceResponseDto.builder()
                     .experienceId(experience.getId())
                     .experienceType(experience.getExperienceType())
                     .qualification(experience.getQualification())
                     .publisher(experience.getPublisher())
                     .issueDate(experience.getEndDate());
         } else {
-            dto = DetailExperienceReadResponseDto.builder()
+            dto = DetailExperienceResponseDto.builder()
                     .experienceId(experience.getId())
                     .experienceType(experience.getExperienceType())
                     .title(experience.getTitle())
