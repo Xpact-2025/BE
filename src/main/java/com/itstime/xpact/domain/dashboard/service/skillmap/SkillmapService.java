@@ -32,6 +32,7 @@ public class SkillmapService {
 
     private final LambdaOpenAiClient lambdaOpenAiClient;
 
+
     /*
     사용자의 모든 경험 요약과, 사용자의 희망 직무에대한 다섯가지 핵심 역량을 입력값으로 사용하여
     각 다섯가지 역량에 맞는 점수를 매기고, AWS람다를 호출하여 분석을 진행
