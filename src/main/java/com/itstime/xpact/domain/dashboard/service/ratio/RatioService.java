@@ -25,6 +25,7 @@ public class RatioService {
     private final RecruitCountRepository recruitCountRepository;
     private final ExperienceRepository experienceRepository;
 
+
     // 직무 카운트 값을 가져와 직무 비율로 변환하는 로직
     public List<RatioResponseDto> detailRecruitRatio(Long memberId) {
         // 직무 카운트 값 가져옴
