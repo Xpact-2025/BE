@@ -1,8 +1,7 @@
 package com.itstime.xpact.domain.experience.service;
 
-import com.itstime.xpact.domain.experience.common.ExperienceType;
-import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
+import com.itstime.xpact.domain.experience.converter.ExperienceConverter;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
 import com.itstime.xpact.domain.experience.entity.*;
@@ -17,11 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALIFICATION;
 
 
 @Slf4j
@@ -31,126 +28,63 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 public class ExperienceService {
 
     private final ExperienceRepository experienceRepository;
+    private final ExperienceConverter experienceConverter;
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
 
     public void create(ExperienceCreateRequestDto createRequestDto) throws GeneralException {
-        // member 조회
         Member member = securityProvider.getCurrentMember();
-
-        // enum타입이 될 string 필드 검증 로직 (INVALID한 값이 들어오면 CustomException발생)
-        Status.validateStatus(createRequestDto.getStatus());
-        FormType.validateFormType(createRequestDto.getFormType());
-        ExperienceType.validateExperienceType(createRequestDto.getExperienceType());
-        Keyword.validateKeyword(createRequestDto.getKeywords());
-
-        Experience experience;
-        // experience가 prize or certificates일 때
-        if(IS_QUALIFICATION.contains(ExperienceType.valueOf(createRequestDto.getExperienceType()))) {
-             experience = Experience.qualification(createRequestDto);
-        } else {
-            // 아닐 때는 star, simple 나눠야함
-            experience = switch (FormType.valueOf(createRequestDto.getFormType())) {
-                case SIMPLE_FORM -> Experience.simpleForm(createRequestDto);
-                case STAR_FORM -> Experience.starForm(createRequestDto);
-            };
-            saveNonQualification(experience, createRequestDto);
-        }
-
-
-        // experience와의 연관관계 설정
-        experience.setMember(member); //TODO setMember 데이터 정합성 만족하는지 검증 필요 (exp <-> member 양방향 관계이므로)
+        Experience experience = experienceConverter.createExperience(createRequestDto);
+        setMapping(member, experience);
         experienceRepository.save(experience);
 
-        if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE)) {
-            setSummaryAndDetailRecruit(experience);
-        }
+        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience);
     }
 
-    // keyword, fils 설정하여 set
-    private void saveNonQualification(Experience experience, ExperienceCreateRequestDto createRequestDto) throws GeneralException {
-        // dto의 keywords를 keyword 엔티티로 변경
-        if(createRequestDto.getKeywords() != null && !createRequestDto.getKeywords().isEmpty()) {
-            List<Keyword> keywords = createRequestDto.getKeywords().stream()
-                    .map(keywordStr -> Keyword.builder()
-                            .name(keywordStr)
-                            .experience(experience)
-                            .build())
-                    .collect(Collectors.toCollection(ArrayList::new));
-            experience.setKeywords(keywords);
-        }
-
-        if(Experience.isNeedFiles(createRequestDto.getExperienceType()) && createRequestDto.getFiles() != null) {
-            List<File> files = createRequestDto.getFiles().stream()
-                    .map(fileUrl -> File.builder()
-                            .fileUrl(fileUrl)
-                            .experience(experience)
-                            .build())
-                    .collect(Collectors.toCollection(ArrayList::new));
-            experience.setFiles(files);
-        }
+    private void setMapping(Member member, Experience experience) {
+        experience.setMember(member);
+        member.getExperiences().add(experience);
     }
 
     public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws GeneralException {
-        Long currentMemberId = securityProvider.getCurrentMemberId();
+        Member member = securityProvider.getCurrentMember();
 
-        // experience 조회
-        Experience experience = experienceRepository.findById(experienceId)
-                .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
+        Experience experience = experienceRepository.findById(experienceId).orElseThrow(() ->
+                GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
-        // 저장된 경험을 임시저장으로 돌리는 플로우 막는 로직
-        if(Status.SAVE.equals(experience.getMetaData().getStatus()) && Status.DRAFT.equals(Status.valueOf(updateRequestDto.getStatus()))) {
-            throw GeneralException.of(ErrorCode.INVALID_SAVE);
-        }
+        validateOwner(member, experience);
 
+        // update experience
+        experience.updateExperience(updateRequestDto);
 
-        if(!experience.getMember().getId().equals(currentMemberId))
-            throw GeneralException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
+        Map<Long, SubExperience> subExperienceMap = experience.getSubExperiences().stream()
+                .collect(Collectors.toMap(SubExperience::getId, subExperience -> subExperience));
 
-        // enum타입이 될 string 필드 검증 로직 (INVALID한 값이 들어오면 CustomException발생)
-        Status.validateStatus(updateRequestDto.getStatus());
-        FormType.validateFormType(updateRequestDto.getFormType());
-        ExperienceType.validateExperienceType(updateRequestDto.getExperienceType());
+        // update subExperience
+        List<SubExperience> updatedSubExperiences = updateRequestDto.getSubExperiences().stream()
+                .map(subExperienceDto ->
+                        experienceConverter.updateSubExperience(subExperienceMap, updateRequestDto, subExperienceDto))
+                .toList();
 
-        if(IS_QUALIFICATION.contains(ExperienceType.valueOf(updateRequestDto.getExperienceType()))) {
-            experience.updateToQualification(updateRequestDto);
-        } else {
-            // 아닐 때는 star, simple 나눠야함
-            switch (FormType.valueOf(updateRequestDto.getFormType())) {
-                case STAR_FORM -> experience.updateToStarForm(updateRequestDto);
-                case SIMPLE_FORM -> experience.updateToSimpleForm(updateRequestDto);
-            }
-            saveNonQualification(experience, updateRequestDto);
-        }
+        // mapping
+        setMapping(updatedSubExperiences, experience);
+
+        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience);
 
         experienceRepository.save(experience);
+    }
 
-        if(Status.valueOf(updateRequestDto.getStatus()).equals(Status.SAVE)) {
-            setSummaryAndDetailRecruit(experience);
+    private void validateOwner(Member member, Experience experience) {
+        if(!experience.getMember().getId().equals(member.getId())){
+            throw GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS);
         }
     }
 
-    private void saveNonQualification(Experience experience, ExperienceUpdateRequestDto updateRequestDto) {
-        Keyword.validateKeyword(updateRequestDto.getKeywords());
-        if(updateRequestDto.getKeywords() != null && !updateRequestDto.getKeywords().isEmpty()) {
-            List<Keyword> keywords = updateRequestDto.getKeywords().stream()
-                    .map(keywordStr -> Keyword.builder()
-                            .name(keywordStr)
-                            .experience(experience)
-                            .build())
-                    .collect(Collectors.toCollection(ArrayList::new));
-            experience.setKeywords(keywords);
-        }
-
-        if(Experience.isNeedFiles(updateRequestDto.getExperienceType())) {
-            List<File> files = updateRequestDto.getFiles().stream()
-                    .map(fileUrl -> File.builder()
-                            .fileUrl(fileUrl)
-                            .experience(experience)
-                            .build())
-                    .collect(Collectors.toCollection(ArrayList::new));
-            experience.setFiles(files);
-        }
+    // 경험 수정에서 사용됨
+    private void setMapping(List<SubExperience> subExperiences, Experience experience) {
+        experience.getSubExperiences().clear();
+        experience.getSubExperiences().addAll(subExperiences);
+        subExperiences.forEach(subExperience -> subExperience.setExperience(experience));
     }
 
     public void delete(Long experienceId) {
@@ -162,17 +96,16 @@ public class ExperienceService {
         if(!experience.getMember().getId().equals(currentMemberId)) {
             throw GeneralException.of(ErrorCode.NOT_YOUR_EXPERIENCE);
         }
-
         experienceRepository.delete(experience);
-    }
-
-    private void setSummaryAndDetailRecruit(Experience experience) {
-        openAiService.summarizeExperience(experience);
-        openAiService.getDetailRecruitFromExperience(experience);
     }
 
     public void deleteAll() {
         Member member = securityProvider.getCurrentMember();
         experienceRepository.deleteAllByMember(member);
+    }
+
+    private void setSummaryAndDetailRecruit(Experience experience) {
+        openAiService.summarizeExperience(experience);
+        openAiService.getDetailRecruitFromExperience(experience);
     }
 }

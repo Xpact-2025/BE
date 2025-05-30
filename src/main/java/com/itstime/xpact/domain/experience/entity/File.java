@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class File extends BaseEntity {
 
     @Id
+    @Column(name = "file_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -23,6 +24,6 @@ public class File extends BaseEntity {
     private String fileUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "experience_id")
-    private Experience experience;
+    @JoinColumn(name = "sub_experience_id")
+    private SubExperience subExperience;
 }

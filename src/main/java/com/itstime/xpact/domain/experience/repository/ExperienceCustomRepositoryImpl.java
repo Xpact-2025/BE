@@ -5,11 +5,14 @@ import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.QExperience;
 import com.itstime.xpact.domain.experience.entity.QKeyword;
+import com.itstime.xpact.domain.experience.entity.QSubExperience;
+import com.itstime.xpact.domain.member.entity.Member;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,7 +23,15 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Experience> findAllByMemberIdAndType(Long memberId, String order, List<ExperienceType> types) {
+    public List<Experience> findAllByMember(Member member, Sort sort) {
+        QExperience experience = QExperience.experience;
+
+        return queryFactory.selectFrom(experience)
+                .where(experience.member.id.eq(member.getId()))
+                .fetch();
+    }
+
+    public List<Experience> findAllByMemberAndType(Member member, String order, List<ExperienceType> types) {
         QExperience experience = QExperience.experience;
 
         OrderSpecifier<?> orderSpecifier = null;
@@ -32,12 +43,11 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         BooleanBuilder builder = new BooleanBuilder();
         for (ExperienceType type : types) {
-            builder.or(experience.metaData.experienceType.eq(type));
+            builder.or(experience.experienceType.eq(type));
         }
 
         return queryFactory.selectFrom(experience)
-                .where(experience.member.id.eq(memberId))
-                .where(builder)
+                .where(builder.and(experience.member.id.eq(member.getId())))
                 .orderBy(orderSpecifier)
                 .fetch();
     }
@@ -47,13 +57,14 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         return queryFactory.select(experience.summary)
                 .from(experience)
-                .where(experience.metaData.status.eq(Status.SAVE)
+                .where(experience.status.eq(Status.SAVE)
                         .and(experience.summary.isNotEmpty()))
                 .fetch();
     }
 
-    public List<Experience> queryExperience(String query) {
+    public List<Experience> queryExperience(Member member, String query) {
         QExperience experience = QExperience.experience;
+        QSubExperience subExperience = QSubExperience.subExperience;
         QKeyword keyword = QKeyword.keyword;
 
         BooleanBuilder condition = new BooleanBuilder();
@@ -61,13 +72,15 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
         if(query != null) {
             condition.and(
                     experience.title.containsIgnoreCase(query)
-                            .or(keyword.name.containsIgnoreCase(query))
+                        .or(experience.qualification.containsIgnoreCase(query))
+                        .or(keyword.name.containsIgnoreCase(query))
             );
         }
 
         return queryFactory.selectFrom(experience)
-                .leftJoin(experience.keywords, keyword).fetchJoin()
-                .where(condition)
+                .leftJoin(experience.subExperiences, subExperience)
+                .leftJoin(subExperience.keywords, keyword)
+                .where(condition.and(experience.member.id.eq(member.getId())))
                 .distinct()
                 .fetch();
     }

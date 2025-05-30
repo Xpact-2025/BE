@@ -70,11 +70,13 @@ public class Member extends BaseEntity {
     @Column(name = "desired_recruit")
     private String desiredRecruit;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Experience> experiences = new ArrayList<>();
-
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Scrap> scraps = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Experience> experiences = new ArrayList<>();
 
     @Builder
     public Member(String name, String email, String password, LocalDate birthDate, Integer age, Type type, Role role) {
