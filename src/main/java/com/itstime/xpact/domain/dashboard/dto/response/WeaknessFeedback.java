@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class WeaknessFeedback {
-    private String strengthName;
+    private String weaknessName;
     private String reason;
     private String improvementSuggestion;
 }
