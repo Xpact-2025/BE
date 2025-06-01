@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.scrap.entity;
+package com.itstime.xpact.domain.guide.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.member.entity.Member;
