@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 @Getter
 @Builder
-@RedisHash(value = "ratio", timeToLive = 60)
+@RedisHash(value = "ratio", timeToLive = 21600) // 6시간
 public class CoreSkillMap {
     @Id
     private Long id;
