@@ -1,21 +1,28 @@
 package com.itstime.xpact.global.openai;
 
+import com.itstime.xpact.domain.dashboard.repository.CoreSkillMapRepository;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
+import com.itstime.xpact.domain.guide.repository.WeaknessRepository;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,6 +31,7 @@ import java.util.stream.Collectors;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
+
     private final DetailRecruitRepository detailRecruitRepository;
     private final ExperienceRepository experienceRepository;
 
@@ -115,4 +123,25 @@ public class OpenAiServiceImpl implements OpenAiService {
                 .forEach(recruit -> recruits.append(", ").append(recruit.getName()));
         return recruits.toString();
     }
+
+    @Async
+    public CompletableFuture<String> analysisWeakness(String weakness, String experiences) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("다음은 나의 경험들에 대한 요약본이다.\n\n");
+        builder.append(experiences).append("\n");
+        builder.append("이에 대하여 나의 약점에 대한 원인 분석을 해주고, 피드백을 해줘. 나의 약점은 ").append(weakness).append("이다.\n");
+
+        PromptTemplate template = new PromptTemplate(String.valueOf(builder));
+
+        String message = template.render();
+
+        Message userMessage = new UserMessage(message);
+        Message systemMessage = new SystemMessage("350~400 byte 분량으로 답해라. 존댓말을 사용해라.");
+
+        String result = openAiChatModel.call(systemMessage, userMessage);
+
+        return CompletableFuture.completedFuture(result);
+    }
+
 }
