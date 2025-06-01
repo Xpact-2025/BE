@@ -98,6 +98,10 @@ public enum ErrorCode {
     // trie
     NO_SEARCH_RESULT(HttpStatus.NOT_FOUND, "TRE001", "검색 결과 조회된 데이터가 없습니다."),
 
+    // weakness
+    WEAKNESS_NOT_FOUND(HttpStatus.NOT_FOUND, "WE001", "해당 약점에 대한 DB 조회가 불가능합니다."),
+    NEED_ANALYSIS(HttpStatus.BAD_REQUEST, "WE002", "경험에 대한 분석을 우선으로 진행해주세요."),
+
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
     ;
