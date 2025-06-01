@@ -10,7 +10,8 @@ import com.itstime.xpact.domain.member.dto.response.EducationSaveResponseDto;
 import com.itstime.xpact.domain.member.dto.response.MemberSaveResponseDto;
 import com.itstime.xpact.domain.member.dto.response.MypageInfoResponseDto;
 import com.itstime.xpact.domain.recruit.dto.response.DesiredRecruitResponseDto;
-import com.itstime.xpact.domain.scrap.entity.Scrap;
+import com.itstime.xpact.domain.guide.entity.Scrap;
+import com.itstime.xpact.domain.guide.entity.Weakness;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -69,6 +70,9 @@ public class Member extends BaseEntity {
 
     @Column(name = "desired_recruit")
     private String desiredRecruit;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Weakness> weaknessList;
 
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
