@@ -37,6 +37,7 @@ public class GuideService {
 
         Member member = securityProvider.getCurrentMember();
 
+        // 경험 분석 우선 필요
         CoreSkillMap coreSkillMap = coreSkillMapRepository.findById(member.getId())
                 .orElseThrow(() -> CustomException.of(ErrorCode.NEED_ANALYSIS));
 
@@ -45,20 +46,20 @@ public class GuideService {
                 .sorted(Comparator.comparingDouble(SkillMapResponseDto.ScoreDto::getScore))
                 .limit(3)
                 .map(SkillMapResponseDto.ScoreDto::getCoreSkillName)
-                .collect(Collectors.toList());
+                .toList();
 
         weaknessRepository.deleteAllByMemberId(member.getId());
 
-        List<Weakness> newWeaknesses = lowestThreeSkillNames.stream()
-                .map(skillName -> {
-                    Weakness weakness = new Weakness();
-                    weakness.setMember(member);
-                    weakness.setName(skillName);
-                    return weakness;
-                })
-                .collect(Collectors.toList());
+        List<Weakness> weaknessList = lowestThreeSkillNames.stream()
+                .map(skillName -> new Weakness(member, skillName))
+                .toList();
 
-        weaknessRepository.saveAll(newWeaknesses);
+        // weakness가 3개가 아니라면 재검사 필요
+        if (weaknessList.size() != 3) {
+            throw CustomException.of(ErrorCode.NEED_ANALYSIS);
+        }
+
+        weaknessRepository.saveAll(weaknessList);
 
         String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
                 .collect(Collectors.joining("\n"));
@@ -67,7 +68,7 @@ public class GuideService {
             throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
         }
 
-        List<CompletableFuture<String>> futures = newWeaknesses.stream()
+        List<CompletableFuture<String>> futures = weaknessList.stream()
                 .map(w -> openAiService.analysisWeakness(w.getName(), experiences))
                 .collect(Collectors.toList());
 
@@ -75,11 +76,11 @@ public class GuideService {
                 .map(CompletableFuture::join)
                 .toList();
 
-        for (int i = 0; i < newWeaknesses.size(); i++) {
-            newWeaknesses.get(i).setExplanation(explanations.get(i));
+        for (int i = 0; i < 3; i++) {
+            weaknessList.get(i).setExplanation(explanations.get(i));
         }
 
-        weaknessRepository.saveAll(newWeaknesses);
+        weaknessRepository.saveAll(weaknessList);
     }
 
     @Transactional(readOnly = true)
