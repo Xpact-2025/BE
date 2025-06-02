@@ -5,11 +5,13 @@ import com.itstime.xpact.domain.guide.dto.WeaknessGuideResponseDto;
 import com.itstime.xpact.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Table(name = "weakness")
+@RequiredArgsConstructor
 public class Weakness extends BaseEntity {
 
     @Id @GeneratedValue
@@ -35,5 +37,10 @@ public class Weakness extends BaseEntity {
                 .weaknessName(weakness.getName())
                 .explanation(weakness.getExplanation())
                 .build();
+    }
+
+    public Weakness(Member member, String skillName) {
+        this.member = member;
+        this.name = skillName;
     }
 }
