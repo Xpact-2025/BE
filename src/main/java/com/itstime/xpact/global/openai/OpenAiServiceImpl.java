@@ -1,11 +1,9 @@
 package com.itstime.xpact.global.openai;
 
-import com.itstime.xpact.domain.dashboard.repository.CoreSkillMapRepository;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
-import com.itstime.xpact.domain.guide.repository.WeaknessRepository;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -137,7 +135,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         String message = template.render();
 
         Message userMessage = new UserMessage(message);
-        Message systemMessage = new SystemMessage("350~400 byte 분량으로 답해라. 존댓말을 사용해라.");
+        Message systemMessage = new SystemMessage("350~400 byte 분량으로 답하고 줄바꿈은 없다. 존댓말을 사용해라.");
 
         String result = openAiChatModel.call(systemMessage, userMessage);
 
