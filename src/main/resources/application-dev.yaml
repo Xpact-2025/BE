@@ -49,6 +49,7 @@ aws:
   credentials:
     access-key: ${DEV_AWS_ACCESS_KEY}
     secret-key: ${DEV_AWS_SECRET_KEY}
+    bucket: ${DEV_AWS_S3_BUCKET}
 
 json:
   exp-data: "/home/xpact/exp-demo.json"
