@@ -35,13 +35,7 @@ public class QueryExperienceService {
         Member member = securityProvider.getCurrentMember();
 
         if(types.get(0).equalsIgnoreCase("all")) {
-            Sort sort = null;
-            switch (order) {
-                case OLDEST -> sort = Sort.by(Sort.Direction.ASC, MODIFIED);
-                case LATEST -> sort = Sort.by(Sort.Direction.DESC, MODIFIED);
-            }
-
-            return experienceRepository.findAllByMember(member, sort)
+            return experienceRepository.findAllByMember(member, order)
                     .stream()
                     .map(ThumbnailExperienceWithkeywordResponseDto::of)
                     .toList();

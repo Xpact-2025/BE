@@ -23,11 +23,19 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Experience> findAllByMember(Member member, Sort sort) {
+    public List<Experience> findAllByMember(Member member, String order) {
         QExperience experience = QExperience.experience;
+
+        OrderSpecifier<?> orderSpecifier = null;
+        if(order.equals("LATEST")) {
+            orderSpecifier = new OrderSpecifier<>(Order.DESC, experience.modifiedTime);
+        } else if(order.equals("OLDEST")) {
+            orderSpecifier = new OrderSpecifier<>(Order.ASC, experience.modifiedTime);
+        }
 
         return queryFactory.selectFrom(experience)
                 .where(experience.member.id.eq(member.getId()))
+                .orderBy(orderSpecifier)
                 .fetch();
     }
 
