@@ -89,8 +89,12 @@ dependencies {
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.3'
 
+
+    implementation(platform("software.amazon.awssdk:bom:2.25.8"))
     // aws lambda
-    implementation 'software.amazon.awssdk:lambda:2.25.8'
+    implementation 'software.amazon.awssdk:lambda'
+    // aws s3
+    implementation 'software.amazon.awssdk:s3'
 }
 
 def queryDslSrcDir = 'build/generated/querydsl/'
