@@ -98,6 +98,8 @@ public enum ErrorCode {
     // trie
     NO_SEARCH_RESULT(HttpStatus.NOT_FOUND, "TRE001", "검색 결과 조회된 데이터가 없습니다."),
 
+    // file
+    NO_SUCH_FILE(HttpStatus.NOT_FOUND, "F001", "해당 파일은 존재하지 않습니다."),
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
     ;
