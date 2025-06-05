@@ -39,8 +39,9 @@ public class Weakness extends BaseEntity {
                 .build();
     }
 
-    public Weakness(Member member, String skillName) {
+    public Weakness(Member member, String skillName, String explanation) {
         this.member = member;
         this.name = skillName;
+        this.explanation = explanation;
     }
 }

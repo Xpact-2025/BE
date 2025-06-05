@@ -101,6 +101,7 @@ public enum ErrorCode {
     // weakness
     WEAKNESS_NOT_FOUND(HttpStatus.NOT_FOUND, "WE001", "해당 약점에 대한 DB 조회가 불가능합니다."),
     NEED_ANALYSIS(HttpStatus.BAD_REQUEST, "WE002", "경험에 대한 분석을 우선으로 진행해주세요."),
+    NEED_THREE_WEAKNESS(HttpStatus.BAD_REQUEST, "WE003", "약점에 대한 DB가 불충분합니다. 핵심스킬맵의 분석을 다시 진행해주세요."),
 
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),

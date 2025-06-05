@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,19 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class GuideController {
 
     private final GuideService guideService;
-
-    @Operation(summary = "약점에 대하여 분석을 요청 API", description = """
-            약점에 대하여 새로운 분석을 원할 때 요청할 수 있는 API입니다.<br>
-            약점의 디테일한 분석을 처음해보거나,<br>
-            경험을 갱신하고자 할 때 해당 요청을 보내주세요.
-            """)
-    @PostMapping("/weakness")
-    public ResponseEntity<RestResponse<?>> analysis() {
-        guideService.saveWeakness();
-        return ResponseEntity.ok(
-                RestResponse.ok()
-        );
-    }
 
     @Operation(summary = "약점에 대한 분석 조회 API", description = """
             약점에 대한 분석을 조회하고자 할 때 사용하는 API입니다.<br>
