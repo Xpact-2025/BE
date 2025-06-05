@@ -13,9 +13,11 @@ import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -32,55 +34,63 @@ public class GuideService {
     private final ExperienceRepository experienceRepository;
     private final CoreSkillMapRepository coreSkillMapRepository;
 
-    @Transactional
-    public void saveWeakness() {
+    @Async
+    public CompletableFuture<Void> saveWeakness(Member member) {
 
-        Member member = securityProvider.getCurrentMember();
+        return CompletableFuture.runAsync(() -> {
+            // 경험 분석 우선 필요
+            CoreSkillMap coreSkillMap = coreSkillMapRepository.findById(member.getId())
+                    .orElseThrow(() -> CustomException.of(ErrorCode.NEED_ANALYSIS));
 
-        // 경험 분석 우선 필요
-        CoreSkillMap coreSkillMap = coreSkillMapRepository.findById(member.getId())
-                .orElseThrow(() -> CustomException.of(ErrorCode.NEED_ANALYSIS));
+            List<String> lowestThreeSkillNames = coreSkillMap.getSkillMapDto().getCoreSkillMaps()
+                    .stream()
+                    .sorted(Comparator.comparingDouble(SkillMapResponseDto.ScoreDto::getScore))
+                    .limit(3)
+                    .map(SkillMapResponseDto.ScoreDto::getCoreSkillName)
+                    .toList();
 
-        List<String> lowestThreeSkillNames = coreSkillMap.getSkillMapDto().getCoreSkillMaps()
-                .stream()
-                .sorted(Comparator.comparingDouble(SkillMapResponseDto.ScoreDto::getScore))
-                .limit(3)
-                .map(SkillMapResponseDto.ScoreDto::getCoreSkillName)
-                .toList();
+            // weakness가 3개가 아니라면 재검사 필요
+            if (lowestThreeSkillNames.size() != 3) {
+                throw CustomException.of(ErrorCode.NEED_THREE_WEAKNESS);
+            }
 
-        weaknessRepository.deleteAllByMemberId(member.getId());
+            // 기존의 Weakness 조회
+            List<Weakness> existingWeakness = weaknessRepository.findByMemberId(member.getId());
 
-        List<Weakness> weaknessList = lowestThreeSkillNames.stream()
-                .map(skillName -> new Weakness(member, skillName))
-                .toList();
+            String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
+                    .collect(Collectors.joining("\n"));
 
-        // weakness가 3개가 아니라면 재검사 필요
-        if (weaknessList.size() != 3) {
-            throw CustomException.of(ErrorCode.NEED_ANALYSIS);
-        }
+            if (experiences == null || experiences.trim().isEmpty()) {
+                throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+            }
 
-        weaknessRepository.saveAll(weaknessList);
+            List<CompletableFuture<String>> futures = lowestThreeSkillNames.stream()
+                    .map(skillName -> openAiService.analysisWeakness(skillName, experiences))
+                    .toList();
 
-        String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
-                .collect(Collectors.joining("\n"));
+            List<String> explanations = futures.stream()
+                    .map(CompletableFuture::join)
+                    .toList();
 
-        if (experiences == null || experiences.trim().isEmpty()) {
-            throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
-        }
+            // Weakness 기존에 존재하지 않을 때 새로 저장
+            List<Weakness> savedWeakness = new ArrayList<>();
 
-        List<CompletableFuture<String>> futures = weaknessList.stream()
-                .map(w -> openAiService.analysisWeakness(w.getName(), experiences))
-                .collect(Collectors.toList());
+            for (int i = 0; i < 3; i++) {
+                String newName = lowestThreeSkillNames.get(i);
+                String explanation = explanations.get(i);
 
-        List<String> explanations = futures.stream()
-                .map(CompletableFuture::join)
-                .toList();
-
-        for (int i = 0; i < 3; i++) {
-            weaknessList.get(i).setExplanation(explanations.get(i));
-        }
-
-        weaknessRepository.saveAll(weaknessList);
+                if (i < existingWeakness.size()) {
+                    // 존재할 경우
+                    Weakness existing = existingWeakness.get(i);
+                    existing.setName(newName);
+                    existing.setExplanation(explanation);
+                } else {
+                    // 존재하지 않을 경우
+                    savedWeakness.add(new Weakness(member, newName, explanation));
+                    weaknessRepository.saveAll(savedWeakness);
+                }
+            }
+                });
     }
 
     @Transactional(readOnly = true)
