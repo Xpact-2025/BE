@@ -18,6 +18,7 @@ public class SkillMapResponseDto {
 
     @Data
     @Schema
+    @Getter
     public static class ScoreDto {
         @Schema(example = "직무에 따른 핵심역량 1~5")
         private String coreSkillName;
