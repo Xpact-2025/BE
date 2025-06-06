@@ -53,6 +53,7 @@ aws:
   credentials:
     access-key: ${LOCAL_AWS_ACCESS_KEY}
     secret-key: ${LOCAL_AWS_SECRET_KEY}
+    bucket: ${DEV_AWS_S3_BUCKET}
 
 json:
   exp-data: "src/main/resources/exp-demo.json"
