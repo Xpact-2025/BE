@@ -14,7 +14,7 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class Weakness extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "weakness_id")
     private long id;
 
