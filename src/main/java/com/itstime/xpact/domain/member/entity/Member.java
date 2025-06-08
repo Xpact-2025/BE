@@ -2,6 +2,7 @@ package com.itstime.xpact.domain.member.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.guide.entity.MemberScrap;
 import com.itstime.xpact.domain.member.common.ActiveStatus;
 import com.itstime.xpact.domain.member.common.Role;
 import com.itstime.xpact.domain.member.common.Type;
@@ -10,7 +11,6 @@ import com.itstime.xpact.domain.member.dto.response.EducationSaveResponseDto;
 import com.itstime.xpact.domain.member.dto.response.MemberSaveResponseDto;
 import com.itstime.xpact.domain.member.dto.response.MypageInfoResponseDto;
 import com.itstime.xpact.domain.recruit.dto.response.DesiredRecruitResponseDto;
-import com.itstime.xpact.domain.guide.entity.Scrap;
 import com.itstime.xpact.domain.guide.entity.Weakness;
 import jakarta.persistence.*;
 import lombok.*;
@@ -76,7 +76,7 @@ public class Member extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Scrap> scraps = new ArrayList<>();
+    private List<MemberScrap> memberScrapList = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
