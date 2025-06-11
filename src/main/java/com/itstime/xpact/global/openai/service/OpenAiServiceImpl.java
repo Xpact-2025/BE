@@ -1,11 +1,15 @@
-package com.itstime.xpact.global.openai;
+package com.itstime.xpact.global.openai.service;
 
+import com.itstime.xpact.domain.experience.dto.response.RecommendExperienceResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
+import com.itstime.xpact.domain.resume.dto.request.AiResumeRequestDto;
+import com.itstime.xpact.domain.resume.dto.request.RecommendExperienceRequestDto;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.openai.dto.response.ResumeResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -108,6 +113,21 @@ public class OpenAiServiceImpl implements OpenAiService {
         fresh.setDetailRecruit(detailRecruit);
         experienceRepository.save(fresh);
     }
+
+    /**
+     * 자기소개서 제목과 문항을 통해 기반으로 작성할 만한 사용자의 경험을 추천
+     */
+    public List<RecommendExperienceResponseDto> getRecommendExperience(RecommendExperienceRequestDto requestDto) {
+        return null;
+    }
+
+    /**
+     * 선택과 경험 키워드 및 문항을 중심으로 일정 글자의 자기소개서 생성
+     */
+    public ResumeResponseDto createResume(AiResumeRequestDto requestDto) {
+        return null;
+    }
+
 
     private String detailRecruitToString() {
         StringBuilder recruits = new StringBuilder();
