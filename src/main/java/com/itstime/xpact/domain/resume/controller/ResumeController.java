@@ -24,8 +24,9 @@ public class ResumeController {
     private final ResumeService resumeService;
 
     @Operation(description = "자기소개서 저장", summary = "AI로 생성된 자기소개서를 저장합니다.")
-    @PostMapping("/")
-    public ResponseEntity<RestResponse<?>> createResume(CreateResumeRequestDto createResumeRequestDto) {
+    @PostMapping("")
+    public ResponseEntity<RestResponse<?>> createResume(
+            @RequestBody CreateResumeRequestDto createResumeRequestDto) {
         resumeService.create(createResumeRequestDto);
         return ResponseEntity.ok(RestResponse.ok());
     }
@@ -56,20 +57,22 @@ public class ResumeController {
     }
 
     @Operation(description = "자기소개서 목록 조회", summary = "사용자의 모든 자기소개서를 조회합니다.")
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<RestResponse<List<ThumbnailResumeResponseDto>>> getAllResume() {
         return ResponseEntity.ok(RestResponse.ok(resumeService.readAll()));
     }
 
     @Operation(description = "추천 경험 조회", summary = "제목, 문항을 통해 자기소개서의 기반이 될 경험을 추천합니다.")
     @PostMapping("/ai-experience")
-    public ResponseEntity<RestResponse<List<RecommendExperienceResponseDto>>> generateAiResume(RecommendExperienceRequestDto requestDto) {
+    public ResponseEntity<RestResponse<List<RecommendExperienceResponseDto>>> generateAiResume(
+            @RequestBody RecommendExperienceRequestDto requestDto) {
         return ResponseEntity.ok(RestResponse.ok(resumeService.getRecommendExperience(requestDto)));
     }
 
     @Operation(description = "AI자기소개서 생성", summary = "작성한 제목, 문항, 경험, 키워드 등을 분석하여 자기소개서를 생성합니다.")
     @GetMapping("/ai-generate")
-    public ResponseEntity<RestResponse<?>> getAiRecommendExperience(AiResumeRequestDto aiResumeRequestDto) {
+    public ResponseEntity<RestResponse<?>> getAiRecommendExperience(
+            @RequestBody AiResumeRequestDto aiResumeRequestDto) {
         return ResponseEntity.ok(RestResponse.ok(resumeService.createResume(aiResumeRequestDto)));
     }
 }
