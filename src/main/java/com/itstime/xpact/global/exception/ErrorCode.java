@@ -98,9 +98,11 @@ public enum ErrorCode {
     // trie
     NO_SEARCH_RESULT(HttpStatus.NOT_FOUND, "TRE001", "검색 결과 조회된 데이터가 없습니다."),
 
+    // resume
+    RESUME_NOT_EXISTS(HttpStatus.BAD_REQUEST, "R001", "존재하지 않는 자기소개서입니다."),
+    NOT_YOUR_RESUME(HttpStatus.BAD_REQUEST, "R002" , "본인의 자기소개서가 아닙니다." ),
     // etc
-    INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
-    ;
+    INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."), ;
 
     private final HttpStatus httpStatus;
     private final String code;
