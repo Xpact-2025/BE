@@ -84,4 +84,13 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
                 .distinct()
                 .fetch();
     }
+
+    public List<Experience> findAllByIds(List<Long> experienceId, Member member) {
+        QExperience experience = QExperience.experience;
+
+        return queryFactory.selectFrom(experience)
+                .where(experience.id.in(experienceId)
+                        .and(experience.member.eq(member)))
+                .fetch();
+    }
 }

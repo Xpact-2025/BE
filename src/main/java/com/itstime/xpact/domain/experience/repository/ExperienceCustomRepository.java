@@ -16,4 +16,6 @@ public interface ExperienceCustomRepository {
     List<Experience> queryExperience(Member member, String query);
 
     List<Experience> findAllByMember(Member member, Sort sort);
+
+    List<Experience> findAllByIds(List<Long> experienceIds, Member member);
 }
