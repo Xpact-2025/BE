@@ -10,6 +10,7 @@ import com.itstime.xpact.domain.member.dto.response.EducationSaveResponseDto;
 import com.itstime.xpact.domain.member.dto.response.MemberSaveResponseDto;
 import com.itstime.xpact.domain.member.dto.response.MypageInfoResponseDto;
 import com.itstime.xpact.domain.recruit.dto.response.DesiredRecruitResponseDto;
+import com.itstime.xpact.domain.resume.entity.Resume;
 import com.itstime.xpact.domain.scrap.entity.Scrap;
 import jakarta.persistence.*;
 import lombok.*;
@@ -77,6 +78,10 @@ public class Member extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Experience> experiences = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Resume> resumes = new ArrayList<>();
 
     @Builder
     public Member(String name, String email, String password, LocalDate birthDate, Integer age, Type type, Role role) {
