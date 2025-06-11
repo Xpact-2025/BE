@@ -19,6 +19,7 @@ public class DetailResumeResponseDto {
     private String content;
 
     @Builder
+    @Getter
     static class ExperienceInfo {
         private Long id;
         private String title;
