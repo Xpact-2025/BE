@@ -49,6 +49,11 @@ public class Resume extends BaseEntity {
     private Member member;
 
     @Builder.Default
+    @JoinTable(
+            name = "resume_experience",
+            joinColumns = @JoinColumn(name = "resume_id"),
+            inverseJoinColumns = @JoinColumn(name = "experience_id")
+    )
     @OneToMany(fetch = FetchType.LAZY)
     private List<Experience> experiences = new ArrayList<>();
 
