@@ -22,7 +22,7 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"detailRecruit"})
+@ToString(exclude = {"status", "isEnded", "startDate", "endDate", "member", "subExperiences", "detailRecruit"})
 public class Experience extends BaseEntity {
 
     @Id
