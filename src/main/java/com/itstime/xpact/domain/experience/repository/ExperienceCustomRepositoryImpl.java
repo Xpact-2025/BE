@@ -93,4 +93,15 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
                         .and(experience.member.eq(member)))
                 .fetch();
     }
+
+    public List<Experience> findAllWithSubExperiencesByMember(Member member) {
+        QExperience experience = QExperience.experience;
+        QSubExperience subExperience = QSubExperience.subExperience;
+
+        return queryFactory.selectFrom(experience)
+                .distinct()
+                .leftJoin(experience.subExperiences, subExperience).fetchJoin()
+                .where(experience.member.eq(member))
+                .fetch();
+    }
 }

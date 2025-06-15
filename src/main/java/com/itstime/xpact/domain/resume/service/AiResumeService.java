@@ -39,8 +39,7 @@ public class AiResumeService {
 //                .map(document -> ((Number) document.getMetadata().get("experienceId")).longValue())
 //                .toList();
 
-
-        List<Experience> experiences = experienceRepository.findAllByMember(member);
+        List<Experience> experiences = experienceRepository.findAllWithSubExperiencesByMember(member);
         if(experiences.isEmpty()){
             throw GeneralException.of(ErrorCode.NOT_EXISTS_RECOMMENDABLE);
         }

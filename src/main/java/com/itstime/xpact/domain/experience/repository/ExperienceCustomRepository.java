@@ -18,4 +18,6 @@ public interface ExperienceCustomRepository {
     List<Experience> findAllByMember(Member member, Sort sort);
 
     List<Experience> findAllByIds(List<Long> experienceIds, Member member);
+
+    List<Experience> findAllWithSubExperiencesByMember(Member member);
 }
