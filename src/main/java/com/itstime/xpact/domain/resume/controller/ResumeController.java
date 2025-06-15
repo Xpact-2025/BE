@@ -8,6 +8,7 @@ import com.itstime.xpact.domain.resume.dto.request.UpdateResumeRequestDto;
 import com.itstime.xpact.domain.resume.dto.response.DetailResumeResponseDto;
 import com.itstime.xpact.domain.resume.dto.response.ThumbnailResumeResponseDto;
 import com.itstime.xpact.domain.resume.service.ResumeService;
+import com.itstime.xpact.global.openai.dto.response.ResumeResponseDto;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class ResumeController {
 
     @Operation(description = "자기소개서 조회", summary = "저장된 자기소개서를 조회합니다.")
     @GetMapping("/{resume_id}")
-    public ResponseEntity<RestResponse<?>> getResume(
+    public ResponseEntity<RestResponse<DetailResumeResponseDto>> getResume(
             @PathVariable("resume_id") Long resumeId) {
         DetailResumeResponseDto responseDto = resumeService.read(resumeId);
         return ResponseEntity.ok(RestResponse.ok(responseDto));
@@ -70,9 +71,8 @@ public class ResumeController {
     }
 
     @Operation(description = "AI자기소개서 생성", summary = "작성한 제목, 문항, 경험, 키워드 등을 분석하여 자기소개서를 생성합니다.")
-    @GetMapping("/ai-generate")
-    public ResponseEntity<RestResponse<?>> getAiRecommendExperience(
-            @RequestBody AiResumeRequestDto aiResumeRequestDto) {
+    @PostMapping("/ai-generate")
+    public ResponseEntity<RestResponse<ResumeResponseDto>> getAiRecommendExperience(@RequestBody AiResumeRequestDto aiResumeRequestDto) {
         return ResponseEntity.ok(RestResponse.ok(resumeService.createResume(aiResumeRequestDto)));
     }
 }
