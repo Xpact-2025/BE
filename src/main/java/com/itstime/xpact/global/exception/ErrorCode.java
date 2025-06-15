@@ -101,6 +101,8 @@ public enum ErrorCode {
     // resume
     RESUME_NOT_EXISTS(HttpStatus.BAD_REQUEST, "R001", "존재하지 않는 자기소개서입니다."),
     NOT_YOUR_RESUME(HttpStatus.BAD_REQUEST, "R002" , "본인의 자기소개서가 아닙니다." ),
+    NOT_EXISTS_RECOMMENDABLE(HttpStatus.BAD_REQUEST, "R003", "경험이 아예 존재하지 않거나, 추천할 만한 경험이 없습니다."),
+
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."), ;
 
