@@ -9,14 +9,11 @@ import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.resume.dto.request.AiResumeRequestDto;
 import com.itstime.xpact.domain.resume.dto.request.RecommendExperienceRequestDto;
-import com.itstime.xpact.global.chroma.repository.ChromaRepository;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.openai.dto.response.ResumeResponseDto;
 import com.itstime.xpact.global.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.converters.ResponseSupportConverter;
-import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
