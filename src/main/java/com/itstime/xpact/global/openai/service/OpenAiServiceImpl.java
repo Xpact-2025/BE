@@ -1,5 +1,6 @@
 package com.itstime.xpact.global.openai.service;
 
+import com.itstime.xpact.domain.experience.converter.ExperienceConverter;
 import com.itstime.xpact.domain.experience.dto.response.RecommendExperienceResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
@@ -12,6 +13,8 @@ import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.openai.dto.response.ResumeResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
+    private final ExperienceConverter experienceConverter;
     private final DetailRecruitRepository detailRecruitRepository;
     private final ExperienceRepository experienceRepository;
 
@@ -115,19 +119,82 @@ public class OpenAiServiceImpl implements OpenAiService {
     }
 
     /**
-     * 자기소개서 제목과 문항을 통해 기반으로 작성할 만한 사용자의 경험을 추천
+     *
+     * @param requestDto (자기소개서 제목, 문항, 글자 수)
+     * @param experiences (해당 experiences 중 추천)
+     * @return RecommendExperienceResponseDto (experience id, title, linkPoint(이유)
      */
-    public List<RecommendExperienceResponseDto> getRecommendExperience(RecommendExperienceRequestDto requestDto) {
-        return null;
+    public String getRecommendExperience(RecommendExperienceRequestDto requestDto, List<Experience> experiences) {
+        String experienceStr = experiencesToString(experiences).toString();
+
+        SystemMessage systemMessage = new SystemMessage("""
+                너는 JSON 응답만 출력하는 AI야. 아래 클래스 형식에 맞춰 응답해. (```json ``` 포함 엄금)
+                [
+                    {
+                      "id": long,
+                      "title": string,
+                      "linkPoint": string
+                    },
+                    {
+                      "id": long,
+                      "title": string,
+                      "linkPoint": string
+                    },
+                    ...
+                ]
+                반드시 JSON만 출력해. 설명이나 불필요한 텍스트 금지.""");
+
+        String userString = String.format("제목 : %s\n" + "문항 : %s\n" +
+                "을 분석하여 기반으로 작성할 만한 경험들을 1~3개정도 아래 경험 데이터에서 선택해줘, 응답 필드의 title은 선택한 경험의 title을 그대로 쓰고, linkPoint는 왜 그 경험을 선택했는지 서술해줘"
+                + "\n%s", requestDto.getTitle(), requestDto.getQuestion(), experienceStr);
+
+        UserMessage userMessage = new UserMessage(userString);
+
+        System.out.println("userMessage = " + userMessage);
+        Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
+        ChatResponse chatResponse = openAiChatModel.call(prompt);
+
+        String result = chatResponse.getResult().getOutput().getText();
+        log.info("result : {}", result);
+        return result;
     }
 
     /**
      * 선택과 경험 키워드 및 문항을 중심으로 일정 글자의 자기소개서 생성
      */
-    public ResumeResponseDto createResume(AiResumeRequestDto requestDto) {
-        return null;
+    public String createResume(AiResumeRequestDto requestDto, List<Experience> experiences) {
+        String experienceStr = experiencesToString(experiences).toString();
+
+        SystemMessage systemMessage = new SystemMessage("""
+                너는 JSON 응답만 출력하는 AI야. 아래 클래스 형식에 맞춰 응답해. (```json ``` 포함 엄금)
+                {
+                  "structure": string,
+                  "content": string,
+                }
+               반드시 JSON만 출력해. 설명이나 불필요한 텍스트 금지.""");
+
+        String userString = String.format("%s\n%s\n", requestDto.toString(), experienceStr +
+                "위 데이터를 분석하고, 주어진 경험 데이터를 참고하여 %d 분량의 자기소개서 문항을 작성해줘, 작성한 문항의 문단별로 정리하여 structure필드에 매핑하고, 문항은 content로 매핑하여 리턴해줘", requestDto.getLimit());
+
+        UserMessage userMessage = new UserMessage(userString);
+        Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
+        ChatResponse chatResponse = openAiChatModel.call(prompt);
+
+        String result = chatResponse.getResult().getOutput().getText();
+        log.info("result : {}", result);
+        return result;
     }
 
+    private StringBuilder experiencesToString(List<Experience> experiences) {
+        StringBuilder experienceString = new StringBuilder();
+        experiences.forEach(experience -> {
+            experienceString.append(experienceConverter.toText(experience));
+            experienceString.append(experienceConverter.toText(experience.getSubExperiences()));
+            experienceString.append("\n\n");
+        });
+
+        return experienceString;
+    }
 
     private String detailRecruitToString() {
         StringBuilder recruits = new StringBuilder();

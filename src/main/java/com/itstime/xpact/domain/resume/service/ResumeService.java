@@ -101,10 +101,12 @@ public class ResumeService {
     }
 
     public List<RecommendExperienceResponseDto> getRecommendExperience(RecommendExperienceRequestDto requestDto) {
-        return aiResumeService.getRecommendExperience(requestDto);
+        Member member = securityProvider.getCurrentMember();
+        return aiResumeService.getRecommendExperience(requestDto, member);
     }
 
     public ResumeResponseDto createResume(AiResumeRequestDto responseDto) {
-        return aiResumeService.createResume(responseDto);
+        Member member = securityProvider.getCurrentMember();
+        return aiResumeService.createResume(responseDto, member);
     }
 }

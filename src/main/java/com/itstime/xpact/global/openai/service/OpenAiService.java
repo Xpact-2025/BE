@@ -21,7 +21,7 @@ public interface OpenAiService {
     @Async("taskExecutor")
     void getDetailRecruitFromExperience(Experience experience);
 
-    ResumeResponseDto createResume(AiResumeRequestDto requestDto);
+    String createResume(AiResumeRequestDto requestDto, List<Experience> experiences);
 
-    List<RecommendExperienceResponseDto> getRecommendExperience(RecommendExperienceRequestDto requestDto);
+    String getRecommendExperience(RecommendExperienceRequestDto requestDto, List<Experience> experiences);
 }
