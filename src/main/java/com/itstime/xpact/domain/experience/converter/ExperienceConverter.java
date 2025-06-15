@@ -13,10 +13,10 @@ import com.itstime.xpact.domain.experience.entity.embeddable.SimpleForm;
 import com.itstime.xpact.domain.experience.entity.embeddable.StarForm;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALIFICATION;
 
@@ -121,6 +121,65 @@ public class ExperienceConverter {
         setKeywords(subExperience, subExperienceRequestDto.getKeywords());
 
         return subExperience;
+    }
+
+    public static final String[] ALLOW_EXPERIENCE_FIELDS = {"id", "experienceType", "title", "qualification", "publisher", "summary"};
+    public String toText(Experience experience) {
+        StringBuilder text = new StringBuilder();
+        for (Field field : experience.getClass().getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                if(List.of(ALLOW_EXPERIENCE_FIELDS).contains(field.getName()) && field.get(experience) != null) {
+                    text.append(field.getName()).append(": ").append(field.get(experience)).append("\n");                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return text.toString();
+    }
+
+    public static final String[] ALLOW_SUB_EXPERIENCE_FIELDS = {"subTitle", "simpleDescription"};
+    public static final String[] ALLOW_SUB_EXPERIENCE_EMBEDDABBLE = {"starForm", "simpleForm"};
+    public String toText(List<SubExperience> subExperiences) {
+        StringBuilder text = new StringBuilder();
+        for (SubExperience subExperience : subExperiences) {
+            for (Field field : subExperience.getClass().getDeclaredFields()) {
+                try {
+                    field.setAccessible(true);
+                    if(List.of(ALLOW_SUB_EXPERIENCE_EMBEDDABBLE).contains(field.getName()) && field.get(subExperience) != null) {
+                        text.append(embeddableToText(field.get(subExperience)));
+                    }
+                    else if(List.of(ALLOW_SUB_EXPERIENCE_FIELDS).contains(field.getName()) && field.get(subExperience) != null) {
+                        text.append(field.getName()).append(": ").append(field.get(subExperience)).append("\n");                }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return text.toString();
+    }
+
+    private String embeddableToText(Object obj) {
+        StringBuilder sb = new StringBuilder();
+        Class<?> clazz = obj.getClass();
+
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(obj);
+                if (value != null) {
+                    sb.append(field.getName()).append(": ").append(value).append("\n");
+                }
+            } catch (IllegalAccessException e) {
+                sb.append(field.getName()).append(": access error, ");
+            }
+        }
+
+        if (sb.length() > 2) {
+            sb.setLength(sb.length() - 1); // 마지막 ", " 제거
+        }
+
+        return sb.toString();
     }
 
     private void setFiles(SubExperience subExperience, List<String> files) {
