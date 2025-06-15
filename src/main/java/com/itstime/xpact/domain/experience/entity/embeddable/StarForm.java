@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StarForm {
 
-    @Column(name = "situation", length = 512)
+    @Column(name = "situation", length = 1024)
     private String situation;
-    @Column(name = "task", length = 512)
+    @Column(name = "task", length = 1024)
     private String task;
-    @Column(name = "action", length = 512)
+    @Column(name = "action", length = 1024)
     private String action;
-    @Column(name = "result", length = 512)
+    @Column(name = "result", length = 1024)
     private String result;
 }
