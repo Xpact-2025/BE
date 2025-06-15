@@ -27,7 +27,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class AiResumeService {
 
-    private final ChromaRepository chromaRepository;
     private final OpenAiService openAiService;
     private final ExperienceRepository experienceRepository;
     private final ObjectMapper objectMapper;
