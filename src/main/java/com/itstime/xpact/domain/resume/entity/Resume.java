@@ -41,7 +41,7 @@ public class Resume extends BaseEntity {
     @Column(name = "structure")
     private String structure;
 
-    @Column(name = "content")
+    @Column(name = "content", length = 1024)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
