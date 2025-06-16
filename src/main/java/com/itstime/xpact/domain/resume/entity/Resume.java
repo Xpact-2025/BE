@@ -4,7 +4,6 @@ import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.resume.converter.RecommendExperienceListConverter;
-import com.itstime.xpact.domain.resume.dto.request.CreateResumeRequestDto;
 import com.itstime.xpact.domain.resume.dto.request.UpdateResumeRequestDto;
 import com.itstime.xpact.domain.resume.entity.embeddable.RecommendExperience;
 import jakarta.persistence.*;

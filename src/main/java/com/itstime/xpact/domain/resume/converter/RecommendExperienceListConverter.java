@@ -1,9 +1,7 @@
 package com.itstime.xpact.domain.resume.converter;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.resume.entity.embeddable.RecommendExperience;
 import com.itstime.xpact.global.exception.ErrorCode;
@@ -30,7 +28,7 @@ public class RecommendExperienceListConverter implements AttributeConverter<List
 
     public List<RecommendExperience> convertToEntityAttribute(String dbData) {
         try {
-            return objectMapper.readValue(dbData, new TypeReference<List<RecommendExperience>>() {});
+            return objectMapper.readValue(dbData, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw GeneralException.of(ErrorCode.PARSING_ERROR);
         }

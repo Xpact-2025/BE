@@ -30,13 +30,12 @@ public class CreateResumeRequestDto {
 
     public static List<RecommendExperience> of(List<RecommendExperienceDto> recommendExperienceDtos) {
         return recommendExperienceDtos.stream()
-                .map(recommendExperienceDto -> {
-                    return RecommendExperience.builder()
+                .map(recommendExperienceDto ->
+                        RecommendExperience.builder()
                             .id(recommendExperienceDto.getId())
                             .title(recommendExperienceDto.getTitle())
                             .linkPoint(recommendExperienceDto.getLinkPoint())
-                            .build();
-                })
+                            .build())
                 .toList();
     }
 }
