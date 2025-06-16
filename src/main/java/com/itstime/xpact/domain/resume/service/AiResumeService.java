@@ -11,7 +11,7 @@ import com.itstime.xpact.domain.resume.dto.request.AiResumeRequestDto;
 import com.itstime.xpact.domain.resume.dto.request.RecommendExperienceRequestDto;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
-import com.itstime.xpact.global.openai.dto.response.ResumeResponseDto;
+import com.itstime.xpact.global.openai.dto.response.AiResumeResponseDto;
 import com.itstime.xpact.global.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -56,12 +56,12 @@ public class AiResumeService {
     }
 
     // requestDto의 필드 값으로 문항 생성
-    public ResumeResponseDto createResume(AiResumeRequestDto requestDto, Member member) {
+    public AiResumeResponseDto createResume(AiResumeRequestDto requestDto, Member member) {
         List<Experience> experiences = experienceRepository.findAllByIds(requestDto.getExperienceIds(), member);
 
         String result = openAiService.createResume(requestDto, experiences);
 
-        ResumeResponseDto responseDto;
+        AiResumeResponseDto responseDto;
         try {
             responseDto = objectMapper.readValue(result, new TypeReference<>() {});
         } catch (JsonProcessingException e) {

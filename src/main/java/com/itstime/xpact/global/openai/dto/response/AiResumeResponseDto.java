@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ResumeResponseDto {
+public class AiResumeResponseDto {
     private String structure;
     private String content;
 }

@@ -15,7 +15,7 @@ import com.itstime.xpact.domain.resume.repository.ResumeRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
-import com.itstime.xpact.global.openai.dto.response.ResumeResponseDto;
+import com.itstime.xpact.global.openai.dto.response.AiResumeResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -105,7 +105,7 @@ public class ResumeService {
         return aiResumeService.getRecommendExperience(requestDto, member);
     }
 
-    public ResumeResponseDto createResume(AiResumeRequestDto responseDto) {
+    public AiResumeResponseDto createResume(AiResumeRequestDto responseDto) {
         Member member = securityProvider.getCurrentMember();
         return aiResumeService.createResume(responseDto, member);
     }

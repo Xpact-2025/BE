@@ -1,7 +1,6 @@
 package com.itstime.xpact.global.openai.service;
 
 import com.itstime.xpact.domain.experience.converter.ExperienceConverter;
-import com.itstime.xpact.domain.experience.dto.response.RecommendExperienceResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
@@ -10,7 +9,6 @@ import com.itstime.xpact.domain.resume.dto.request.AiResumeRequestDto;
 import com.itstime.xpact.domain.resume.dto.request.RecommendExperienceRequestDto;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.openai.dto.response.ResumeResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.SystemMessage;
