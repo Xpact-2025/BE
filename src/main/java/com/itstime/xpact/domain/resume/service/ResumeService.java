@@ -42,6 +42,7 @@ public class ResumeService {
                 .question(createResumeRequestDto.getQuestion())
                 .limit(createResumeRequestDto.getLimit())
                 .experiences(experiences)
+                .recommendExperiences(CreateResumeRequestDto.of(createResumeRequestDto.getRecommendExperiences()))
                 .keywords(createResumeRequestDto.getKeywords())
                 .structure(createResumeRequestDto.getStructure())
                 .content(createResumeRequestDto.getContent())

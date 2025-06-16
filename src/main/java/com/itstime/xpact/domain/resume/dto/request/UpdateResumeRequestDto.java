@@ -10,7 +10,6 @@ public class UpdateResumeRequestDto {
     private String title;
     private String question;
     private Integer limit;
-    private List<String> keywords;
     private String structure;
     private String content;
 }

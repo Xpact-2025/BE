@@ -3,7 +3,10 @@ package com.itstime.xpact.domain.resume.entity;
 import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.member.entity.Member;
+import com.itstime.xpact.domain.resume.converter.RecommendExperienceListConverter;
+import com.itstime.xpact.domain.resume.dto.request.CreateResumeRequestDto;
 import com.itstime.xpact.domain.resume.dto.request.UpdateResumeRequestDto;
+import com.itstime.xpact.domain.resume.entity.embeddable.RecommendExperience;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +41,10 @@ public class Resume extends BaseEntity {
     @Column(name = "keywords")
     private List<String> keywords;
 
+    @Column(name = "recommend_experiences")
+    @Convert(converter = RecommendExperienceListConverter.class)
+    private List<RecommendExperience>  recommendExperiences;
+
     @Column(name = "structure")
     private String structure;
 
@@ -63,7 +70,6 @@ public class Resume extends BaseEntity {
         this.title = updateResumeRequestDto.getTitle();
         this.question = updateResumeRequestDto.getQuestion();
         this.limit = updateResumeRequestDto.getLimit();
-        this.keywords = updateResumeRequestDto.getKeywords();
         this.structure = updateResumeRequestDto.getStructure();
         this.content = updateResumeRequestDto.getContent();
     }
