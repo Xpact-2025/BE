@@ -96,11 +96,13 @@ public class OpenAiServiceImpl implements OpenAiService {
         String experienceStr = experience.toString();
         String recruits = detailRecruitToString();
         String message = String.format(
-                "다음 객체를 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.\n" +
-                        "객체: %s\n" +
-                        "recruit (각 recruit는 '/'로 분리되어 있음) : %s\n" +
-                        "출력 형식 : {recruit}\n" +
-                        "출력 시 다른 문구 넣지 말고 그저 선택한 recruit만 출력해야함",
+                """     
+                        다음 객체를 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.
+                        객체: %s
+                        recruit (각 recruit는 '/'로 분리되어 있음) : %s
+                        출력 형식 : {recruit}
+                        출력 시 다른 문구 넣지 말고 그저 선택한 recruit만 출력해야함
+                """,
                 experienceStr, recruits
         );
 
@@ -142,9 +144,11 @@ public class OpenAiServiceImpl implements OpenAiService {
                 ]
                 반드시 JSON만 출력해. 설명이나 불필요한 텍스트 금지.""");
 
-        String userString = String.format("제목 : %s\n" + "문항 : %s\n" +
-                "을 분석하여 기반으로 작성할 만한 경험들을 1~3개정도 아래 경험 데이터에서 선택해줘, 응답 필드의 title은 선택한 경험의 title을 그대로 쓰고, linkPoint는 왜 그 경험을 선택했는지 서술해줘"
-                + "\n%s", requestDto.getTitle(), requestDto.getQuestion(), experienceStr);
+        String userString = String.format("""
+                제목 : %s
+                문항 : %s
+                을 분석하여 기반으로 작성할 만한 경험들을 1~3개정도 아래 경험 데이터에서 선택해줘, 응답 필드의 title은 선택한 경험의 title을 그대로 쓰고, linkPoint는 왜 그 경험을 선택했는지 서술해줘\
+                %s""", requestDto.getTitle(), requestDto.getQuestion(), experienceStr);
 
         UserMessage userMessage = new UserMessage(userString);
 
@@ -171,8 +175,10 @@ public class OpenAiServiceImpl implements OpenAiService {
                 }
                반드시 JSON만 출력해. 설명이나 불필요한 텍스트 금지.""");
 
-        String userString = String.format("%s\n%s\n", requestDto.toString(), experienceStr +
-                "위 데이터를 분석하고, 주어진 경험 데이터를 참고하여 %d 분량의 자기소개서 문항을 작성해줘, 작성한 문항의 문단별로 정리하여 structure필드에 매핑하고, 문항은 content로 매핑하여 리턴해줘", requestDto.getLimit());
+        String userString = String.format("""
+                %s
+                %s
+                위 데이터를 분석하고, 주어진 경험 데이터를 참고하여 %d 분량의 자기소개서 문항을 작성해줘, 작성한 문항의 문단별로 정리하여 structure필드에 매핑하고, 문항은 content로 매핑하여 리턴해줘""", requestDto.toString(), experienceStr, requestDto.getLimit());
 
         UserMessage userMessage = new UserMessage(userString);
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));

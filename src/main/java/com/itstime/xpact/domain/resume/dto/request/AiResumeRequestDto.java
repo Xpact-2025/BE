@@ -19,7 +19,6 @@ public class AiResumeRequestDto {
     public String toString() {
         return "title='" + title + '\'' +
                 "question='" + question + '\'' +
-                "limit=" + limit +
                 "keywords=" + keywords;
     }
 }
