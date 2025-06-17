@@ -11,7 +11,7 @@ import com.itstime.xpact.domain.resume.dto.request.AiResumeRequestDto;
 import com.itstime.xpact.domain.resume.dto.request.RecommendExperienceRequestDto;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
-import com.itstime.xpact.global.openai.dto.response.AiResumeResponseDto;
+import com.itstime.xpact.domain.resume.dto.response.AiResumeResponseDto;
 import com.itstime.xpact.global.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

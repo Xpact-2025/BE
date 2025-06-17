@@ -8,7 +8,7 @@ import com.itstime.xpact.domain.resume.dto.request.UpdateResumeRequestDto;
 import com.itstime.xpact.domain.resume.dto.response.DetailResumeResponseDto;
 import com.itstime.xpact.domain.resume.dto.response.ThumbnailResumeResponseDto;
 import com.itstime.xpact.domain.resume.service.ResumeService;
-import com.itstime.xpact.global.openai.dto.response.AiResumeResponseDto;
+import com.itstime.xpact.domain.resume.dto.response.AiResumeResponseDto;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

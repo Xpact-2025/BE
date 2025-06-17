@@ -1,4 +1,4 @@
-package com.itstime.xpact.global.openai.dto.response;
+package com.itstime.xpact.domain.resume.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
