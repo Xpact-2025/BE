@@ -34,7 +34,6 @@ public class ResumeService {
 
     @Transactional
     public void create(CreateResumeRequestDto createResumeRequestDto) {
-        System.out.println("experienceIds = " + createResumeRequestDto.getExperienceIds());
         Member member = securityProvider.getCurrentMember();
         List<Experience> experiences = experienceRepository.findAllByIds(createResumeRequestDto.getExperienceIds(), member);
         Resume resume = Resume.builder()

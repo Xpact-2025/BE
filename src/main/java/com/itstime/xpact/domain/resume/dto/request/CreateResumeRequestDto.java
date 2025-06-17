@@ -1,6 +1,6 @@
 package com.itstime.xpact.domain.resume.dto.request;
 
-import com.itstime.xpact.domain.resume.entity.embeddable.RecommendExperience;
+import com.itstime.xpact.domain.resume.entity.Resume;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,10 +28,10 @@ public class CreateResumeRequestDto {
         private String linkPoint;
     }
 
-    public static List<RecommendExperience> of(List<RecommendExperienceDto> recommendExperienceDtos) {
+    public static List<Resume.RecommendExperience> of(List<RecommendExperienceDto> recommendExperienceDtos) {
         return recommendExperienceDtos.stream()
                 .map(recommendExperienceDto ->
-                        RecommendExperience.builder()
+                        Resume.RecommendExperience.builder()
                             .id(recommendExperienceDto.getId())
                             .title(recommendExperienceDto.getTitle())
                             .linkPoint(recommendExperienceDto.getLinkPoint())
