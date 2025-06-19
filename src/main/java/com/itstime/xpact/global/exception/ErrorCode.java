@@ -57,6 +57,7 @@ public enum ErrorCode {
     FAILED_OPENAI_PARSING(HttpStatus.BAD_REQUEST, "OPENAI002", "OpenAI의 응답을 파싱할 수 없습니다."),
     FILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "OPENAI003", "업로드할 파일이 존재하지 않습니다."),
     UNMATCHED_OPENAI_FORMAT(HttpStatus.BAD_REQUEST, "OPENAI004", "OpenAI 응답이 형식에 맞지 않습니다."),
+    INVALID_DATA(HttpStatus.BAD_REQUEST, "OPENAI005", "데이터가 부족하여 유의미한 분석을 할 수 없습니다."),
 
     // crawling
     CRAWLING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CRAWL001", "Crawling Error"),

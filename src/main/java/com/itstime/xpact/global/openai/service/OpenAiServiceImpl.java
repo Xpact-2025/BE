@@ -34,17 +34,25 @@ public class OpenAiServiceImpl implements OpenAiService {
     private final DetailRecruitRepository detailRecruitRepository;
     private final ExperienceRepository experienceRepository;
 
+    private static final String INVALID_INPUT = "INVALID_INPUT";
+
     @Async
     public void summarizeExperience(Experience experience) {
-        String message = String.format("""
-                역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘\s
-                요약만 출력되도록 해줘\s
-                data : %s""", experience.toString());
+        String message = String.format(
+                """
+                    다음 주어질 경험에 대해 역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘
+                    요약만 출력되도록 해줘
+                    만약 주어진 경험이 요약하기 충분하지 않은 경우, 'INVALID_INPUT'를 출력하시오.
+                    data : %s
+                """,
+                experience.toString());
 
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
         String summary = response.getResult().getOutput().getText();
         log.info("summary : {}", summary);
+
+        if(summary.contains(INVALID_INPUT)) throw GeneralException.of(ErrorCode.INVALID_DATA);
 
         Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow();
 
@@ -94,14 +102,15 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     public void getDetailRecruitFromExperience(Experience experience) {
         String experienceStr = experience.toString();
-        String recruits = detailRecruitToString();
+        List<String> recruits = detailRecruitToString();
         String message = String.format(
                 """     
-                        다음 객체를 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.
-                        객체: %s
+                        다음 경험을 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.
+                        경험: %s
                         recruit (각 recruit는 '/'로 분리되어 있음) : %s
                         출력 형식 : {recruit}
                         출력 시 다른 문구 넣지 말고 그저 선택한 recruit만 출력해야함
+                        만약, 주어진 경험이 분석하기 충분치 않거나 해당하는 recruit가 없는 경우, 'INVALID_INPUT'을 출력하시오.
                 """,
                 experienceStr, recruits
         );
@@ -109,6 +118,9 @@ public class OpenAiServiceImpl implements OpenAiService {
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
         String result = response.getResult().getOutput().getText();
+
+        if(result.contains(INVALID_INPUT)) throw GeneralException.of(ErrorCode.INVALID_DATA);
+
         log.info("result : {}", result);
         DetailRecruit detailRecruit = detailRecruitRepository.findByName(result).orElseThrow(() ->
                 GeneralException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND));
@@ -147,8 +159,10 @@ public class OpenAiServiceImpl implements OpenAiService {
         String userString = String.format("""
                 제목 : %s
                 문항 : %s
-                을 분석하여 기반으로 작성할 만한 경험들을 1~3개정도 아래 경험 데이터에서 선택해줘, 응답 필드의 title은 선택한 경험의 title을 그대로 쓰고, linkPoint는 왜 그 경험을 선택했는지 서술해줘\
-                %s""", requestDto.getTitle(), requestDto.getQuestion(), experienceStr);
+                을 분석하여 기반으로 작성할 만한 경험들을 1~3개정도 아래 경험 데이터에서 선택해줘, 응답 필드의 title은 선택한 경험의 title을 그대로 쓰고, linkPoint는 왜 그 경험을 선택했는지 서술해줘
+                만약 추천할만한 경험 데이터가 존재하지 않는 경우, 'INVALID_INPUT'을 출력하시오.
+                %s
+                """, requestDto.getTitle(), requestDto.getQuestion(), experienceStr);
 
         UserMessage userMessage = new UserMessage(userString);
 
@@ -158,6 +172,8 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         String result = chatResponse.getResult().getOutput().getText();
         log.info("result : {}", result);
+
+        if(result.contains(INVALID_INPUT)) throw GeneralException.of(ErrorCode.INVALID_DATA);
         return result;
     }
 
@@ -178,7 +194,10 @@ public class OpenAiServiceImpl implements OpenAiService {
         String userString = String.format("""
                 %s
                 %s
-                위 데이터를 분석하고, 주어진 경험 데이터를 참고하여 %d 분량의 자기소개서 문항을 작성해줘, 작성한 문항의 문단별로 정리하여 structure필드에 매핑하고, 문항은 content로 매핑하여 리턴해줘""", requestDto.toString(), experienceStr, requestDto.getLimit());
+                위 데이터를 분석하고, 주어진 경험 데이터를 참고하여 %d 분량의 자기소개서 문항을 작성해줘,
+                작성한 문항의 문단별로 정리하여 structure필드에 매핑하고, 문항은 content로 매핑하여 리턴해줘
+                만약 요청한 분량만큼의 자기소개서를 작성하기 어렵다면, 분량을 줄이고, 만약 그래도 어렵다면 'INVALID_INPUT'을 출력하시오.
+                """, requestDto.toString(), experienceStr, requestDto.getLimit());
 
         UserMessage userMessage = new UserMessage(userString);
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
@@ -186,6 +205,8 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         String result = chatResponse.getResult().getOutput().getText();
         log.info("result : {}", result);
+
+        if(result.contains(INVALID_INPUT)) throw GeneralException.of(ErrorCode.INVALID_DATA);
         return result;
     }
 
@@ -200,10 +221,10 @@ public class OpenAiServiceImpl implements OpenAiService {
         return experienceString;
     }
 
-    private String detailRecruitToString() {
-        StringBuilder recruits = new StringBuilder();
+    private List<String> detailRecruitToString() {
+        List<String> recruits = new ArrayList<>();
         detailRecruitRepository.findAll()
-                .forEach(recruit -> recruits.append(", ").append(recruit.getName()));
-        return recruits.toString();
+                .forEach(recruit -> recruits.add(recruit.getName()));
+        return recruits;
     }
 }
