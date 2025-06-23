@@ -71,12 +71,14 @@ public class SubExperience extends BaseEntity {
 
     public void updateSubFields(ExperienceUpdateRequestDto.SubExperienceRequestDto targetExperience, ExperienceType experienceType) {
         if(IS_QUALIFICATION.contains(experienceType)) {
+            this.tabName = targetExperience.getTabName();
             this.subTitle = targetExperience.getSubTitle();
             this.formType = FormType.valueOf(targetExperience.getFormType());
             this.simpleDescription = targetExperience.getSimpleDescription();
         } else {
             switch (FormType.valueOf(targetExperience.getFormType())) {
                 case STAR_FORM -> {
+                    this.tabName = targetExperience.getTabName();
                     this.subTitle = targetExperience.getSubTitle();
                     this.formType = FormType.valueOf(targetExperience.getFormType());
                     this.starForm = StarForm.builder()
@@ -87,6 +89,7 @@ public class SubExperience extends BaseEntity {
                             .build();
                 }
                 case SIMPLE_FORM -> {
+                    this.tabName = targetExperience.getTabName();
                     this.subTitle = targetExperience.getSubTitle();
                     this.formType = FormType.valueOf(targetExperience.getFormType());
                     this.simpleForm = SimpleForm.builder()
