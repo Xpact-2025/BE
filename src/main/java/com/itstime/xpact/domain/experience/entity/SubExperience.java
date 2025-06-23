@@ -31,6 +31,9 @@ public class SubExperience extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private FormType formType;
 
+    @Column(name = "tab_name")
+    private String tabName;
+
     @Column(name = "sub_title")
     private String subTitle;
 
