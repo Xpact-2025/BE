@@ -46,6 +46,8 @@ public class ExperienceCreateRequestDto {
     public static class SubExperienceRequestDto {
         @Schema(description = "경험 양식 지정 (Star양식 or 간결 양식)", example = "STAR_FORM")
         private String formType;
+        @Schema(description = "탭 이름")
+        private String tabName;
         @Schema(description = "세부 경험")
         private String subTitle;
 

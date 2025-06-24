@@ -65,6 +65,8 @@ public class RatioService {
         RecruitCount recruitCount = recruitCountRepository.findById(memberId)
                 .orElseGet(() -> setCounts(memberId));
 
+        if(recruitCount.getRecruitCount().isEmpty()) throw GeneralException.of(ErrorCode.NO_EXPERIENCE);
+
         log.info("get count from redis");
         return recruitCount.getRecruitCount().entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue()

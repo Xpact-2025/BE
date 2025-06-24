@@ -16,6 +16,13 @@ spring:
       hibernate:
         highlight_sql: true # 색상 부여
 
+  jwt:
+    refresh:
+      expiration: 604800 # 7일
+    access:
+      expiration: 86400 # 1일
+    secret: ${JWT_SECRET_KEY}
+
   data:
     redis:
       host: localhost
@@ -46,6 +53,7 @@ aws:
   credentials:
     access-key: ${LOCAL_AWS_ACCESS_KEY}
     secret-key: ${LOCAL_AWS_SECRET_KEY}
+    bucket: ${DEV_AWS_S3_BUCKET}
 
 json:
   exp-data: "src/main/resources/exp-demo.json"

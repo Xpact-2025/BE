@@ -20,6 +20,13 @@ spring:
     ansi:
       enabled: always # 서버에서 색상 부여
 
+  jwt:
+    refresh:
+      expiration: 604800 # 7일
+    access:
+      expiration: 1800 # 30분 임시 변경
+    secret: ${JWT_SECRET_KEY}
+
   data:
     redis:
       host: ${DEV_REDIS_HOST}
@@ -49,6 +56,7 @@ aws:
   credentials:
     access-key: ${DEV_AWS_ACCESS_KEY}
     secret-key: ${DEV_AWS_SECRET_KEY}
+    bucket: ${DEV_AWS_S3_BUCKET}
 
 json:
   exp-data: "/home/xpact/exp-demo.json"

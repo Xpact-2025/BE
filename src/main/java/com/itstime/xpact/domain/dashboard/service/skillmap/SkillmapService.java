@@ -4,6 +4,7 @@ import com.itstime.xpact.domain.dashboard.dto.response.SkillMapResponseDto;
 import com.itstime.xpact.domain.dashboard.entity.CoreSkillMap;
 import com.itstime.xpact.domain.dashboard.repository.CoreSkillMapRepository;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
+import com.itstime.xpact.domain.guide.service.GuideService;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.domain.recruit.entity.CoreSkill;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
@@ -31,6 +32,8 @@ public class SkillmapService {
     private final CoreSkillMapRepository coreSkillMapRepository;
 
     private final LambdaOpenAiClient lambdaOpenAiClient;
+
+    private final GuideService guideService;
 
     public CompletableFuture<SkillMapResponseDto> evaluate(Member member) {
 
@@ -74,6 +77,13 @@ public class SkillmapService {
                             .id(member.getId())
                             .skillMapDto(resultDto).build();
                     coreSkillMapRepository.save(coreSkillMap);
+
+                    guideService.saveWeakness(member)
+                            .exceptionally(ex -> {
+                                log.warn("Weakness 결과 저장 중 오류 발생", ex);
+                                return null;
+                            });
+
                     return resultDto;
                 });
     }

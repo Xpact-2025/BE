@@ -5,6 +5,7 @@ import com.itstime.xpact.domain.experience.common.ExperienceType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.Keyword;
+import com.itstime.xpact.domain.experience.entity.SubExperience;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,6 +23,7 @@ public class ThumbnailExperienceWithkeywordResponseDto {
     private LocalDateTime draftTime;
     private Status status;
     private List<String> keywords;
+    private List<String> subTitles;
 
     public static ThumbnailExperienceWithkeywordResponseDto of(Experience experience) {
         return ThumbnailExperienceWithkeywordResponseDto.builder()
@@ -35,6 +37,9 @@ public class ThumbnailExperienceWithkeywordResponseDto {
                         .map(Keyword::getName)
                         .collect(Collectors.toSet())
                         .stream().toList())
+                .subTitles(experience.getSubExperiences().stream()
+                        .map(SubExperience::getSubTitle)
+                        .toList())
                 .build();
     }
 }
