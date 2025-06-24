@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "scrap")
@@ -79,6 +80,9 @@ public class Scrap extends BaseEntity {
 
     @Embedded
     private ScrapActivity scrapActivity;
+
+    @OneToMany(mappedBy = "scrap")
+    private List<MemberScrap> MemberScrapList;
 
     public void validateScrapType() {
         switch (this.scrapType) {
