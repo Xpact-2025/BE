@@ -76,6 +76,9 @@ public enum ErrorCode {
     KEYWORD_EXCEEDED(HttpStatus.BAD_REQUEST, "EXP009", "키워드는 5개를 넘길 수 없습니다."),
     KEYWORD_TOO_LONG(HttpStatus.BAD_REQUEST, "EXP010", "키워드는 10글자를 넘길 수 없습니다."),
 
+    // ratio
+    NO_EXPERIENCE(HttpStatus.BAD_REQUEST, "RAT001", "분석할 경험이 없습니다."),
+
     // coreSkill
     NOT_FOUND_CORESKILLS(HttpStatus.BAD_REQUEST, "CSE001", "해당 핵심 역량을 불러오는 데에 실패했습니다."),
 

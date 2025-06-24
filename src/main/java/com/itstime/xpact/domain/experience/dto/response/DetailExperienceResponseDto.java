@@ -38,6 +38,7 @@ public class DetailExperienceResponseDto {
     public static class SubExperienceResponseDto {
         private Long subExperienceId;
         private FormType formType;
+        private String tabName;
         private String subTitle;
 
         // STAR 양식 부분
@@ -86,6 +87,7 @@ public class DetailExperienceResponseDto {
                         subExperienceResponseDto = SubExperienceResponseDto.builder()
                                 .subExperienceId(subExperience.getId())
                                 .formType(subExperience.getFormType())
+                                .tabName(subExperience.getTabName())
                                 .subTitle(subExperience.getSubTitle())
                                 .simpleDescription(subExperience.getSimpleDescription())
                                 .keywords(subExperience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
@@ -96,6 +98,7 @@ public class DetailExperienceResponseDto {
                             case STAR_FORM -> subExperienceResponseDto = SubExperienceResponseDto.builder()
                                     .subExperienceId(subExperience.getId())
                                     .formType(subExperience.getFormType())
+                                    .tabName(subExperience.getTabName())
                                     .subTitle(subExperience.getSubTitle())
                                     .situation(subExperience.getStarForm().getSituation())
                                     .task(subExperience.getStarForm().getTask())
@@ -108,6 +111,7 @@ public class DetailExperienceResponseDto {
                             case SIMPLE_FORM -> subExperienceResponseDto = SubExperienceResponseDto.builder()
                                     .subExperienceId(subExperience.getId())
                                     .formType(subExperience.getFormType())
+                                    .tabName(subExperience.getTabName())
                                     .subTitle(subExperience.getSubTitle())
                                     .role(subExperience.getSimpleForm().getRole())
                                     .perform(subExperience.getSimpleForm().getPerform())

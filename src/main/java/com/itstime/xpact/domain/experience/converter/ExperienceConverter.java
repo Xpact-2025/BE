@@ -82,6 +82,7 @@ public class ExperienceConverter {
         // 수상 및 자격증 경험일 때
         if(IS_QUALIFICATION.contains(experienceType)) {
             subExperience = SubExperience.builder()
+                    .tabName(subExperienceDto.getTabName())
                     .subTitle(subExperienceDto.getSubTitle())
                     .simpleDescription(subExperienceDto.getSimpleDescription())
                     .formType(FormType.valueOf(subExperienceDto.getFormType()))
@@ -89,6 +90,7 @@ public class ExperienceConverter {
         } else {
             switch (FormType.valueOf(subExperienceDto.getFormType())) {
                 case STAR_FORM -> subExperience = SubExperience.builder()
+                            .tabName(subExperienceDto.getTabName())
                             .subTitle(subExperienceDto.getSubTitle())
                             .formType(FormType.STAR_FORM)
                             .starForm(StarForm.builder()
@@ -99,6 +101,7 @@ public class ExperienceConverter {
                                     .build())
                             .build();
                 case SIMPLE_FORM -> subExperience = SubExperience.builder()
+                            .tabName(subExperienceDto.getTabName())
                             .subTitle(subExperienceDto.getSubTitle())
                             .formType(FormType.SIMPLE_FORM)
                             .simpleForm(SimpleForm.builder()
