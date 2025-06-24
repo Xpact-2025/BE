@@ -33,8 +33,7 @@ public class Weakness extends BaseEntity {
     private String name;
 
     @Setter
-    @Lob
-    @Column(name = "explanation")
+    @Column(name = "explanation", columnDefinition = "TEXT")
     private String explanation;
 
     public static WeaknessGuideResponseDto toDto(Weakness weakness) {
