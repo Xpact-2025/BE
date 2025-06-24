@@ -1,4 +1,4 @@
-package com.itstime.xpact.infra.lambda;
+package com.itstime.xpact.infra.lambda.recruit;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
