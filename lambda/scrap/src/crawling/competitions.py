@@ -48,20 +48,20 @@ def get_href(driver):
                 competition_key = href.split("/")[-1]
                 competitions_dict[competition_key] = competitions_value
 
-
+            # 클릭 가능한 페이지 번호 조회
             buttons = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".button-page-number")))
 
-            # 현재 페이지 목록에서 최대 페이지 번호
+            # 현재 페이지 목록에서 최대 페이지 번호 (max_number)
             max_number = 0
             for btn in buttons:
                 max_number = max(max_number, int(btn.text.strip()))
 
             # 현재 위치해있는 페이지와 페이지 번호
-            active_button = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".active-page")))
-            active_number = int(active_button.text.strip())
+            cur_button = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".active-page")))
+            cur_number = int(cur_button.text.strip())
 
             # 다음 페이지 버튼 눌러야 할 때 (최대 페이지 번호와 현재 페이지 번호가 같을 때)
-            if(active_number == max_number):
+            if(cur_number == max_number):
                 next_button = driver.find_element(By.CLASS_NAME, "button-arrow-next")
                 driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
 
@@ -71,7 +71,7 @@ def get_href(driver):
 
                 driver.execute_script("arguments[0].click();", next_button)
 
-            # 페이지 목록을 조회 후, 다음 눌러야할 번호가 같으면 클릭
+            # 페이지 목록을 조회 후, 다음 눌러야할 번호가 같으면 다음 페이지로 넘어가는 번호 클릭
             buttons = driver.find_elements(By.CSS_SELECTOR, ".button-page-number")
             for btn in buttons:
                 if btn.text.strip() == str(active_number + 1):
