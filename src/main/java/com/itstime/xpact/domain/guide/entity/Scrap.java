@@ -23,7 +23,7 @@ import java.util.List;
 public class Scrap extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "scrap_activity_id")
+    @Column(name = "scrap_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -53,7 +53,7 @@ public class Scrap extends BaseEntity {
     @Column(name = "job_category")
     private String jobCategory; // 우선적으로 jobCategory로 설정( 후에 detailRecruit로 변경 고민 )
 
-    @Column(name = "homepage_url")
+    @Column(name = "homepage_url", length = 512)
     private String homepageUrl;
 
     @Column(name = "img_url")
