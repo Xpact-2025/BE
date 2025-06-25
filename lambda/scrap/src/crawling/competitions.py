@@ -33,7 +33,6 @@ def get_href(driver):
     results = []
     page_count = 1
     driver.get(f'https://linkareer.com/list/contest?filterType=CATEGORY&orderBy_direction=DESC&orderBy_field=CREATED_AT&page={page_count}')
-    time.sleep(1)
 
     try:
         while(True):
@@ -94,6 +93,8 @@ def crawling_activities():
     User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
     chrome_options.add_argument(f"user-agent={User_Agent}")
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu") # 성능 높이기 위해
+    chrome_options.add_argument("--no-sandbox") # 성능 높이기 위해
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
@@ -101,11 +102,16 @@ def crawling_activities():
     hrefs = get_href(driver=driver)
 
     for href in hrefs:
+        print(f"progressing...  {href}")
         driver.get(href)
-        time.sleep(1)
+        WebDriverWait(driver, 3).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-detail-content")))
 
         competition_key = href.split("/")[-1]
         competition_value = competitions_dict[competition_key]
+
+        # 만약 값이 없다면 건너뛰기
+        if(competition_value is None):
+            continue
 
         competition_value["start_date"] = safe_get_text(driver, By.XPATH, "//span[@class='start-at']/following-sibling::span[1]")
         competition_value["end_date"] = safe_get_text(driver, By.XPATH, "//span[@class='end-at']/following-sibling::span[1]")
@@ -119,31 +125,41 @@ def crawling_activities():
         competition_value["additional_benefits"] = safe_get_text(driver, By.XPATH, "//dt[text()='추가혜택']/following-sibling::dd")
         competition_value["participant"] = safe_get_text(driver, By.XPATH, "//dt[text()='참여대상']/following-sibling::dd")
 
-
-        save_to_db(competition_value)
+    # 모든 순회를 다 돌고 dictionary에 저장된 모든 데이를 한꺼번에 add (spring boot로 치면 repository.saveAll())
+    print(competitions_dict.values())
+    save_to_db(competitions_dict.values())
 
     driver.quit()
 
-def save_to_db(raw: dict) -> None:
+def save_to_db(data_list: list[dict]) -> None:
     from src.database.orm import Scrap, ScrapType
     from datetime import datetime
-    scrap = Scrap(
-        scrap_type = ScrapType.INTERN,
 
-        title = raw["title"],
-        organizer_name = raw["organizer_name"],
-        start_date = raw["start_date"],
-        end_date = raw["end_date"],
-        job_category = raw["job_category"],
-        homepage_url = raw["homepage_url"],
-        img_url = raw["img_url"],
-        benefits = raw["benefits"],
-        additional_benefits = raw["additional_benefits"],
-        # participant = raw["participant"]
-    )
+    scraps = []
+    for raw in data_list:
+        scrap = Scrap(
+            scrap_type = ScrapType.INTERN,
+
+            # 만약 dictionary에 key값이 없거나 key값이 있어도 값이 없을 때를 대비하여 get()사용
+            created_time = datetime.now(),
+            modified_time = datetime.now(),
+            title = raw.get("title"),
+            organizer_name = raw.get("organizer_name"),
+            start_date = raw.get("start_date"),
+            end_date = raw.get("end_date"),
+            job_category = raw.get("job_category"),
+            homepage_url = raw.get("homepage_url"),
+            img_url = raw.get("img_url"),
+            benefits = raw.get("benefits"),
+            additional_benefits = raw.get("additional_benefits"),
+            # participant = raw["participant"]
+        )
+        scraps.append(scrap)
     from src.database.connection import get_session
 
     with get_session() as session:
-        session.add(scrap)
+        session.add_all(scraps)
+        session.commit()
+
 
 crawling_activities()
