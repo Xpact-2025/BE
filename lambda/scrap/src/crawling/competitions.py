@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -48,37 +49,37 @@ def get_href(driver):
                 competition_key = href.split("/")[-1]
                 competitions_dict[competition_key] = competitions_value
 
-            # recruit_links = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "image-link")))
-            # hrefs = [recruit_link.get_attribute("href") for recruit_link in recruit_links]
-            # results.extend(hrefs)
 
-            buttons = WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".button-page-number"))
-            )
+            buttons = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".button-page-number")))
+
+            # 현재 페이지 목록에서 최대 페이지 번호
             max_number = 0
             for btn in buttons:
                 max_number = max(max_number, int(btn.text.strip()))
 
+            # 현재 위치해있는 페이지와 페이지 번호
             active_button = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".active-page")))
             active_number = int(active_button.text.strip())
 
-            # 다음 페이지 버튼 눌러야 할 때
+            # 다음 페이지 버튼 눌러야 할 때 (최대 페이지 번호와 현재 페이지 번호가 같을 때)
             if(active_number == max_number):
                 next_button = driver.find_element(By.CLASS_NAME, "button-arrow-next")
                 driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
 
+                # 만약 마지막 페이지 번호라 다음 목록으로 넘어가는 버튼이 활성화되지 않았다면 종료
                 if "Mui-disabled" in next_button.get_attribute("class"):
                     return results
 
-                next_button.click()
+                driver.execute_script("arguments[0].click();", next_button)
 
+            # 페이지 목록을 조회 후, 다음 눌러야할 번호가 같으면 클릭
             buttons = driver.find_elements(By.CSS_SELECTOR, ".button-page-number")
             for btn in buttons:
                 if btn.text.strip() == str(active_number + 1):
-                    driver.execute_script("arguments[0].scrollIntoView(true);", btn)
-                    btn.click()
+                    driver.execute_script("arguments[0].click();", btn)
                     break
 
+            # 다음 페이지 넘어간 후 페이지 번호 1 증가
             page_count = active_number + 1
     except Exception as e:
         print(e)
@@ -92,7 +93,7 @@ def crawling_activities():
     chrome_options.add_experimental_option('detach', True)
     User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
     chrome_options.add_argument(f"user-agent={User_Agent}")
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
