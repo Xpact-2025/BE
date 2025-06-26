@@ -13,12 +13,14 @@ import json, re
 
 def safe_get_text(driver, by, value):
     try:
+        print(driver.find_element(by, value).text)
         return driver.find_element(by, value).text
     except NoSuchElementException:
         return '-'
 
 def safe_get_attr(driver, by, value, attr):
     try:
+        print(driver.find_element(by, value).get_attribute(attr))
         return driver.find_element(by, value).get_attribute(attr)
     except NoSuchElementException:
         return '-'
@@ -87,7 +89,7 @@ def crawling_activities():
     chrome_options.add_experimental_option('detach', True)
     User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
     chrome_options.add_argument(f"user-agent={User_Agent}")
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-notifications")
@@ -100,7 +102,7 @@ def crawling_activities():
         for href in hrefs:
             print(f"progressing...{href}")
             driver.get(href)
-            WebDriverWait(driver, 3).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-detail-content")))
+            WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-detail-content")))
 
             competition_key = href.split("/")[-1]
             competition_value = competitions_dict[competition_key]
@@ -113,10 +115,13 @@ def crawling_activities():
             competition_value["title"] = safe_get_text(driver, By.XPATH, "//header[contains(@class, 'ActivityInformationHeader__StyledWrapper')]/h1")
             competition_value["job_category"] = safe_get_text(driver, By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")
 
-            competition_value["start_date"] = safe_get_text(driver, By.XPATH, "//span[@class='start-at']/following-sibling::span[1]")
+            start_date = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/div/span[@class='start-at']/following-sibling::span[1]")
+            if not re.fullmatch(r"\d{4}[-.]\d{2}[-.]\d{2}", start_date):
+                start_date = None
+            competition_value["start_date"] = start_date
 
-            end_date = safe_get_text(driver, By.XPATH, "//span[@class='end-at']/following-sibling::span[1]")
-            if not bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}", end_date)):
+            end_date = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/span[@class='end-at']/following-sibling::span[1]")
+            if not re.fullmatch(r"\d{4}[-.]\d{2}[-.]\d{2}", end_date):
                 end_date = None
             competition_value["end_date"] = end_date
 
