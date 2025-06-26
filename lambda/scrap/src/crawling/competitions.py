@@ -1,16 +1,14 @@
+import traceback
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from webdriver_manager.chrome import ChromeDriverManager
 
-from src.database.orm import ScrapType
 
-import time
 import json
 
 def safe_get_text(driver, by, value):
@@ -37,31 +35,28 @@ def get_href(driver):
     try:
         while(True):
             print(f" === 크롤링 중: {page_count} 페이지 === ")
-            cards = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-list-card-item-wrapper")))
+            cards = WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-list-card-item-wrapper")))
             # 각 ACTIVITY당 썸네일에서 파싱 가능한 데이터는 미리 dictionary에 삽입 (key, value) -> 여기서 key값은 href의 마지막 숫자 ex) 243667, value는 dict()
             for card in cards:
-                competitions_value = dict()
                 href = card.find_element(By.CLASS_NAME, "image-link").get_attribute("href")
                 results.append(href)
-                competitions_value["organizer_name"] = card.find_element(By.CLASS_NAME, "organization-name").text
-                competitions_value["title"] = card.find_element(By.CLASS_NAME, "activity-title").text
                 competition_key = href.split("/")[-1]
-                competitions_dict[competition_key] = competitions_value
+                competitions_dict[competition_key] = dict()
 
-            # 클릭 가능한 페이지 번호 조회
+
             buttons = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".button-page-number")))
 
-            # 현재 페이지 목록에서 최대 페이지 번호 (max_number)
+            # 현재 페이지 목록에서 최대 페이지 번호
             max_number = 0
             for btn in buttons:
                 max_number = max(max_number, int(btn.text.strip()))
 
             # 현재 위치해있는 페이지와 페이지 번호
-            cur_button = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".active-page")))
-            cur_number = int(cur_button.text.strip())
+            active_button = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".active-page")))
+            active_number = int(active_button.text.strip())
 
             # 다음 페이지 버튼 눌러야 할 때 (최대 페이지 번호와 현재 페이지 번호가 같을 때)
-            if(cur_number == max_number):
+            if(active_number == max_number):
                 next_button = driver.find_element(By.CLASS_NAME, "button-arrow-next")
                 driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
 
@@ -71,7 +66,7 @@ def get_href(driver):
 
                 driver.execute_script("arguments[0].click();", next_button)
 
-            # 페이지 목록을 조회 후, 다음 눌러야할 번호가 같으면 다음 페이지로 넘어가는 번호 클릭
+            # 페이지 목록을 조회 후, 다음 눌러야할 번호가 같으면 클릭
             buttons = driver.find_elements(By.CSS_SELECTOR, ".button-page-number")
             for btn in buttons:
                 if btn.text.strip() == str(active_number + 1):
@@ -82,8 +77,8 @@ def get_href(driver):
             page_count = active_number + 1
     except Exception as e:
         print(e)
+        traceback.print_exc()  # 추가
         driver.quit()
-        return {}
 
 
 def crawling_activities():
@@ -92,73 +87,89 @@ def crawling_activities():
     chrome_options.add_experimental_option('detach', True)
     User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
     chrome_options.add_argument(f"user-agent={User_Agent}")
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu") # 성능 높이기 위해
-    chrome_options.add_argument("--no-sandbox") # 성능 높이기 위해
+    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-    hrefs = get_href(driver=driver)
+    try:
+        hrefs = get_href(driver=driver)
 
-    for href in hrefs:
-        print(f"progressing...  {href}")
-        driver.get(href)
-        WebDriverWait(driver, 3).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-detail-content")))
+        for href in hrefs:
+            print(f"progressing...{href}")
+            driver.get(href)
+            WebDriverWait(driver, 3).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-detail-content")))
 
-        competition_key = href.split("/")[-1]
-        competition_value = competitions_dict[competition_key]
+            competition_key = href.split("/")[-1]
+            competition_value = competitions_dict[competition_key]
 
-        # 만약 값이 없다면 건너뛰기
-        if(competition_value is None):
-            continue
+            # 만약 데이터가 없을 시, pass
+            if(competition_value is None):
+                continue
 
-        competition_value["start_date"] = safe_get_text(driver, By.XPATH, "//span[@class='start-at']/following-sibling::span[1]")
-        competition_value["end_date"] = safe_get_text(driver, By.XPATH, "//span[@class='end-at']/following-sibling::span[1]")
-        try:
-            competition_value["job_category"] = json.dumps([elem.text for elem in driver.find_elements(By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")], ensure_ascii=False)
-        except Exception:
-            competition_value["job_category"] = json.dumps([], ensure_ascii=False)
-        competition_value["homepage_url"] = safe_get_attr(driver, By.CSS_SELECTOR, "dd.text > a", "href")
-        competition_value["img_url"] = safe_get_attr(driver, By.CLASS_NAME, "card-image", "src")
-        competition_value["benefits"] = safe_get_text(driver, By.XPATH, "//dt[text()='활동혜택']/following-sibling::dd")
-        competition_value["additional_benefits"] = safe_get_text(driver, By.XPATH, "//dt[text()='추가혜택']/following-sibling::dd")
-        competition_value["participant"] = safe_get_text(driver, By.XPATH, "//dt[text()='참여대상']/following-sibling::dd")
+            competition_value["organizer_name"] = safe_get_text(driver, By.XPATH, "//header[@class='organization-info']/h2[@class='organization-name']")
+            competition_value["title"] = safe_get_text(driver, By.XPATH, "//header[contains(@class, 'ActivityInformationHeader__StyledWrapper')]/h1")
+            competition_value["job_category"] = safe_get_text(driver, By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")
 
-    # 모든 순회를 다 돌고 dictionary에 저장된 모든 데이를 한꺼번에 add (spring boot로 치면 repository.saveAll())
-    print(competitions_dict.values())
-    save_to_db(competitions_dict.values())
+            competition_value["start_date"] = safe_get_text(driver, By.XPATH, "//span[@class='start-at']/following-sibling::span[1]")
+            competition_value["end_date"] = safe_get_text(driver, By.XPATH, "//span[@class='end-at']/following-sibling::span[1]")
+            try:
+                competition_value["job_category"] = json.dumps([elem.text for elem in driver.find_elements(By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")], ensure_ascii=False)
+            except Exception:
+                competition_value["job_category"] = json.dumps([], ensure_ascii=False)
 
-    driver.quit()
+            # 홈페이지 없을 시, 링커리어 링크 첨부
+            homepage_url = safe_get_attr(driver, By.CSS_SELECTOR, "dd.text > a", "href")
+            if(homepage_url == '-'):
+                homepage_url = href
+            competition_value["homepage_url"] = homepage_url
 
-def save_to_db(data_list: list[dict]) -> None:
+            competition_value["img_url"] = safe_get_attr(driver, By.CLASS_NAME, "card-image", "src")
+            competition_value["benefits"] = safe_get_text(driver, By.XPATH, "//dt[text()='활동혜택']/following-sibling::dd")
+            competition_value["eligibility"] = safe_get_text(driver, By.XPATH, "//dt[text()='참여대상']/following-sibling::dd")
+            competition_value["linkareer_id"] = competition_key
+            print(competition_value)
+            if(find_by_reference_url(href)):
+                return
+            else:
+                save_to_db(competition_value)
+    finally:
+        driver.quit()
+
+# linkareer_id로 레코드 확인 있으면 true, 없으면 false 반환
+def find_by_reference_url(url: str) -> bool:
+    from src.database.connection import get_session
+    from src.database.orm import Scrap
+
+    with get_session() as session:
+        return session.query(Scrap).filter(Scrap.homepage_url == url).first() is not None
+
+def save_to_db(raw: dict) -> None:
     from src.database.orm import Scrap, ScrapType
     from datetime import datetime
 
-    scraps = []
-    for raw in data_list:
-        scrap = Scrap(
-            scrap_type = ScrapType.INTERN,
+    scrap = Scrap(
+        scrap_type = ScrapType.INTERN,
 
-            # 만약 dictionary에 key값이 없거나 key값이 있어도 값이 없을 때를 대비하여 get()사용
-            created_time = datetime.now(),
-            modified_time = datetime.now(),
-            title = raw.get("title"),
-            organizer_name = raw.get("organizer_name"),
-            start_date = raw.get("start_date"),
-            end_date = raw.get("end_date"),
-            job_category = raw.get("job_category"),
-            homepage_url = raw.get("homepage_url"),
-            img_url = raw.get("img_url"),
-            benefits = raw.get("benefits"),
-            additional_benefits = raw.get("additional_benefits"),
-            # participant = raw["participant"]
-        )
-        scraps.append(scrap)
+        created_time = datetime.now(),
+        modified_time = datetime.now(),
+        linkareer_id = raw.get("linkareer_id"),
+        title = raw.get("title"),
+        organizer_name = raw.get("organizer_name"),
+        start_date = raw.get("start_date"),
+        end_date = raw.get("end_date"),
+        job_category = raw.get("job_category"),
+        homepage_url = raw.get("homepage_url"),
+        img_url = raw.get("img_url"),
+        benefits = raw.get("benefits"),
+        eligibility = raw.get("eligibility")
+    )
+
     from src.database.connection import get_session
-
     with get_session() as session:
-        session.add_all(scraps)
+        session.add(scrap)
         session.commit()
 
 
