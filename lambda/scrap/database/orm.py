@@ -25,7 +25,7 @@ class Scrap(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     job_category = Column(String(256))
-    homepage_url=Column(Text)
+    homepage_url=Column(String(512)
     img_url=Column(String(256))
 
     benefits=Column(String(256))
