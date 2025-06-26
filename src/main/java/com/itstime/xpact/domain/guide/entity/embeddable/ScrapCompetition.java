@@ -7,6 +7,4 @@ import lombok.Getter;
 @Getter
 public class ScrapCompetition {
 
-    @Column(name = "award")
-    private String award;
 }

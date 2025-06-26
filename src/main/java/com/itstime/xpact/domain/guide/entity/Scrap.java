@@ -31,27 +31,19 @@ public class Scrap extends BaseEntity {
     private ScrapType scrapType;
 
     @Column(name = "title")
-    private String title;
+    private String title; // 제목
 
     @Column(name = "organizer_name")
-    private String organizerName;
+    private String organizerName; // 기관
 
-    @Column(name = "d_day")
-    private int dDay;
-
-    @Column(name = "work_type")
-    private String workType;
-
-    @Column(name = "region")
-    private String region;
 
     @Column(name = "start_date")
-    private LocalDate startDate;
+    private LocalDate startDate; // 공고 시작일
     @Column(name = "end_date")
-    private LocalDate endDate;
+    private LocalDate endDate; // 공고 종료일
 
     @Column(name = "job_category")
-    private String jobCategory; // 우선적으로 jobCategory로 설정( 후에 detailRecruit로 변경 고민 )
+    private String jobCategory; // 우선적으로 jobCategory로 설정( 후에 detailRecruit로 변경 고민 ), 분야 (대외활동 - 활동분야 / 공모전 - 공모분야 / 교육 - 교육분야 / 인턴 - 모집분야)
 
     @Column(name = "homepage_url", length = 512)
     private String homepageUrl;
@@ -59,50 +51,57 @@ public class Scrap extends BaseEntity {
     @Column(name = "img_url")
     private String imgUrl;
 
-    // 부분 일치
+    // 대외활동, 공모전에서만 사용하는 필드
     @Column(name = "benefits")
     private String benefits;
-    @Column(name = "additional_benefits")
-    private String additionalBenefits;
-    @Column(name = "period")
-    private String period;
-    @Column(name = "recruit_number")
-    private String recruitNumber;
+    @Column(name = "eligibility")
+    private String eligibility;
 
-    @Embedded
-    private ScrapIntern scrapIntern;
+    // 교육에서만 사용하는 필드
+    @Column(name = "on_off_line")
+    private String onOffLine;
 
-    @Embedded
-    private ScrapCompetition scrapCompetition;
+    // 인턴에서만 사용하는 필드
+    @Column(name = "enterprise_type")
+    private String enterpriseType;
+    @Column(name = "region")
+    private String region;
 
-    @Embedded
-    private ScrapEducation scrapEducation;
 
-    @Embedded
-    private ScrapActivity scrapActivity;
-
-    @OneToMany(mappedBy = "scrap")
-    private List<MemberScrap> MemberScrapList;
-
-    public void validateScrapType() {
-        switch (this.scrapType) {
-            case INTERN -> {
-                if (scrapIntern == null) {
-                    throw GeneralException.of(ErrorCode.TEST);
-                }
-            } case COMPETITION -> {
-                if (scrapCompetition == null) {
-                    throw GeneralException.of(ErrorCode.TEST);
-                }
-            } case EDUCATION -> {
-                if (scrapEducation == null) {
-                    throw GeneralException.of(ErrorCode.TEST);
-                }
-            } case ACTIVITY -> {
-                if (scrapActivity == null) {
-                    throw GeneralException.of(ErrorCode.TEST);
-                }
-            }
-        }
-    }
+//    @Embedded
+//    private ScrapIntern scrapIntern;
+//
+//    @Embedded
+//    private ScrapCompetition scrapCompetition;
+//
+//    @Embedded
+//    private ScrapEducation scrapEducation;
+//
+//    @Embedded
+//    private ScrapActivity scrapActivity;
+//
+//    @OneToMany(mappedBy = "scrap")
+//    private List<MemberScrap> MemberScrapList;
+//
+//    public void validateScrapType() {
+//        switch (this.scrapType) {
+//            case INTERN -> {
+//                if (scrapIntern == null) {
+//                    throw GeneralException.of(ErrorCode.TEST);
+//                }
+//            } case COMPETITION -> {
+//                if (scrapCompetition == null) {
+//                    throw GeneralException.of(ErrorCode.TEST);
+//                }
+//            } case EDUCATION -> {
+//                if (scrapEducation == null) {
+//                    throw GeneralException.of(ErrorCode.TEST);
+//                }
+//            } case ACTIVITY -> {
+//                if (scrapActivity == null) {
+//                    throw GeneralException.of(ErrorCode.TEST);
+//                }
+//            }
+//        }
+//    }
 }
