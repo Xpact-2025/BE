@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-import json
+import json, re
 
 def safe_get_text(driver, by, value):
     try:
@@ -114,7 +114,12 @@ def crawling_activities():
             competition_value["job_category"] = safe_get_text(driver, By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")
 
             competition_value["start_date"] = safe_get_text(driver, By.XPATH, "//span[@class='start-at']/following-sibling::span[1]")
-            competition_value["end_date"] = safe_get_text(driver, By.XPATH, "//span[@class='end-at']/following-sibling::span[1]")
+
+            end_date = safe_get_text(driver, By.XPATH, "//span[@class='end-at']/following-sibling::span[1]")
+            if not bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}", end_date)):
+                end_date = None
+            competition_value["end_date"] = end_date
+
             try:
                 competition_value["job_category"] = json.dumps([elem.text for elem in driver.find_elements(By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")], ensure_ascii=False)
             except Exception:
@@ -151,7 +156,7 @@ def save_to_db(raw: dict) -> None:
     from datetime import datetime
 
     scrap = Scrap(
-        scrap_type = ScrapType.INTERN,
+        scrap_type = ScrapType.COMPETITION,
 
         created_time = datetime.now(),
         modified_time = datetime.now(),
