@@ -26,6 +26,9 @@ public class Scrap extends BaseEntity {
     @Column(name = "scrap_id")
     private Long id;
 
+    @Column(name = "linkareer_id", unique = true)
+    private Long linkareerId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "scrap_type")
     private ScrapType scrapType;
@@ -53,55 +56,22 @@ public class Scrap extends BaseEntity {
 
     // 대외활동, 공모전에서만 사용하는 필드
     @Column(name = "benefits")
-    private String benefits;
+    private String benefits; // 활동혜택
     @Column(name = "eligibility")
-    private String eligibility;
+    private String eligibility; // 지원자격
 
     // 교육에서만 사용하는 필드
     @Column(name = "on_off_line")
-    private String onOffLine;
+    private String onOffLine; // 온/오프라인
 
     // 인턴에서만 사용하는 필드
     @Column(name = "enterprise_type")
-    private String enterpriseType;
+    private String enterpriseType; // 기업형태
     @Column(name = "region")
-    private String region;
+    private String region; // 근무지역
+
+    @Column(name = "reference_url")
+    private String referenceUrl;
 
 
-//    @Embedded
-//    private ScrapIntern scrapIntern;
-//
-//    @Embedded
-//    private ScrapCompetition scrapCompetition;
-//
-//    @Embedded
-//    private ScrapEducation scrapEducation;
-//
-//    @Embedded
-//    private ScrapActivity scrapActivity;
-//
-//    @OneToMany(mappedBy = "scrap")
-//    private List<MemberScrap> MemberScrapList;
-//
-//    public void validateScrapType() {
-//        switch (this.scrapType) {
-//            case INTERN -> {
-//                if (scrapIntern == null) {
-//                    throw GeneralException.of(ErrorCode.TEST);
-//                }
-//            } case COMPETITION -> {
-//                if (scrapCompetition == null) {
-//                    throw GeneralException.of(ErrorCode.TEST);
-//                }
-//            } case EDUCATION -> {
-//                if (scrapEducation == null) {
-//                    throw GeneralException.of(ErrorCode.TEST);
-//                }
-//            } case ACTIVITY -> {
-//                if (scrapActivity == null) {
-//                    throw GeneralException.of(ErrorCode.TEST);
-//                }
-//            }
-//        }
-//    }
 }
