@@ -69,9 +69,4 @@ public class Scrap extends BaseEntity {
     private String enterpriseType; // 기업형태
     @Column(name = "region")
     private String region; // 근무지역
-
-    @Column(name = "reference_url")
-    private String referenceUrl;
-
-
 }
