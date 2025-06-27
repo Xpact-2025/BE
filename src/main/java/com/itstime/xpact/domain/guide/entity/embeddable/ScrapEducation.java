@@ -7,12 +7,4 @@ import lombok.Getter;
 @Embeddable
 public class ScrapEducation {
 
-    @Column(name = "employment")
-    private String employment;
-
-    @Column(name = "cost")
-    private String cost;
-
-    @Column(name = "on_off_line")
-    private String onOffLine;
 }

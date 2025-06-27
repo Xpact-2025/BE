@@ -7,6 +7,4 @@ import lombok.Getter;
 @Getter
 public class ScrapIntern {
 
-    @Column(name = "enterprise_type")
-    private String enterpriseType;
 }

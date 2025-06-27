@@ -7,9 +7,4 @@ import lombok.Getter;
 @Getter
 public class ScrapActivity {
 
-    @Column(name = "preferred_skills")
-    private String preferredSkills;
-
-    @Column(name = "participant")
-    private String participant;
 }
