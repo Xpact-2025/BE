@@ -41,9 +41,9 @@ public class Scrap extends BaseEntity {
 
 
     @Column(name = "start_date")
-    private LocalDate startDate; // 공고 시작일
+    private String startDate; // 공고 시작일
     @Column(name = "end_date")
-    private LocalDate endDate; // 공고 종료일
+    private String endDate; // 공고 종료일
 
     @Column(name = "job_category")
     private String jobCategory; // 우선적으로 jobCategory로 설정( 후에 detailRecruit로 변경 고민 ), 분야 (대외활동 - 활동분야 / 공모전 - 공모분야 / 교육 - 교육분야 / 인턴 - 모집분야)

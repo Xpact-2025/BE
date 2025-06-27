@@ -13,37 +13,35 @@ import json, re
 
 def safe_get_text(driver, by, value):
     try:
-        print(driver.find_element(by, value).text)
         return driver.find_element(by, value).text
     except NoSuchElementException:
         return '-'
 
 def safe_get_attr(driver, by, value, attr):
     try:
-        print(driver.find_element(by, value).get_attribute(attr))
         return driver.find_element(by, value).get_attribute(attr)
     except NoSuchElementException:
         return '-'
 
 
-competitions_dict = dict()
+educations_dict = dict()
 
 
 def get_href(driver):
     results = []
     page_count = 1
-    driver.get(f'https://linkareer.com/list/contest?filterType=CATEGORY&orderBy_direction=DESC&orderBy_field=CREATED_AT&page={page_count}')
+    driver.get(f'https://linkareer.com/list/education?page={page_count}')
 
     try:
         while(True):
-            print(f" === 크롤링 중: {page_count} 페이지 === ")
-            cards = WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-list-card-item-wrapper")))
+            print(f" === EDUCATION 활동 크롤링 중: {page_count} 페이지 === ")
+            cards = WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "EducationListRow-desktop__StyledWrapper-sc-1c4f824c-0")))
             # 각 ACTIVITY당 썸네일에서 파싱 가능한 데이터는 미리 dictionary에 삽입 (key, value) -> 여기서 key값은 href의 마지막 숫자 ex) 243667, value는 dict()
             for card in cards:
-                href = card.find_element(By.CLASS_NAME, "image-link").get_attribute("href")
+                href = card.find_element(By.CLASS_NAME, "education-link").get_attribute("href")
                 results.append(href)
-                competition_key = href.split("/")[-1]
-                competitions_dict[competition_key] = dict()
+                education_key = href.split("/")[-1]
+                educations_dict[education_key] = dict()
 
 
             buttons = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".button-page-number")))
@@ -83,7 +81,7 @@ def get_href(driver):
         driver.quit()
 
 
-def crawling_activities():
+def lambda_handler(event, context):
     # 브라우저 꺼짐 방지
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_experimental_option('detach', True)
@@ -105,46 +103,39 @@ def crawling_activities():
             WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-detail-content")))
 
             competition_key = href.split("/")[-1]
-            competition_value = competitions_dict[competition_key]
+            education_value = educations_dict[competition_key]
 
             # 만약 데이터가 없을 시, pass
-            if(competition_value is None):
+            if(education_value is None):
                 continue
 
-            competition_value["organizer_name"] = safe_get_text(driver, By.XPATH, "//header[@class='organization-info']/h2[@class='organization-name']")
-            competition_value["title"] = safe_get_text(driver, By.XPATH, "//header[contains(@class, 'ActivityInformationHeader__StyledWrapper')]/h1")
-            competition_value["job_category"] = safe_get_text(driver, By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")
+            education_value["organizer_name"] = safe_get_text(driver, By.XPATH, "//header[@class='organization-info']/h2[@class='organization-name']")
+            education_value["title"] = safe_get_text(driver, By.XPATH, "//header[contains(@class, 'ActivityInformationHeader__StyledWrapper')]/h1")
 
-            start_date = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/div/span[@class='start-at']/following-sibling::span[1]")
-            if not re.fullmatch(r"\d{4}[-.]\d{2}[-.]\d{2}", start_date):
-                start_date = None
-            competition_value["start_date"] = start_date
+            # start_date 날짜 형식이 아닐 시 None 입력
+            start_date = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/div/span[@class='start-at']/following-sibling::span[1]").strip()
+            education_value["start_date"] = start_date
 
-            end_date = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/span[@class='end-at']/following-sibling::span[1]")
-            if not re.fullmatch(r"\d{4}[-.]\d{2}[-.]\d{2}", end_date):
-                end_date = None
-            competition_value["end_date"] = end_date
+            # end_date 날짜 형식이 아닐 시 None 입력
+            end_date = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/span[@class='end-at']/following-sibling::span[1]").strip()
+            education_value["end_date"] = end_date
 
-            try:
-                competition_value["job_category"] = json.dumps([elem.text for elem in driver.find_elements(By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")], ensure_ascii=False)
-            except Exception:
-                competition_value["job_category"] = json.dumps([], ensure_ascii=False)
+            education_value["job_category"] = safe_get_text(driver, By.XPATH, "//dt[text()='교육분야']/following-sibling::dd[1]")
 
             # 홈페이지 없을 시, 링커리어 링크 첨부
             homepage_url = safe_get_attr(driver, By.CSS_SELECTOR, "dd.text > a", "href")
             if(homepage_url == '-'):
                 homepage_url = href
-            competition_value["homepage_url"] = homepage_url
+            education_value["homepage_url"] = homepage_url
 
-            competition_value["img_url"] = safe_get_attr(driver, By.CLASS_NAME, "card-image", "src")
-            competition_value["benefits"] = safe_get_text(driver, By.XPATH, "//dt[text()='활동혜택']/following-sibling::dd")
-            competition_value["eligibility"] = safe_get_text(driver, By.XPATH, "//dt[text()='참여대상']/following-sibling::dd")
-            competition_value["linkareer_id"] = competition_key
-            print(competition_value)
+            education_value["img_url"] = safe_get_attr(driver, By.CLASS_NAME, "card-image", "src")
+            education_value["on_off_line"] = safe_get_text(driver, By.XPATH, "//dt[text()='온/오프라인']/following-sibling::dd[1]")
+            education_value["linkareer_id"] = competition_key
+
             if(find_by_reference_url(href)):
                 return
             else:
-                save_to_db(competition_value)
+                save_to_db(education_value)
     finally:
         driver.quit()
 
@@ -161,7 +152,7 @@ def save_to_db(raw: dict) -> None:
     from datetime import datetime
 
     scrap = Scrap(
-        scrap_type = ScrapType.COMPETITION,
+        scrap_type = ScrapType.EDUCATION,
 
         created_time = datetime.now(),
         modified_time = datetime.now(),
@@ -173,14 +164,11 @@ def save_to_db(raw: dict) -> None:
         job_category = raw.get("job_category"),
         homepage_url = raw.get("homepage_url"),
         img_url = raw.get("img_url"),
-        benefits = raw.get("benefits"),
-        eligibility = raw.get("eligibility")
+        on_off_line = raw.get("on_off_line"),
+
     )
 
     from src.database.connection import get_session
     with get_session() as session:
         session.add(scrap)
         session.commit()
-
-
-crawling_activities()
