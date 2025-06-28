@@ -7,9 +7,11 @@ import com.itstime.xpact.domain.guide.repository.ScrapRepository;
 import com.itstime.xpact.infra.s3.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.bidi.script.ArrayLocalValue;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,15 +32,15 @@ public class ScrapScheduler {
 
     @Scheduled(cron = "0 0 3 * * *")
     public void updateCrawling() {
-
-        for (ScrapType scrapType : ScrapType.values()) {
+        for (ScrapType scrapType : List.of(ScrapType.INTERN, ScrapType.EDUCATION, ScrapType.ACTIVITY, ScrapType.COMPETITION)) {
             log.info("{} crwaling", scrapType.name());
-            List<ScrapResponseDto> crawlingFile = fileService.findCrawlingFile(scrapType);
-            if(!crawlingFile.isEmpty()) {
-                List<Scrap> competitionList = crawlingFile.stream()
-                        .map(ScrapResponseDto::toEntity)
+            List<ScrapResponseDto> crawlingFiles = fileService.findCrawlingFile(scrapType);
+            if(!crawlingFiles.isEmpty()) {
+                List<Scrap> competitionList = crawlingFiles.stream()
+                        .map(scrapResponseDto -> scrapResponseDto.toEntity(scrapType))
                         .toList();
-                scrapRepository.saveAll(competitionList);
+                int count = scrapRepository.saveAllWithIgnore(competitionList);
+                log.info("{} rows saved", count);
                 log.info("{} crawling finished", scrapType.name());
             }
         }
