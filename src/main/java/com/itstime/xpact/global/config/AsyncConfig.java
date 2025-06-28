@@ -29,4 +29,11 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    // Queue Rejected Error
+    private RejectedExecutionHandler rejectedExecutionHandler() {
+        return (runnable, executor) -> {
+            throw CustomException.of(ErrorCode.REJECTED_QUEUE);
+        };
+    }
 }
