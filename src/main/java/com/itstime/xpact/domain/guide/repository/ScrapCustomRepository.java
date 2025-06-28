@@ -7,7 +7,5 @@ import java.util.List;
 
 public interface ScrapCustomRepository {
 
-    void deleteScrapWithEndDate(LocalDate date);
-
     int saveAllWithIgnore(List<Scrap> scraps);
 }

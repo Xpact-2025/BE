@@ -7,12 +7,9 @@ import com.itstime.xpact.domain.guide.repository.ScrapRepository;
 import com.itstime.xpact.infra.s3.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.bidi.script.ArrayLocalValue;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -22,13 +19,6 @@ public class ScrapScheduler {
 
     private final ScrapRepository scrapRepository;
     private final FileService fileService;
-
-    @Scheduled(cron = "0 0 * * * *")
-    public void removeExpiredScraps() {
-        LocalDate now = LocalDate.now();
-        scrapRepository.deleteScrapWithEndDate(now);
-        log.info("Removed Expired Scraps");
-    }
 
     @Scheduled(cron = "0 0 3 * * *")
     public void updateCrawling() {
