@@ -95,6 +95,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         String experienceStr = experience.toString();
         String recruits = detailRecruitToString();
         String message = String.format(
+                // TODO 퀄리티 높이기
                 "다음 객체를 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.\n" +
                         "객체: %s\n" +
                         "recruit (각 recruit는 '/'로 분리되어 있음) : %s\n" +
