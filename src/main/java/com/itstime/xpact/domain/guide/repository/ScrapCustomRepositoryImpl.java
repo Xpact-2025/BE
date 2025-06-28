@@ -19,14 +19,14 @@ public class ScrapCustomRepositoryImpl implements ScrapCustomRepository {
     @Override
     @Transactional
     public void deleteScrapWithEndDate(LocalDate date) {
-        QScrap scrap = QScrap.scrap;
-
-        queryFactory
-                .delete(scrap)
-                .where(scrap.endDate.lt(date)) // WHERE end_date < :date
-                .execute();
-
-        entityManager.flush();
-        entityManager.clear();
+//        QScrap scrap = QScrap.scrap;
+//
+//        queryFactory
+//                .delete(scrap)
+//                .where(scrap.endDate.lt(date)) // WHERE end_date < :date
+//                .execute();
+//
+//        entityManager.flush();
+//        entityManager.clear();
     }
 }
