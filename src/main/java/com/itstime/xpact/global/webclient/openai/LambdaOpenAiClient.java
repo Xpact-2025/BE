@@ -18,7 +18,7 @@ public class LambdaOpenAiClient {
 
     @Async
     public CompletableFuture<SkillMapResponseDto> requestEvaluation(OpenAiRequestDto requestDto) {
-        SkillMapResponseDto resultDto = lambdaWebClient
+        CompletableFuture<SkillMapResponseDto> resultDto = lambdaWebClient
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/skillmaps")
@@ -26,8 +26,8 @@ public class LambdaOpenAiClient {
                 .bodyValue(requestDto)
                 .retrieve()
                 .bodyToMono(SkillMapResponseDto.class)
-                .block();
+                .toFuture();
 
-        return CompletableFuture.completedFuture(resultDto);
+        return resultDto;
     }
 }
