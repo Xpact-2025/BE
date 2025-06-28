@@ -51,7 +51,7 @@ public class DashboardController {
             content = @Content(schema = @Schema(implementation = SkillMapResponseDto.class)))
     @PostMapping("/skills")
     public DeferredResult<ResponseEntity<?>> evaluateScore() {
-        DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>(40_000L);
+        DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>(60_000L);
 
         deferredResult.onTimeout(() -> {
             deferredResult.setErrorResult(
