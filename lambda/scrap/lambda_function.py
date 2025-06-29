@@ -18,7 +18,6 @@ def setTime():
     now = datetime.datetime.now()
     return now.strftime('%Y_%m_%d')
 
-
 def lambda_handler(event, context):
     try:
         new_intern_key = f"data/INTERN_{setTime()}.json"
