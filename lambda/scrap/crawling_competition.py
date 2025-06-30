@@ -1,13 +1,11 @@
 import traceback
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import json
-import subprocess
 import boto3
 import os
 
@@ -122,11 +120,11 @@ def get_href(driver):
         driver.quit()
 
 
-def save_competition_to_s3():
+def save_competition_to_s3(bucket_name: str, driver):
 
     # 기존의 데이터 불러오기
     try:
-        old_ids = load_all_json_ids_from_s3(BUCKET_NAME, "data/COMPETITION")
+        old_ids = load_all_json_ids_from_s3(bucket_name, "data/COMPETITION")
     except Exception as e:
         old_ids = set()
         print("파일을 읽을 수 없습니다.", e)
@@ -134,19 +132,6 @@ def save_competition_to_s3():
     new_data = []
 
     try:
-        # 브라우저 꺼짐 방지
-        chrome_options = Options()
-        chrome_options.binary_location = "/opt/chrome/chrome"
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-notifications")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--single-process")
-
-        service = Service(executable_path="/opt/chromedriver")
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-
         hrefs = get_href(driver=driver)
 
         for href in hrefs:
@@ -187,5 +172,5 @@ def save_competition_to_s3():
             new_data.append(competition_value)
             print(f"Saved: {competition_value['title']}")
 
-    finally:
-        driver.quit()
+    except Exception as e:
+        print(f"공모전 크롤링 중 오류 발생: {e}")

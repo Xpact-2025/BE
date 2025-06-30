@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException, StaleElementReferenceException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 import os
 import json
 import boto3
@@ -179,31 +178,17 @@ def crawling_activity_detail(link: str, driver) -> dict | None:
 
 
 # S3에 저장
-def save_acitivity_to_s3():
+def save_activity_to_s3(bucket_name: str, driver):
 
     # 기존의 데이터 불러오기
     try:
-        old_ids = load_all_json_ids_from_s3(BUCKET_NAME, "data/ACTIVITY")
+        old_ids = load_all_json_ids_from_s3(bucket_name, "data/ACTIVITY")
     except Exception as e:
         old_ids = set()
         print("파일을 읽을 수 없습니다.", e)
 
     # 새로운 크롤링
     try:
-        options = webdriver.ChromeOptions()
-        options.binary_location = '/opt/chrome/chrome'
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument("--disable-gpu")
-        options.add_argument("--window-size=1280x1696")
-        options.add_argument("--single-process")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-dev-tools")
-        options.add_argument("--no-zygote")
-        options.add_argument('user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
-
-        driver = webdriver.Chrome("/opt/chromedriver", options=options)
-
         links = crawling_activity_link(driver)
 
         new_data = []
@@ -219,5 +204,5 @@ def save_acitivity_to_s3():
 
         return new_data
 
-    finally:
-        driver.quit()
+    except Exception as e:
+        print(f"대외활동 크롤링 중 오류 발생: {e}")
