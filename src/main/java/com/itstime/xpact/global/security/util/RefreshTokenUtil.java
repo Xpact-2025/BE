@@ -83,8 +83,13 @@ public class RefreshTokenUtil {
 
                 if (tokenProvider.validationToken(refreshToken).getHttpStatus() == 200) {
                     Long memberId = tokenProvider.getMemberIdFromToken(refreshToken);
-                    log.info("유효한 Refresh token입니다. Member Id: {}", memberId);
-                    return memberId;
+                    if (refreshToken.equals(getRefreshToken(memberId))) {
+                        log.info("유효한 Refresh token입니다. Member Id: {}", memberId);
+                        return memberId;
+                    } else {
+                        log.warn("저장된 Refresh Token과 일치하지 않습니다.");
+                        throw GeneralException.of(ErrorCode.UNMATCHED_TOKEN);
+                    }
                 } else {
                     log.warn("유효하지 않은 Refresh Token입니다.");
                     throw GeneralException.of(ErrorCode.INVALID_JWT_TOKEN);
