@@ -1,15 +1,17 @@
+import os
 import traceback
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from webdriver_manager.chrome import ChromeDriverManager
 
-import json
-import subprocess
+import json, boto3
+from datetime import datetime
 
 def safe_get_text(driver, by, value):
     try:
@@ -27,6 +29,9 @@ def safe_get_attr(driver, by, value, attr):
 
 
 competitions_dict = dict()
+load_dotenv()
+s3 = boto3.client("s3")
+BUCKET_NAME = os.getenv("S3_BUCKET")
 
 
 def get_href(driver):
@@ -36,7 +41,7 @@ def get_href(driver):
 
     try:
         while(True):
-            print(f" === 크롤링 중: {page_count} 페이지 === ")
+            print(f" === COMPETITION 크롤링 중: {page_count} 페이지 === ")
             cards = WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-list-card-item-wrapper")))
             # 각 ACTIVITY당 썸네일에서 파싱 가능한 데이터는 미리 dictionary에 삽입 (key, value) -> 여기서 key값은 href의 마지막 숫자 ex) 243667, value는 dict()
             for card in cards:
@@ -82,27 +87,47 @@ def get_href(driver):
         traceback.print_exc()  # 추가
         driver.quit()
 
+def get_new_data(hrefs: list):
+    now = datetime.now()
+    formatted = now.strftime("%Y-%m-%d")
+    key = f"data/COMPETITION-{formatted}.json"
+    response = s3.get_object(Bucket=BUCKET_NAME, Key=key)
+    body = response['Body'].read().decode('utf-8')
+    contents = json.loads(body)
+    existing_ids = [content["linkareer_id"] for content in contents]
+    return [href for href in hrefs if href.split("/")[-1] not in existing_ids]
 
-def lambda_handler(event, context):
+def put_new_data(datas: list):
+    now = datetime.now()
+    formatted = now.strftime("%Y-%m-%d")
+    key = f"data/COMPETITION-{formatted}.json"
+    body = json.dumps(datas, indent=2)
+    s3.put_object(
+        Bucket=BUCKET_NAME,
+        Key=key,
+        Body=body.encode("utf-8"),
+        ContentType="application/json"
+    )
+    return key
+
+def crawling_activities():
     # 브라우저 꺼짐 방지
-    chrome_options = Options()
-    chrome_options.binary_location = "/opt/chrome/chrome"
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option('detach', True)
+    User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
+    chrome_options.add_argument(f"user-agent={User_Agent}")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-notifications")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--single-process")
-
-    service = Service(executable_path="/opt/chromedriver")
-
-#     result = subprocess.run(['chromedriver', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-#     print(result)
-
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     try:
         hrefs = get_href(driver=driver)
+
+        # 링크 중 이미 존재하는 데이터가 있으면 제외
+        hrefs = get_new_data(hrefs)
 
         for href in hrefs:
             print(f"progressing...{href}")
@@ -141,44 +166,15 @@ def lambda_handler(event, context):
             competition_value["benefits"] = safe_get_text(driver, By.XPATH, "//dt[text()='활동혜택']/following-sibling::dd")
             competition_value["eligibility"] = safe_get_text(driver, By.XPATH, "//dt[text()='참여대상']/following-sibling::dd")
             competition_value["linkareer_id"] = competition_key
-            print(competition_value)
-            if(find_by_reference_url(href)):
-                return
-            else:
-                save_to_db(competition_value)
+
+        data_file = [v for v in competitions_dict.values() if v]
+        key = put_new_data(data_file)
     finally:
         driver.quit()
 
-# linkareer_id로 레코드 확인 있으면 true, 없으면 false 반환
-def find_by_reference_url(url: str) -> bool:
-    from database.connection import get_session
-    from database.orm import Scrap
+    return {
+        "statusCode": 200,
+        "body": json.dumps({"message": "Saved to S3", "s3_key": key})
+    }
 
-    with get_session() as session:
-        return session.query(Scrap).filter(Scrap.homepage_url == url).first() is not None
-
-def save_to_db(raw: dict) -> None:
-    from database.orm import Scrap, ScrapType
-    from datetime import datetime
-
-    scrap = Scrap(
-        scrap_type = ScrapType.COMPETITION,
-
-        created_time = datetime.now(),
-        modified_time = datetime.now(),
-        linkareer_id = raw.get("linkareer_id"),
-        title = raw.get("title"),
-        organizer_name = raw.get("organizer_name"),
-        start_date = raw.get("start_date"),
-        end_date = raw.get("end_date"),
-        job_category = raw.get("job_category"),
-        homepage_url = raw.get("homepage_url"),
-        img_url = raw.get("img_url"),
-        benefits = raw.get("benefits"),
-        eligibility = raw.get("eligibility")
-    )
-
-    from database.connection import get_session
-    with get_session() as session:
-        session.add(scrap)
-        session.commit()
+crawling_activities()

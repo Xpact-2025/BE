@@ -1,4 +1,6 @@
+import os
 import traceback
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -8,8 +10,9 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from webdriver_manager.chrome import ChromeDriverManager
 
+import boto3, json
+from datetime import datetime
 
-import json, re
 
 def safe_get_text(driver, by, value):
     try:
@@ -25,6 +28,9 @@ def safe_get_attr(driver, by, value, attr):
 
 
 educations_dict = dict()
+load_dotenv()
+s3 = boto3.client("s3")
+BUCKET_NAME = os.getenv("S3_BUCKET")
 
 
 def get_href(driver):
@@ -80,8 +86,30 @@ def get_href(driver):
         traceback.print_exc()  # 추가
         driver.quit()
 
+def get_new_data(hrefs: list):
+    now = datetime.now()
+    formatted = now.strftime("%Y-%m-%d")
+    key = f"data/EDUCATION-{formatted}.json"
+    response = s3.get_object(Bucket=BUCKET_NAME, Key=key)
+    body = response['Body'].read().decode('utf-8')
+    contents = json.loads(body)
+    existing_ids = [content["linkareer_id"] for content in contents]
+    return [href for href in hrefs if href.split("/")[-1] not in existing_ids]
 
-def lambda_handler(event, context):
+def put_new_data(datas: list):
+    now = datetime.now()
+    formatted = now.strftime("%Y-%m-%d")
+    key = f"data/EDUCATION-{formatted}.json"
+    body = json.dumps(datas, indent=2)
+    s3.put_object(
+        Bucket=BUCKET_NAME,
+        Key=key,
+        Body=body.encode("utf-8"),
+        ContentType="application/json"
+    )
+    return key
+
+def lambda_handler():
     # 브라우저 꺼짐 방지
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_experimental_option('detach', True)
@@ -96,6 +124,9 @@ def lambda_handler(event, context):
 
     try:
         hrefs = get_href(driver=driver)
+
+        # 링크 중 이미 존재하는 데이터가 있으면 제외
+        hrefs = get_new_data(hrefs)
 
         for href in hrefs:
             print(f"progressing...{href}")
@@ -132,43 +163,16 @@ def lambda_handler(event, context):
             education_value["on_off_line"] = safe_get_text(driver, By.XPATH, "//dt[text()='온/오프라인']/following-sibling::dd[1]")
             education_value["linkareer_id"] = competition_key
 
-            if(find_by_reference_url(href)):
-                return
-            else:
-                save_to_db(education_value)
+        # educatio_dict에 {key : {}}로 들어있음 -> values() 사용
+        data_file = [v for v in educations_dict.values() if v]
+        key = put_new_data(data_file)
     finally:
         driver.quit()
 
-# linkareer_id로 레코드 확인 있으면 true, 없으면 false 반환
-def find_by_reference_url(url: str) -> bool:
-    from src.database.connection import get_session
-    from src.database.orm import Scrap
+    return {
+        "statusCode": 200,
+        "body": json.dumps({"message": "Saved to S3", "s3_key": key})
+    }
 
-    with get_session() as session:
-        return session.query(Scrap).filter(Scrap.homepage_url == url).first() is not None
 
-def save_to_db(raw: dict) -> None:
-    from src.database.orm import Scrap, ScrapType
-    from datetime import datetime
-
-    scrap = Scrap(
-        scrap_type = ScrapType.EDUCATION,
-
-        created_time = datetime.now(),
-        modified_time = datetime.now(),
-        linkareer_id = raw.get("linkareer_id"),
-        title = raw.get("title"),
-        organizer_name = raw.get("organizer_name"),
-        start_date = raw.get("start_date"),
-        end_date = raw.get("end_date"),
-        job_category = raw.get("job_category"),
-        homepage_url = raw.get("homepage_url"),
-        img_url = raw.get("img_url"),
-        on_off_line = raw.get("on_off_line"),
-
-    )
-
-    from src.database.connection import get_session
-    with get_session() as session:
-        session.add(scrap)
-        session.commit()
+lambda_handler()
