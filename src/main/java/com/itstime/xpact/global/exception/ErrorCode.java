@@ -94,6 +94,7 @@ public enum ErrorCode {
     // Async
     FAILED_GET_RESULT(HttpStatus.BAD_REQUEST, "AE001", "요청에 대한 응답을 얻지 못했습니다."),
     REQUEST_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "AE002", "요청 시간이 초과되었습니다."),
+    REJECTED_QUEUE(HttpStatus.TOO_MANY_REQUESTS, "AE003", "서버가 현재 요청을 처리할 수 없습니다. 잠시 뒤에 다시 시도해주세요."),
 
     // json
     FAILED_DESERIALIZE(HttpStatus.BAD_REQUEST, "JE001", "역직렬화에 실패하였습니다."),

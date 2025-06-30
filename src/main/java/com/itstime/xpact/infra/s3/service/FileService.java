@@ -1,5 +1,11 @@
 package com.itstime.xpact.infra.s3.service;
 
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itstime.xpact.domain.guide.common.ScrapType;
+import com.itstime.xpact.domain.guide.dto.ScrapResponseDto;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
@@ -8,23 +14,26 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
+import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileService {
 
+    private final ObjectMapper objectMapper;
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
     private final SecurityProvider securityProvider;
@@ -76,5 +85,27 @@ public class FileService {
                         .getObjectRequest(getRequest));
 
         return presigned.url().toString();
+    }
+
+    public List<ScrapResponseDto> findCrawlingFile(ScrapType scrapType) {
+        String key = scrapType.name();
+
+        GetObjectRequest getRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key("data/" + key + ".json")
+                .build();
+
+        // 파일 존재 시 -> json으로 파싱 -> 자바 클래스로 파싱하여 return
+        // 파일 존재하지 않을 시 -> return;
+        try{
+            ResponseInputStream<GetObjectResponse> file = s3Client.getObject(getRequest);
+            return objectMapper.readValue(file, new TypeReference<List<ScrapResponseDto>>() {});
+        } catch (S3Exception e) {
+            log.info("파일을 찾을 수 없습니다.");
+        } catch (Exception e) {
+            log.error("파일을 파싱할 수 없습니다.");
+        }
+
+        return List.of();
     }
 }

@@ -20,9 +20,6 @@ public class WebClientConfig {
     @Value("${external.api.school.base-url}")
     private String schoolBaseUrl;
 
-    @Value("${spring.ai.openai.api-key}")
-    private String openAiKey;
-
     @Value("${external.lambda.function.base-url}")
     private String lambdaFunctionUrl;
 
