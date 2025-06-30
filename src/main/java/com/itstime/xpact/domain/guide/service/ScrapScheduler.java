@@ -22,7 +22,7 @@ public class ScrapScheduler {
 
     @Scheduled(cron = "0 0 3 * * *")
     public void updateCrawling() {
-        for (ScrapType scrapType : List.of(ScrapType.INTERN, ScrapType.EDUCATION, ScrapType.ACTIVITY, ScrapType.COMPETITION)) {
+        for (ScrapType scrapType : ScrapType.values()) {
             log.info("{} crwaling", scrapType.name());
             List<ScrapResponseDto> crawlingFiles = fileService.findCrawlingFile(scrapType);
             if(!crawlingFiles.isEmpty()) {

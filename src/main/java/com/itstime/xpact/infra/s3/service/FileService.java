@@ -21,12 +21,11 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
-import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 @Slf4j
 @Service
@@ -38,6 +37,7 @@ public class FileService {
     private final S3Presigner s3Presigner;
     private final SecurityProvider securityProvider;
     private static final String prefix = "USER_UPLOADS";
+    private static final String S3_PREFIX = "data/";
 
     @Value("${aws.credentials.bucket}")
     private String bucket;
@@ -88,11 +88,14 @@ public class FileService {
     }
 
     public List<ScrapResponseDto> findCrawlingFile(ScrapType scrapType) {
-        String key = scrapType.name();
+        LocalDate nowLocalDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String nowDate = nowLocalDate.format(formatter);
 
+        String key = S3_PREFIX + scrapType.name().toUpperCase() + "-" + nowDate + ".json";
         GetObjectRequest getRequest = GetObjectRequest.builder()
                 .bucket(bucket)
-                .key("data/" + key + ".json")
+                .key(key)
                 .build();
 
         // 파일 존재 시 -> json으로 파싱 -> 자바 클래스로 파싱하여 return
