@@ -61,4 +61,9 @@ public class Weakness extends BaseEntity {
         oldest.setExplanation(explanation);
         return oldest;
     }
+
+    @Override
+    public String toString() {
+        return "Weakness{" + "name='" + name + ", explanation='" + explanation + '}';
+    }
 }
