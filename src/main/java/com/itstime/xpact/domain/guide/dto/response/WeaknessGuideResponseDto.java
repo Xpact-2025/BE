@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.guide.dto;
+package com.itstime.xpact.domain.guide.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

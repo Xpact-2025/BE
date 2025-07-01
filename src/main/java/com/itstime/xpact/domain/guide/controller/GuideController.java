@@ -1,8 +1,7 @@
 package com.itstime.xpact.domain.guide.controller;
 
-import com.itstime.xpact.domain.guide.dto.ScrapThumbnailResponseDto;
+import com.itstime.xpact.domain.guide.dto.response.ScrapThumbnailResponseDto;
 import com.itstime.xpact.domain.guide.service.GuideService;
-import com.itstime.xpact.domain.guide.service.ScrapService;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +18,6 @@ import java.util.List;
 public class GuideController {
 
     private final GuideService guideService;
-    private final ScrapService scrapService;
 
     @Operation(summary = "약점에 대한 분석 조회 API", description = """
             약점에 대한 분석을 조회하고자 할 때 사용하는 API입니다.<br>

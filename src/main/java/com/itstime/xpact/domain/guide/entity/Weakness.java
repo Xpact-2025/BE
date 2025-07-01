@@ -1,7 +1,7 @@
 package com.itstime.xpact.domain.guide.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
-import com.itstime.xpact.domain.guide.dto.WeaknessGuideResponseDto;
+import com.itstime.xpact.domain.guide.dto.response.WeaknessGuideResponseDto;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;

@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.guide.dto;
+package com.itstime.xpact.domain.guide.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.itstime.xpact.domain.guide.common.ScrapType;

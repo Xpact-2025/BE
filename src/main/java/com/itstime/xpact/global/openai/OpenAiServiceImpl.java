@@ -2,7 +2,6 @@ package com.itstime.xpact.global.openai;
 
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
-import com.itstime.xpact.domain.guide.dto.ScrapThumbnailResponseDto;
 import com.itstime.xpact.domain.guide.entity.Weakness;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;

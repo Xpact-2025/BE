@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.guide.dto;
+package com.itstime.xpact.domain.guide.dto.response;
 
 import com.itstime.xpact.domain.guide.common.ScrapType;
 import com.itstime.xpact.domain.guide.entity.Scrap;

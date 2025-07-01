@@ -1,7 +1,7 @@
 package com.itstime.xpact.domain.guide.service;
 
 import com.itstime.xpact.domain.guide.common.ScrapType;
-import com.itstime.xpact.domain.guide.dto.ScrapRequestDto;
+import com.itstime.xpact.domain.guide.dto.request.ScrapRequestDto;
 import com.itstime.xpact.domain.guide.entity.Scrap;
 import com.itstime.xpact.domain.guide.repository.ScrapRepository;
 import com.itstime.xpact.infra.s3.service.FileService;

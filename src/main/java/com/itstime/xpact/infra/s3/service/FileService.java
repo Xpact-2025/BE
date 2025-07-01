@@ -3,7 +3,7 @@ package com.itstime.xpact.infra.s3.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.guide.common.ScrapType;
-import com.itstime.xpact.domain.guide.dto.ScrapRequestDto;
+import com.itstime.xpact.domain.guide.dto.request.ScrapRequestDto;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
