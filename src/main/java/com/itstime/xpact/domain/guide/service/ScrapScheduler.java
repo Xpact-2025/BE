@@ -1,7 +1,7 @@
 package com.itstime.xpact.domain.guide.service;
 
 import com.itstime.xpact.domain.guide.common.ScrapType;
-import com.itstime.xpact.domain.guide.dto.ScrapResponseDto;
+import com.itstime.xpact.domain.guide.dto.ScrapRequestDto;
 import com.itstime.xpact.domain.guide.entity.Scrap;
 import com.itstime.xpact.domain.guide.repository.ScrapRepository;
 import com.itstime.xpact.infra.s3.service.FileService;
@@ -24,7 +24,7 @@ public class ScrapScheduler {
     public void updateCrawling() {
         for (ScrapType scrapType : List.of(ScrapType.INTERN, ScrapType.EDUCATION, ScrapType.ACTIVITY, ScrapType.COMPETITION)) {
             log.info("{} crwaling", scrapType.name());
-            List<ScrapResponseDto> crawlingFiles = fileService.findCrawlingFile(scrapType);
+            List<ScrapRequestDto> crawlingFiles = fileService.findCrawlingFile(scrapType);
             if(!crawlingFiles.isEmpty()) {
                 List<Scrap> competitionList = crawlingFiles.stream()
                         .map(scrapResponseDto -> scrapResponseDto.toEntity(scrapType))
