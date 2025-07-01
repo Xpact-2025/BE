@@ -110,6 +110,10 @@ public enum ErrorCode {
     // file
     NO_SUCH_FILE(HttpStatus.NOT_FOUND, "F001", "해당 파일은 존재하지 않습니다."),
 
+    // scrap (크롤링한 활동)
+    SCRAP_NOT_EXISTS(HttpStatus.BAD_REQUEST, "SC001", "해당 활동은 존재하지 않습니다."),
+
+
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
     ;
