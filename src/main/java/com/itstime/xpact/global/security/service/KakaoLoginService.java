@@ -11,7 +11,6 @@ import com.itstime.xpact.global.security.dto.response.KakaoTokenDto;
 import com.itstime.xpact.global.security.dto.response.LoginResponseDto;
 import com.itstime.xpact.global.security.util.KakaoUtil;
 import com.itstime.xpact.global.security.util.RefreshTokenUtil;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Tag(name ="카카오 로그인 API Controller", description = "카카오 로그인 API")
 public class KakaoLoginService implements LoginStrategy {
 
     private final KakaoUtil kakaoUtil;
@@ -41,7 +39,7 @@ public class KakaoLoginService implements LoginStrategy {
     }
 
     @Transactional
-    public LoginResponseDto login(String code, HttpServletResponse response) {
+    public LoginResponseDto loginWithKakao(String code, HttpServletResponse response) {
         KakaoTokenDto kakaoToken = kakaoUtil.requestAccessToken(code);
         String token = kakaoToken.getAccessToken();
         KakaoInfoResponseDto profile = kakaoUtil.requestProfile(token);
@@ -66,6 +64,7 @@ public class KakaoLoginService implements LoginStrategy {
         String accessToken = tokenProvider.generateAccessToken(member);
         String refreshToken = tokenProvider.generateRefreshToken(member);
         // Refresh Token 쿠키로 설정
+        refreshTokenUtil.saveRefreshToken(member.getId(), refreshToken);
         refreshTokenUtil.addRefreshTokenCookie(response, refreshToken);
 
         return LoginResponseDto.builder()

@@ -65,6 +65,6 @@ public class KakaoLoginController {
             @RequestParam String code,
             HttpServletResponse response) throws GeneralException {
         return ResponseEntity.ok(
-                RestResponse.ok(kakaoLoginService.login(code, response)));
+                RestResponse.ok(kakaoLoginService.loginWithKakao(code, response)));
     }
 }

@@ -5,11 +5,48 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-from webdriver_manager.chrome import ChromeDriverManager
-
-
+import boto3
+import os
 import json, re
+
+# 기존의 모든 json 파일 로드
+def load_all_json_ids_from_s3(bucket_name: str, prefix: str) -> set:
+    s3 = boto3.client("s3")
+    BUCKET_NAME = os.environ.get("S3_BUCKET")
+    if not BUCKET_NAME:
+        raise ValueError("환경 변수 'S3_BUCKET'이 설정되어 있지 않습니다.")
+
+    all_ids = set()
+
+    try:
+        response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+        contents = response.get("Contents", [])
+
+        for obj in contents:
+            key = obj["Key"]
+            if key.endswith(".json"):
+                try:
+                    res = s3.get_object(Bucket=bucket_name, Key=key)
+                    data = json.load(res["Body"])
+                    ids = {item["linkareer_id"] for item in data if "linkareer_id" in item}
+                    all_ids.update(ids)
+                except Exception as e:
+                    print(f"S3에서 {key} 읽는 중 오류: {e}")
+
+    except Exception as e:
+        print(f"S3 파일 목록 조회 중 오류: {e}")
+
+    return all_ids
+
+# linkareer_id 추출을 위한 함수
+def extract_link_id(link: str) -> int | None:
+    prefix = "https://linkareer.com/activity/"
+    try:
+        return int(link.replace(prefix, ""))
+    except ValueError:
+        return None
+
+
 
 def safe_get_text(driver, by, value):
     try:
@@ -81,23 +118,26 @@ def get_href(driver):
         driver.quit()
 
 
-def lambda_handler(event, context):
-    # 브라우저 꺼짐 방지
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_experimental_option('detach', True)
-    User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
-    chrome_options.add_argument(f"user-agent={User_Agent}")
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-notifications")
-    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+def save_education_to_s3(bucket_name: str, driver):
 
+    # 기존의 데이터 불러오기
+    try:
+        old_ids = load_all_json_ids_from_s3(bucket_name, "data/EDUCATION")
+    except Exception as e:
+        old_ids = set()
+        print("파일을 읽을 수 없습니다.", e)
+
+    new_data = []
     try:
         hrefs = get_href(driver=driver)
 
         for href in hrefs:
+            link_id = extract_link_id(href)
+            if link_id is None or link_id in old_ids:
+                print(f"이미 존재하는 공고입니다: {link_id}")
+                continue
+
+
             print(f"progressing...{href}")
             driver.get(href)
             WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-detail-content")))
@@ -132,43 +172,7 @@ def lambda_handler(event, context):
             education_value["on_off_line"] = safe_get_text(driver, By.XPATH, "//dt[text()='온/오프라인']/following-sibling::dd[1]")
             education_value["linkareer_id"] = competition_key
 
-            if(find_by_reference_url(href)):
-                return
-            else:
-                save_to_db(education_value)
-    finally:
-        driver.quit()
-
-# linkareer_id로 레코드 확인 있으면 true, 없으면 false 반환
-def find_by_reference_url(url: str) -> bool:
-    from src.database.connection import get_session
-    from src.database.orm import Scrap
-
-    with get_session() as session:
-        return session.query(Scrap).filter(Scrap.homepage_url == url).first() is not None
-
-def save_to_db(raw: dict) -> None:
-    from src.database.orm import Scrap, ScrapType
-    from datetime import datetime
-
-    scrap = Scrap(
-        scrap_type = ScrapType.EDUCATION,
-
-        created_time = datetime.now(),
-        modified_time = datetime.now(),
-        linkareer_id = raw.get("linkareer_id"),
-        title = raw.get("title"),
-        organizer_name = raw.get("organizer_name"),
-        start_date = raw.get("start_date"),
-        end_date = raw.get("end_date"),
-        job_category = raw.get("job_category"),
-        homepage_url = raw.get("homepage_url"),
-        img_url = raw.get("img_url"),
-        on_off_line = raw.get("on_off_line"),
-
-    )
-
-    from src.database.connection import get_session
-    with get_session() as session:
-        session.add(scrap)
-        session.commit()
+            new_data.append(competition_value)
+            print(f"Saved: {competition_value['title']}")
+    except Exception as e:
+        print(f"교육 크롤링 중 오류 발생: {e}")

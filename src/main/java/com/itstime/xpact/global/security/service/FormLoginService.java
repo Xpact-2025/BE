@@ -103,7 +103,7 @@ public class FormLoginService implements LoginStrategy {
         Long memberId = tokenProvider.getMemberIdFromToken(token);
 
         refreshTokenUtil.removeRefreshTokenCookie(response, memberId);
-        refreshTokenUtil.removeRefreshTokenCookie(response, memberId);
+        refreshTokenUtil.deleteRefreshToken(memberId);
     }
 
     // 액세스 토큰 재발급

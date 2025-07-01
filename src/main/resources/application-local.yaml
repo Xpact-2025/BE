@@ -31,10 +31,12 @@ spring:
   security:
     kakao:
       client-id: ${KAKAO_REST_API_KEY}
-      redirect-uri: ${KAKAO_CALLBACK}
-      base-url: "https://kauth.kakao.com"
+      redirect-uri: ${KAKAO_LOCAL_CALLBACK}
+    naver:
+      client-id: ${NAVER_REST_API_KEY}
+      secret-key: ${NAVER_SECRET_KEY}
+      redirect-uri: ${NAVER_LOCAL_CALLBACK}
 
-    # TODO: NAVER 설정 추가
 
   ai:
     openai:

@@ -1,15 +1,52 @@
 import traceback
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-
 import json
-import subprocess
+import boto3
+import os
+
+
+# 기존의 모든 json 파일 로드
+def load_all_json_ids_from_s3(bucket_name: str, prefix: str) -> set:
+    s3 = boto3.client("s3")
+    BUCKET_NAME = os.environ.get("S3_BUCKET")
+    if not BUCKET_NAME:
+        raise ValueError("환경 변수 'S3_BUCKET'이 설정되어 있지 않습니다.")
+
+    all_ids = set()
+
+    try:
+        response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+        contents = response.get("Contents", [])
+
+        for obj in contents:
+            key = obj["Key"]
+            if key.endswith(".json"):
+                try:
+                    res = s3.get_object(Bucket=bucket_name, Key=key)
+                    data = json.load(res["Body"])
+                    ids = {item["linkareer_id"] for item in data if "linkareer_id" in item}
+                    all_ids.update(ids)
+                except Exception as e:
+                    print(f"S3에서 {key} 읽는 중 오류: {e}")
+
+    except Exception as e:
+        print(f"S3 파일 목록 조회 중 오류: {e}")
+
+    return all_ids
+
+# linkareer_id 추출을 위한 함수
+def extract_link_id(link: str) -> int | None:
+    prefix = "https://linkareer.com/activity/"
+    try:
+        return int(link.replace(prefix, ""))
+    except ValueError:
+        return None
+
 
 def safe_get_text(driver, by, value):
     try:
@@ -83,102 +120,57 @@ def get_href(driver):
         driver.quit()
 
 
-def lambda_handler(event, context):
-    # 브라우저 꺼짐 방지
-    chrome_options = Options()
-    chrome_options.binary_location = "/opt/chrome/chrome"
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-notifications")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--single-process")
+def save_competition_to_s3(bucket_name: str, driver):
 
-    service = Service(executable_path="/opt/chromedriver")
+    # 기존의 데이터 불러오기
+    try:
+        old_ids = load_all_json_ids_from_s3(bucket_name, "data/COMPETITION")
+    except Exception as e:
+        old_ids = set()
+        print("파일을 읽을 수 없습니다.", e)
 
-#     result = subprocess.run(['chromedriver', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-#     print(result)
-
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    new_data = []
 
     try:
         hrefs = get_href(driver=driver)
 
         for href in hrefs:
+            link_id = extract_link_id(href)
+            if link_id is None or link_id in old_ids:
+                print(f"이미 존재하는 공고입니다: {link_id}")
+                continue
+
+            # 새로 크롤링
             print(f"progressing...{href}")
             driver.get(href)
             WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "activity-detail-content")))
 
             competition_key = href.split("/")[-1]
-            competition_value = competitions_dict[competition_key]
-
-            # 만약 데이터가 없을 시, pass
-            if(competition_value is None):
+            competition_value = competitions_dict.get(competition_key)
+            if competition_value is None:
                 continue
 
             competition_value["organizer_name"] = safe_get_text(driver, By.XPATH, "//header[@class='organization-info']/h2[@class='organization-name']")
             competition_value["title"] = safe_get_text(driver, By.XPATH, "//header[contains(@class, 'ActivityInformationHeader__StyledWrapper')]/h1")
-            competition_value["job_category"] = safe_get_text(driver, By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")
-
-            start_date = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/div/span[@class='start-at']/following-sibling::span[1]")
-            competition_value["start_date"] = start_date
-
-            end_date = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/span[@class='end-at']/following-sibling::span[1]")
-            competition_value["end_date"] = end_date
 
             try:
                 competition_value["job_category"] = json.dumps([elem.text for elem in driver.find_elements(By.XPATH, "//dt[text()='공모분야']/following-sibling::dd//li/p")], ensure_ascii=False)
             except Exception:
                 competition_value["job_category"] = json.dumps([], ensure_ascii=False)
 
-            # 홈페이지 없을 시, 링커리어 링크 첨부
+            competition_value["start_date"] = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/div/span[@class='start-at']/following-sibling::span[1]")
+            competition_value["end_date"] = safe_get_text(driver, By.XPATH, "//dl[dt[text()='접수기간']]/dd/span[@class='end-at']/following-sibling::span[1]")
+
             homepage_url = safe_get_attr(driver, By.CSS_SELECTOR, "dd.text > a", "href")
-            if(homepage_url == '-'):
-                homepage_url = href
-            competition_value["homepage_url"] = homepage_url
+            competition_value["homepage_url"] = homepage_url if homepage_url != '-' else href
 
             competition_value["img_url"] = safe_get_attr(driver, By.CLASS_NAME, "card-image", "src")
             competition_value["benefits"] = safe_get_text(driver, By.XPATH, "//dt[text()='활동혜택']/following-sibling::dd")
             competition_value["eligibility"] = safe_get_text(driver, By.XPATH, "//dt[text()='참여대상']/following-sibling::dd")
-            competition_value["linkareer_id"] = competition_key
-            print(competition_value)
-            if(find_by_reference_url(href)):
-                return
-            else:
-                save_to_db(competition_value)
-    finally:
-        driver.quit()
+            competition_value["linkareer_id"] = int(competition_key)
 
-# linkareer_id로 레코드 확인 있으면 true, 없으면 false 반환
-def find_by_reference_url(url: str) -> bool:
-    from database.connection import get_session
-    from database.orm import Scrap
+            new_data.append(competition_value)
+            print(f"Saved: {competition_value['title']}")
 
-    with get_session() as session:
-        return session.query(Scrap).filter(Scrap.homepage_url == url).first() is not None
-
-def save_to_db(raw: dict) -> None:
-    from database.orm import Scrap, ScrapType
-    from datetime import datetime
-
-    scrap = Scrap(
-        scrap_type = ScrapType.COMPETITION,
-
-        created_time = datetime.now(),
-        modified_time = datetime.now(),
-        linkareer_id = raw.get("linkareer_id"),
-        title = raw.get("title"),
-        organizer_name = raw.get("organizer_name"),
-        start_date = raw.get("start_date"),
-        end_date = raw.get("end_date"),
-        job_category = raw.get("job_category"),
-        homepage_url = raw.get("homepage_url"),
-        img_url = raw.get("img_url"),
-        benefits = raw.get("benefits"),
-        eligibility = raw.get("eligibility")
-    )
-
-    from database.connection import get_session
-    with get_session() as session:
-        session.add(scrap)
-        session.commit()
+    except Exception as e:
+        print(f"공모전 크롤링 중 오류 발생: {e}")
