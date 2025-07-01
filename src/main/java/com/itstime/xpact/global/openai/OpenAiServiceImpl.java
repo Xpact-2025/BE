@@ -2,6 +2,7 @@ package com.itstime.xpact.global.openai;
 
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
+import com.itstime.xpact.domain.guide.entity.Weakness;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.global.exception.GeneralException;
@@ -23,6 +24,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,10 +38,14 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     @Async
     public void summarizeExperience(Experience experience) {
-        String message = String.format("""
-                역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘\s
-                요약만 출력되도록 해줘\s
-                data : %s""", experience.toString());
+        String message = String.format(
+                """
+                    다음 주어질 경험에 대해 역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘
+                    요약만 출력되도록 해줘
+                    만약 주어진 경험이 요약하기 충분하지 않은 경우, 'INVALID_INPUT'를 출력하시오.
+                    data : %s
+                """,
+                experience.toString());
 
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
@@ -71,7 +78,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
             log.info("Requesting core skill extraction from OpenAI for detailRecruits: {}", joinedDetailNames);
 
-            String promptMessage = String.format(
+            String promptMessage = format(
                     "다음 ','로 구분된 직무에 대해 반드시 요구되는 핵심 스킬 5가지를 도출해줘.(숫자 넣지 마)\n" +
                             "출력 형식: {직무}-{핵심스킬1}/{핵심2}/{핵심스킬3}/{핵심스킬4}/{핵심스킬5}\n\n" +
                             "출력 시 직무는 변형 없이 그대로 출력해라. -와 /는 필수이다.\n" +
@@ -93,17 +100,17 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     public void getDetailRecruitFromExperience(Experience experience) {
         String experienceStr = experience.toString();
-        String recruits = detailRecruitToString();
+        List<String> recruits = detailRecruitToString();
         String message = String.format(
-                // TODO 퀄리티 높이기
-                "다음 객체를 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.\n" +
-                        "객체: %s\n" +
-                        "recruit (각 recruit는 '/'로 분리되어 있음) : %s\n" +
-                        "출력 형식 : {recruit}\n" +
-                        "출력 시 다른 문구 넣지 말고 그저 선택한 recruit만 출력해야함",
+                """     
+                        다음 경험을 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.
+                        경험: %s
+                        recruit (각 recruit는 '/'로 분리되어 있음) : %s
+                        출력 형식 : {recruit}
+                        출력 시 다른 문구 넣지 말고 그저 선택한 recruit만 출력해야함
+                """,
                 experienceStr, recruits
         );
-
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
         String result = response.getResult().getOutput().getText();
@@ -116,11 +123,11 @@ public class OpenAiServiceImpl implements OpenAiService {
         experienceRepository.save(fresh);
     }
 
-    private String detailRecruitToString() {
-        StringBuilder recruits = new StringBuilder();
+    private List<String> detailRecruitToString() {
+        List<String> recruits = new ArrayList<>();
         detailRecruitRepository.findAll()
-                .forEach(recruit -> recruits.append(", ").append(recruit.getName()));
-        return recruits.toString();
+        .forEach(recruit -> recruits.add(recruit.getName()));
+        return recruits;
     }
 
     @Async
@@ -143,4 +150,31 @@ public class OpenAiServiceImpl implements OpenAiService {
         return CompletableFuture.completedFuture(result);
     }
 
+    // 3가지 약점 분석 -> 3가지 약점에 맞춘 맞춤형 활동 추천하기
+    public String getRecommendActivitiesByExperiecnes(List<Weakness> weaknesses) {
+        String weaknessString = weaknesses.toString();
+        System.out.println("weaknessString = " + weaknessString);
+        String systemString = """
+                너는 JSON 응답만 출력하는 AI야, 아래와 같이 HashMap<String, List<Long>>에 맞춰 응답해 (```json ``` 포함 엄금)
+                {
+                    "weakName1" : [1, 2, 3, ...],
+                    "weakName2" : [4, 5, 6, ...],
+                    "weakName3" : [7, 8, 9, ...]
+                }
+                """;
+        String userString = String.format("""
+                %s
+                위 약점 데이터를 분석하여, 약점을 보완할만한 활동의 id를 선택하여 해당 weakName으로 할당해줘
+                (하나의 id는 60444를 포함시켜줘 & id는 60444 이상)
+                """, weaknessString);
+        Message userMessage = new UserMessage(userString);
+        Message systemMessage = new SystemMessage(systemString);
+
+        Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
+        ChatResponse response = openAiChatModel.call(prompt);
+
+        String result = response.getResult().getOutput().getText();
+        log.info("result : {}", result);
+        return result;
+    }
 }

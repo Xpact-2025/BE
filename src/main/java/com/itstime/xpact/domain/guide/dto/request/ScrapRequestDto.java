@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.guide.dto;
+package com.itstime.xpact.domain.guide.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.itstime.xpact.domain.guide.common.ScrapType;
@@ -6,10 +6,13 @@ import com.itstime.xpact.domain.guide.entity.Scrap;
 import lombok.Getter;
 
 @Getter
-public class ScrapResponseDto {
+public class ScrapRequestDto {
 
     @JsonProperty("linkareer_id")
     private Long linkareerId;
+    @JsonProperty("scrap_type")
+    private ScrapType scrapType;
+    @JsonProperty("title")
     private String title;
     @JsonProperty("orgnizer_name")
     private String organizerName;

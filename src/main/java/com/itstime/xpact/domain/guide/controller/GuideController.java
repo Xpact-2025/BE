@@ -1,18 +1,19 @@
 package com.itstime.xpact.domain.guide.controller;
 
+import com.itstime.xpact.domain.guide.dto.response.ScrapThumbnailResponseDto;
 import com.itstime.xpact.domain.guide.service.GuideService;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "가이드 API Controller")
+@Tag(name = "성장 가이드 API Controller")
 @RequestMapping("/api/guide")
 public class GuideController {
 
@@ -30,5 +31,11 @@ public class GuideController {
                         guideService.getAnalysis()
                 )
         );
+    }
+
+    @Operation(summary = "약점 기반 AI 추천 활동")
+    @GetMapping("/activities")
+    public ResponseEntity<RestResponse<List<ScrapThumbnailResponseDto>>> getActivities() {
+        return ResponseEntity.ok(RestResponse.ok(guideService.getActivities()));
     }
 }

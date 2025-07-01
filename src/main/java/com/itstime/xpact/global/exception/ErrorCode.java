@@ -111,6 +111,13 @@ public enum ErrorCode {
     // file
     NO_SUCH_FILE(HttpStatus.NOT_FOUND, "F001", "해당 파일은 존재하지 않습니다."),
 
+    // Scrap
+    SCRAP_NOT_EXISTS(HttpStatus.BAD_REQUEST, "SC001", "해당 활동은 존재하지 않습니다."),
+
+    // Scrap 기능
+    ALREADY_SCRAPPED(HttpStatus.BAD_REQUEST, "SC002", "이미 스크랩한 활동입니다."),
+    ALREADY_UNSCRAPPED(HttpStatus.BAD_REQUEST, "SC003", "이미 스크랩 해제한 활동입니다."),
+
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),
     ;
