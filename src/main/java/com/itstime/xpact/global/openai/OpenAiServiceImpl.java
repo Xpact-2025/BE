@@ -152,8 +152,21 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     // 3가지 약점 분석 -> 3가지 약점에 맞춘 맞춤형 활동 추천하기
     public String getRecommendActivitiesByExperiecnes(List<Weakness> weaknesses) {
-        String userString = "";
-        String systemString = "asdf";
+        String weaknessString = weaknesses.toString();
+        System.out.println("weaknessString = " + weaknessString);
+        String systemString = """
+                너는 JSON 응답만 출력하는 AI야, 아래와 같이 HashMap<String, List<Long>>에 맞춰 응답해 (```json ``` 포함 엄금)
+                {
+                    "weakName1" : [1, 2, 3, ...],
+                    "weakName2" : [4, 5, 6, ...],
+                    "weakName3" : [7, 8, 9, ...]
+                }
+                """;
+        String userString = String.format("""
+                %s
+                위 약점 데이터를 분석하여, 약점을 보완할만한 활동의 id를 선택하여 해당 weakName으로 할당해줘
+                (하나의 id는 60444를 포함시켜줘 & id는 60444 이상)
+                """, weaknessString);
         Message userMessage = new UserMessage(userString);
         Message systemMessage = new SystemMessage(systemString);
 
@@ -164,5 +177,4 @@ public class OpenAiServiceImpl implements OpenAiService {
         log.info("result : {}", result);
         return result;
     }
-
 }
