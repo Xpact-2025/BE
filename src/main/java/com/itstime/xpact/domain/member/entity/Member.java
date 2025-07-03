@@ -108,12 +108,17 @@ public class Member extends BaseEntity {
                 .name(member.getName())
                 .imgurl(member.getImgurl() != null ? member.getImgurl() : null)
                 .age(member.getAge() != null ? member.getAge() : 0)
-                .educationName(member.getEducation() == null ? null : member.getEducation().getEducationName())
+                .educationName(
+                        member.getEducation() != null && member.getEducation().getEducationName() != null
+                                ? member.getEducation().getEducationName()
+                                : null
+                )
                 .desiredDetailRecruit(member.getDesiredRecruit() != null ? member.getDesiredRecruit() : null)
                 .educationSaveResponseDto(educationDto != null ? educationDto : null)
                 .desiredRecruitResponseDto(desiredRecruitDto != null ? desiredRecruitDto : null)
                 .build();
     }
+
 
     public void updateMemberInfo(MemberSaveRequestDto requestDto) {
         if (requestDto.name() != null) this.name = requestDto.name();
