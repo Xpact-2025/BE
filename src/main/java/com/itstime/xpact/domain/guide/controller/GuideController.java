@@ -1,9 +1,9 @@
 package com.itstime.xpact.domain.guide.controller;
 
-import com.itstime.xpact.domain.guide.dto.response.ScrapThumbnailResponseDto;
 import com.itstime.xpact.domain.guide.service.GuideService;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +33,14 @@ public class GuideController {
         );
     }
 
-    @Operation(summary = "약점 기반 AI 추천 활동")
+    @Operation(summary = "약점 기반 AI 추천 활동", description = """
+            약점 별 공고를 추천하는 API입니다.<br>
+            조회하고 싶은 약점이 몇번째인지에 대하여 입력해주세요.
+            """)
     @GetMapping("/activities")
-    public ResponseEntity<RestResponse<List<ScrapThumbnailResponseDto>>> getActivities() {
-        return ResponseEntity.ok(RestResponse.ok(guideService.getActivities()));
+    public ResponseEntity<RestResponse<List<?>>> getActivities(
+            @Parameter(name = "weaknessOrder") int weaknessOrder
+    ) {
+        return ResponseEntity.ok(RestResponse.ok(guideService.getActivities(weaknessOrder)));
     }
 }

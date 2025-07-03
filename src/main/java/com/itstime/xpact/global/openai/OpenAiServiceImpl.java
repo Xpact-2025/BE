@@ -151,30 +151,25 @@ public class OpenAiServiceImpl implements OpenAiService {
     }
 
     // 3가지 약점 분석 -> 3가지 약점에 맞춘 맞춤형 활동 추천하기
-    public String getRecommendActivitiesByExperiecnes(List<Weakness> weaknesses) {
-        String weaknessString = weaknesses.toString();
-        System.out.println("weaknessString = " + weaknessString);
-        String systemString = """
-                너는 JSON 응답만 출력하는 AI야, 아래와 같이 HashMap<String, List<Long>>에 맞춰 응답해 (```json ``` 포함 엄금)
-                {
-                    "weakName1" : [1, 2, 3, ...],
-                    "weakName2" : [4, 5, 6, ...],
-                    "weakName3" : [7, 8, 9, ...]
-                }
-                """;
-        String userString = String.format("""
-                %s
-                위 약점 데이터를 분석하여, 약점을 보완할만한 활동의 id를 선택하여 해당 weakName으로 할당해줘
-                (하나의 id는 60444를 포함시켜줘 & id는 60444 이상)
-                """, weaknessString);
+    public List<String> getRecommendActivities(String weakness) {
+
+        String systemString = "너는 입력된 키워드를 기반으로, 해당 키워드와 의미적으로 관련된 직무, 기술, 산업, 직군 등 연관 키워드를 추천해주는 전문가다." +
+                    "추천 키워드는 최대한 직무 또는 산업에서 실제로 사용되는 용어로 제시해라." +
+                    "키워드는 한국어와 영어 둘 다 출력한다." +
+                    "한국어 5개, 영어 5개로 총 10개로 제한한다." +
+                    "출력은 반드시 쉼표로 구분된 키워드만 응답한다.";
+        String userString = String.format("%s", weakness);
+
         Message userMessage = new UserMessage(userString);
         Message systemMessage = new SystemMessage(systemString);
 
-        Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
+        Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
         ChatResponse response = openAiChatModel.call(prompt);
 
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
-        return result;
+        return Arrays.stream(result.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 }

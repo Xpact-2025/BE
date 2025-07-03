@@ -1,6 +1,9 @@
 package com.itstime.xpact.domain.guide.repository;
 
+import com.itstime.xpact.domain.guide.entity.QScrap;
 import com.itstime.xpact.domain.guide.entity.Scrap;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,6 +20,9 @@ import java.util.List;
 public class ScrapCustomRepositoryImpl implements ScrapCustomRepository {
 
     private final JdbcTemplate jdbcTemplate;
+
+    private final JPAQueryFactory jpaQueryFactory;
+    private final QScrap scrap = QScrap.scrap;
 
     @Transactional
     public int saveAllWithIgnore(List<Scrap> scraps) {
@@ -54,5 +60,21 @@ public class ScrapCustomRepositoryImpl implements ScrapCustomRepository {
         });
 
         return Arrays.stream(result).sum();
+    }
+
+    @Override
+    public List<Scrap> findByTitleContainingKeywords(List<String> keywords) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        for (String keyword: keywords) {
+            builder.or(scrap.title.containsIgnoreCase(keyword)); // or로 중복 방지
+        }
+
+        return jpaQueryFactory
+                .select(scrap)
+                .from(scrap)
+                .where(builder)
+                .fetch();
     }
 }

@@ -8,4 +8,5 @@ import java.util.List;
 public interface ScrapCustomRepository {
 
     int saveAllWithIgnore(List<Scrap> scraps);
+    List<Scrap> findByTitleContainingKeywords(List<String> keywords);
 }
