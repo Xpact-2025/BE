@@ -27,6 +27,7 @@ public enum ErrorCode {
     EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "TE004", "토큰의 기한이 만료되었습니다."),
     UNSUPPORTED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "TE005", "지원하지 않는 토큰 형식입니다."),
     FAILED_JWT_INFO(HttpStatus.UNAUTHORIZED, "TE006", "토큰으로부터 회원의 정보를 얻을 수 없습니다."),
+    UNMATCHED_TOKEN(HttpStatus.UNAUTHORIZED, "TE007", "저장된 토큰과 일치하지 않습니다."),
 
     // login
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "권한이 존재하지 않습니다"),
@@ -109,6 +110,13 @@ public enum ErrorCode {
 
     // file
     NO_SUCH_FILE(HttpStatus.NOT_FOUND, "F001", "해당 파일은 존재하지 않습니다."),
+
+    // Scrap
+    SCRAP_NOT_EXISTS(HttpStatus.BAD_REQUEST, "SC001", "해당 활동은 존재하지 않습니다."),
+
+    // Scrap 기능
+    ALREADY_SCRAPPED(HttpStatus.BAD_REQUEST, "SC002", "이미 스크랩한 활동입니다."),
+    ALREADY_UNSCRAPPED(HttpStatus.BAD_REQUEST, "SC003", "이미 스크랩 해제한 활동입니다."),
 
     // etc
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ETC001", "잘못된 날짜입니다."),

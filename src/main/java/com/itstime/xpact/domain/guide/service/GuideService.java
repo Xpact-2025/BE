@@ -1,26 +1,36 @@
 package com.itstime.xpact.domain.guide.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.dashboard.dto.response.SkillMapResponseDto;
 import com.itstime.xpact.domain.dashboard.entity.CoreSkillMap;
 import com.itstime.xpact.domain.dashboard.repository.CoreSkillMapRepository;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
-import com.itstime.xpact.domain.guide.dto.WeaknessGuideResponseDto;
+import com.itstime.xpact.domain.guide.dto.response.OpenAiScrapResponseDto;
+import com.itstime.xpact.domain.guide.dto.response.ScrapThumbnailResponseDto;
+import com.itstime.xpact.domain.guide.dto.response.WeaknessGuideResponseDto;
+import com.itstime.xpact.domain.guide.entity.MemberScrap;
+import com.itstime.xpact.domain.guide.entity.Scrap;
 import com.itstime.xpact.domain.guide.entity.Weakness;
+import com.itstime.xpact.domain.guide.repository.MemberScrapRepository;
+import com.itstime.xpact.domain.guide.repository.ScrapRepository;
 import com.itstime.xpact.domain.guide.repository.WeaknessRepository;
 import com.itstime.xpact.domain.member.entity.Member;
+import com.itstime.xpact.domain.member.repository.MemberRepository;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,10 +39,13 @@ public class GuideService {
 
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
+    private final ObjectMapper objectMapper;
 
     private final WeaknessRepository weaknessRepository;
     private final ExperienceRepository experienceRepository;
     private final CoreSkillMapRepository coreSkillMapRepository;
+    private final ScrapRepository scrapRepository;
+    private final MemberScrapRepository memberScrapRepository;
 
     @Async
     public CompletableFuture<Void> saveWeakness(Member member) {
@@ -105,5 +118,40 @@ public class GuideService {
                 .stream()
                 .map(Weakness::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScrapThumbnailResponseDto> getActivities() {
+        Member member = securityProvider.getCurrentMember();
+        List<Weakness> weaknesses = weaknessRepository.findByMemberId(member.getId());
+
+        String result = openAiService.getRecommendActivitiesByExperiecnes(weaknesses);
+
+        OpenAiScrapResponseDto scrapResponseIds;
+        try {
+            scrapResponseIds = objectMapper.readValue(result, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            throw GeneralException.of(ErrorCode.FAILED_OPENAI_PARSING);
+        }
+
+        List<Long> scrapIdList = scrapResponseIds.values().stream()
+                .flatMap(Collection::stream)
+                .distinct()
+                .toList();
+
+        List<Scrap> scrapList = scrapRepository.findAllById(scrapIdList);
+        Map<Long, Scrap> scrapMap = scrapList.stream().collect(Collectors.toMap(Scrap::getId, Function.identity()));
+
+        List<MemberScrap> memberScrapList = memberScrapRepository.findByMemberAndScrapIds(member, scrapIdList);
+        Set<Long> scrappedScrapIdList = memberScrapList.stream()
+                .map(memberScrap -> memberScrap.getScrap().getId())
+                .collect(Collectors.toSet());
+
+        return scrapIdList.stream()
+                .map(id -> {
+                    Scrap scrap = scrapMap.get(id);
+                    Boolean isScraped = scrappedScrapIdList.contains(id);
+                    return ScrapThumbnailResponseDto.of(scrap, isScraped);
+                }).toList();
     }
 }
