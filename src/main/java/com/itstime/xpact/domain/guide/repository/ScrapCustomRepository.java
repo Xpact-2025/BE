@@ -1,12 +1,13 @@
 package com.itstime.xpact.domain.guide.repository;
 
 import com.itstime.xpact.domain.guide.entity.Scrap;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface ScrapCustomRepository {
 
     int saveAllWithIgnore(List<Scrap> scraps);
-    List<Scrap> findByTitleContainingKeywords(List<String> keywords);
+    Slice<Scrap> findByTitleContainingKeywords(List<String> keywords, Pageable pageable);
 }
