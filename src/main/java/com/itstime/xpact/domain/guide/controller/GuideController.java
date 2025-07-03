@@ -6,10 +6,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +37,8 @@ public class GuideController {
 
     @Operation(summary = "약점 기반 AI 추천 활동", description = """
             약점 별 공고를 추천하는 API입니다.<br>
-            조회하고 싶은 약점이 몇번째인지에 대하여 입력해주세요.
+            조회하고 싶은 약점이 몇번째인지에 대하여 입력해주세요.<br>
+            0은 전체, 1은 첫번째 약점, 2는 두번째 약점, 3은 세번째 약점으로 조회됩니다.
             """)
     @GetMapping("/activities")
     public ResponseEntity<RestResponse<List<?>>> getActivities(
