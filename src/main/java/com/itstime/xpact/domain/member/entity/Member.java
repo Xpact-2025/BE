@@ -98,7 +98,11 @@ public class Member extends BaseEntity {
                 .name(member.getName())
                 .imgurl(member.getImgurl() != null ? member.getImgurl() : null)
                 .age(member.getAge() != null ? member.getAge() : 0)
-                .educationName(member.getEducation().getEducationName() != null ? member.getEducation().getEducationName() : null)
+                .educationName(
+                        member.getEducation() != null && member.getEducation().getEducationName() != null
+                                ? member.getEducation().getEducationName()
+                                : null
+                )
                 .desiredDetailRecruit(member.getDesiredRecruit() != null ? member.getDesiredRecruit() : null)
                 .build();
     }
