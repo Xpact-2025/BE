@@ -1,6 +1,5 @@
 package com.itstime.xpact.domain.guide.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.dashboard.dto.response.SkillMapResponseDto;
 import com.itstime.xpact.domain.dashboard.entity.CoreSkillMap;
 import com.itstime.xpact.domain.dashboard.repository.CoreSkillMapRepository;
@@ -19,6 +18,8 @@ import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,6 @@ public class GuideService {
 
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
-    private final ObjectMapper objectMapper;
 
     private final WeaknessRepository weaknessRepository;
     private final ExperienceRepository experienceRepository;
@@ -97,8 +97,9 @@ public class GuideService {
                     weaknessRepository.saveAll(savedWeakness);
                 }
             }
-                });
+        });
     }
+
 
     @Transactional(readOnly = true)
     public List<WeaknessGuideResponseDto> getAnalysis() {
@@ -114,38 +115,57 @@ public class GuideService {
                 .toList();
     }
 
+
     @Transactional(readOnly = true)
-    public List<ScrapThumbnailResponseDto> getActivities(int weaknessOrder) {
+    public Slice<ScrapThumbnailResponseDto> getActivities(int weaknessOrder, Pageable pageable) {
         Member member = securityProvider.getCurrentMember();
 
-//        if (weaknessOrder == 0) {
-//            weaknessRepository.findAll()
-//        }
-        String weakness = weaknessRepository.findByMemberId(member.getId())
-                .get(weaknessOrder-1)
-                .getName();
+        List<String> keywords;
+        // 전체 약점 기반 추천
+        if (weaknessOrder == 0) {
+            List<String> weaknessNames = weaknessRepository.findByMemberId(member.getId())
+                    .stream()
+                    .map(Weakness::getName)
+                    .filter(name -> name != null & name.isBlank())
+                    .toList();
 
-        // 만약 약점 분석이 안 되어있을 경우 우선적으로 분석 필수
-        if (weakness == null || weakness.trim().isEmpty()) {
-            throw CustomException.of(ErrorCode.NEED_ANALYSIS);
+            Set<String> keywordSet = new HashSet<>();
+
+            for (String weaknessName : weaknessNames) {
+                List<String> keywordsByAi = openAiService.getRecommendActivities(weaknessName);
+                keywordSet.addAll(keywordsByAi);
+            }
+            keywords = new ArrayList<>(keywordSet);
+        } else { // 특정 약점 기반으로 분석
+
+            String weakness = weaknessRepository.findByMemberId(member.getId())
+                    .get(weaknessOrder - 1)
+                    .getName();
+
+            // 만약 약점 분석이 안 되어있을 경우 우선적으로 분석 필수
+            if (weakness == null || weakness.trim().isEmpty()) {
+                throw CustomException.of(ErrorCode.NEED_ANALYSIS);
+            }
+
+            keywords = openAiService.getRecommendActivities(weakness);
         }
 
-        List<String> result = openAiService.getRecommendActivities(weakness);
-
-        List<Scrap> scrapList = scrapRepository.findByTitleContainingKeywords(result);
+        // 추천 기반 공고 조회
+        Slice<Scrap> scrapList = scrapRepository.findByTitleContainingKeywords(keywords, pageable);
         List<Long> scrapIdList = scrapList.stream()
                 .map(Scrap::getId)
                 .toList();
 
+        // 스크랩 여부 조회
         List<MemberScrap> memberScrapList = memberScrapRepository.findByMemberAndScrapIds(member, scrapIdList);
         Set<Long> scrappedScrapIdList = memberScrapList.stream()
                 .map(memberScrap -> memberScrap.getScrap().getId())
                 .collect(Collectors.toSet());
 
-        return scrapList.stream()
+        return scrapList
                 .map(s -> {
                     Boolean isScraped = scrappedScrapIdList.contains(s.getId());
                     return ScrapThumbnailResponseDto.of(s, isScraped);
-                }).toList();
+                });
     }
 }

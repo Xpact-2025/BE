@@ -153,11 +153,13 @@ public class OpenAiServiceImpl implements OpenAiService {
     // 3가지 약점 분석 -> 3가지 약점에 맞춘 맞춤형 활동 추천하기
     public List<String> getRecommendActivities(String weakness) {
 
-        String systemString = "너는 입력된 키워드를 기반으로, 해당 키워드와 의미적으로 관련된 직무, 기술, 산업, 직군 등 연관 키워드를 추천해주는 전문가다." +
-                    "추천 키워드는 최대한 직무 또는 산업에서 실제로 사용되는 용어로 제시해라." +
-                    "키워드는 한국어와 영어 둘 다 출력한다." +
-                    "한국어 5개, 영어 5개로 총 10개로 제한한다." +
-                    "출력은 반드시 쉼표로 구분된 키워드만 응답한다.";
+        String systemString = String.join(" ",
+                "너는 입력된 키워드를 기반으로 의미적으로 관련된 직무, 기술, 산업, 직군 키워드를 추천해주는 전문가다.",
+                "추천 키워드는 실제 대외활동이나 채용 공고 등에서 자주 등장하는 실용적인 키워드여야 한다.",
+                "한국어 키워드 7개와 영어 키워드 3개로, 총 10개의 키워드를 쉼표(,)로 구분해서 출력해라.",
+                "다른 설명이나 문장은 절대 포함하지 마.",
+                "예: 해커톤, 데이터베이스, 서버 운영, 웹 개발, 클라우드, 정보보안, 데이터 분석, backend, database, cloud"
+        );
         String userString = String.format("%s", weakness);
 
         Message userMessage = new UserMessage(userString);

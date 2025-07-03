@@ -41,9 +41,10 @@ public class GuideController {
             0은 전체, 1은 첫번째 약점, 2는 두번째 약점, 3은 세번째 약점으로 조회됩니다.
             """)
     @GetMapping("/activities")
-    public ResponseEntity<RestResponse<List<?>>> getActivities(
-            @Parameter(name = "weaknessOrder") int weaknessOrder
+    public ResponseEntity<RestResponse<?>> getActivities(
+            @Parameter @RequestParam(name = "weaknessOrder") int weaknessOrder,
+            @ParameterObject @PageableDefault(size = 12, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(RestResponse.ok(guideService.getActivities(weaknessOrder)));
+        return ResponseEntity.ok(RestResponse.ok(guideService.getActivities(weaknessOrder, pageable)));
     }
 }
