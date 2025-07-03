@@ -4,6 +4,7 @@ services:
     container_name: xpact-api
     ports:
       - "8080:8080"
+      - "1099:1099"
     env_file:
       - /home/ubuntu/xpact-api/.env
     volumes:
