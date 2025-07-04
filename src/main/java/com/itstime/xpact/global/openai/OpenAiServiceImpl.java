@@ -52,10 +52,12 @@ public class OpenAiServiceImpl implements OpenAiService {
         String summary = response.getResult().getOutput().getText();
         log.info("summary : {}", summary);
 
-        Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow();
+        Experience fresh = experienceRepository.findById(experience.getId())
+                .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
 
         fresh.setSummary(summary);
         experienceRepository.save(fresh);
+        log.info("finish to save {}'s summary ....", experience.getId());
     }
 
     public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
@@ -82,6 +84,9 @@ public class OpenAiServiceImpl implements OpenAiService {
                     "다음 ','로 구분된 직무에 대해 반드시 요구되는 핵심 스킬 5가지를 도출해줘.(숫자 넣지 마)\n" +
                             "출력 형식: {직무}-{핵심스킬1}/{핵심2}/{핵심스킬3}/{핵심스킬4}/{핵심스킬5}\n\n" +
                             "출력 시 직무는 변형 없이 그대로 출력해라. -와 /는 필수이다.\n" +
+                            "예시:\n" +
+                            "서비스 기획자-사용자 중심 사고/커뮤니케이션/문제 해결력/데이터 분석/콘텐츠 기획력\n" +
+                            "데이터 엔지니어-SQL/데이터 파이프라인/ETL/클라우드 플랫폼/시스템 최적화\n\n" +
                             "%s", joinedDetailNames);
 
             Prompt prompt = new Prompt(promptMessage);
