@@ -5,7 +5,7 @@ import com.itstime.xpact.domain.dashboard.entity.RecruitCount;
 import com.itstime.xpact.domain.dashboard.repository.RecruitCountRepository;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
-import com.itstime.xpact.global.exception.GeneralException;
+import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +65,7 @@ public class RatioService {
         RecruitCount recruitCount = recruitCountRepository.findById(memberId)
                 .orElseGet(() -> setCounts(memberId));
 
-        if(recruitCount.getRecruitCount().isEmpty()) throw GeneralException.of(ErrorCode.NO_EXPERIENCE);
+        if(recruitCount.getRecruitCount().isEmpty()) throw CustomException.of(ErrorCode.NO_EXPERIENCE);
 
         log.info("get count from redis");
         return recruitCount.getRecruitCount().entrySet().stream()
@@ -84,7 +84,7 @@ public class RatioService {
         List<Experience> experiences = experienceRepository.findAllWithDetailRecruitByMemberId(memberId);
 
         if(experiences == null || experiences.isEmpty()) {
-            throw GeneralException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+            throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
         }
 
         Map<String, Integer> result = new HashMap<>();
@@ -109,14 +109,14 @@ public class RatioService {
         if(diff > 0) {
             String maxKey = result.entrySet().stream()
                     .max(Map.Entry.comparingByValue())
-                    .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH))
+                    .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH))
                     .getKey();
 
             result.put(maxKey, result.get(maxKey) + diff);
         } else if(diff < 0) {
             String minKey = result.entrySet().stream()
                     .min(Map.Entry.comparingByValue())
-                    .orElseThrow(() -> GeneralException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH))
+                    .orElseThrow(() -> CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH))
                     .getKey();
 
             result.put(minKey, result.get(minKey) - diff);
