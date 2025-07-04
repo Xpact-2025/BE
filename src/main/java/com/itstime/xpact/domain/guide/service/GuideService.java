@@ -120,35 +120,9 @@ public class GuideService {
     public Slice<ScrapThumbnailResponseDto> getActivities(int weaknessOrder, Pageable pageable) {
         Member member = securityProvider.getCurrentMember();
 
-        List<String> keywords;
-        // 전체 약점 기반 추천
-        if (weaknessOrder == 0) {
-            List<String> weaknessNames = weaknessRepository.findByMemberId(member.getId())
-                    .stream()
-                    .map(Weakness::getName)
-                    .filter(name -> name != null & name.isBlank())
-                    .toList();
-
-            Set<String> keywordSet = new HashSet<>();
-
-            for (String weaknessName : weaknessNames) {
-                List<String> keywordsByAi = openAiService.getRecommendActivities(weaknessName);
-                keywordSet.addAll(keywordsByAi);
-            }
-            keywords = new ArrayList<>(keywordSet);
-        } else { // 특정 약점 기반으로 분석
-
-            String weakness = weaknessRepository.findByMemberId(member.getId())
-                    .get(weaknessOrder - 1)
-                    .getName();
-
-            // 만약 약점 분석이 안 되어있을 경우 우선적으로 분석 필수
-            if (weakness == null || weakness.trim().isEmpty()) {
-                throw CustomException.of(ErrorCode.NEED_ANALYSIS);
-            }
-
-            keywords = openAiService.getRecommendActivities(weakness);
-        }
+        // OpenAI로부터 추천 키워드 받기
+        List<String> keywords = (weaknessOrder == 0)
+                ? getKeywordsForAll(member) : getKeywords(member, weaknessOrder);
 
         // 추천 기반 공고 조회
         Slice<Scrap> scrapList = scrapRepository.findByTitleContainingKeywords(keywords, pageable);
@@ -167,5 +141,38 @@ public class GuideService {
                     Boolean isScraped = scrappedScrapIdList.contains(s.getId());
                     return ScrapThumbnailResponseDto.of(s, isScraped);
                 });
+    }
+
+
+
+    // WeaknessOrder = 0 일 때
+    private List<String> getKeywordsForAll(Member member) {
+        List<String> weaknessNames = weaknessRepository.findByMemberId(member.getId())
+                .stream()
+                .map(Weakness::getName)
+                .filter(name -> name != null && name.isBlank())
+                .toList();
+
+        Set<String> keywordSet = new HashSet<>();
+
+        for (String weaknessName : weaknessNames) {
+            List<String> keywordsByAi = openAiService.getRecommendActivities(weaknessName);
+            keywordSet.addAll(keywordsByAi);
+        }
+        return new ArrayList<>(keywordSet);
+    }
+
+    // WeaknessOrder != 0 일 때
+    private List<String> getKeywords(Member member, int weaknessOrder) {
+        String weakness = weaknessRepository.findByMemberId(member.getId())
+                .get(weaknessOrder - 1)
+                .getName();
+
+        // 만약 약점 분석이 안 되어있을 경우 우선적으로 분석 필수
+        if (weakness == null || weakness.trim().isEmpty()) {
+            throw CustomException.of(ErrorCode.NEED_ANALYSIS);
+        }
+
+        return openAiService.getRecommendActivities(weakness);
     }
 }
