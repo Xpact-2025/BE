@@ -56,7 +56,7 @@ public class TimeService {
 
         experiences.stream()
                 .filter(e -> e.getSummary() == null || e.getSummary().isEmpty())
-                .forEach(openAiService::summarizeExperience);
+                .forEach(e -> openAiService.summarizeExperience(e, e.getSubExperiences()));
     }
 
     public void checkDetailRecruitOfExperience(Long memberId) {

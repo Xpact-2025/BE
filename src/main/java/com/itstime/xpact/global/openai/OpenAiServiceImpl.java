@@ -1,6 +1,7 @@
 package com.itstime.xpact.global.openai;
 
 import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.experience.entity.SubExperience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.guide.entity.Weakness;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
@@ -18,6 +19,7 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.*;
@@ -37,25 +39,25 @@ public class OpenAiServiceImpl implements OpenAiService {
     private final ExperienceRepository experienceRepository;
 
     @Async
-    public void summarizeExperience(Experience experience) {
+    @Transactional
+    public void summarizeExperience(Experience experience, List<SubExperience> subExperiences) {
         String message = String.format(
                 """
                     다음 주어질 경험에 대해 역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘
                     요약만 출력되도록 해줘
-                    만약 주어진 경험이 요약하기 충분하지 않은 경우, 'INVALID_INPUT'를 출력하시오.
-                    data : %s
+                    Experience : %s
+                    SubExperience : %s
                 """,
-                experience.toString());
+                experience.toString(), subExperiences.toString());
 
+        System.out.println("prompt input value = " + message);
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
         String summary = response.getResult().getOutput().getText();
         log.info("summary : {}", summary);
 
         Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow();
-
         fresh.setSummary(summary);
-        experienceRepository.save(fresh);
     }
 
     public Map<String, Map<String, String>> getCoreSkill(List<String> recruitNames) {
@@ -98,6 +100,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         return result;
     }
 
+    @Transactional
     public void getDetailRecruitFromExperience(Experience experience) {
         String experienceStr = experience.toString();
         List<String> recruits = detailRecruitToString();
@@ -120,7 +123,6 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow();
         fresh.setDetailRecruit(detailRecruit);
-        experienceRepository.save(fresh);
     }
 
     private List<String> detailRecruitToString() {

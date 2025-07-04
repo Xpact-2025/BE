@@ -20,6 +20,7 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "sub_experience")
+@ToString(exclude = {"id", "tabName", "experience"})
 public class SubExperience extends BaseEntity {
 
     @Id
