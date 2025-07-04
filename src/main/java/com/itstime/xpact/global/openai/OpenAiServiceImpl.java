@@ -40,9 +40,8 @@ public class OpenAiServiceImpl implements OpenAiService {
     public void summarizeExperience(Experience experience) {
         String message = String.format(
                 """
-                    다음 주어질 경험에 대해 역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘
-                    요약만 출력되도록 해줘
-                    만약 주어진 경험이 요약하기 충분하지 않은 경우, 'INVALID_INPUT'를 출력하시오.
+                    다음 주어질 경험에 대해 역할, 내가 한 일, 성과(결과)가 드러나도록 2줄 분량으로 요약해줘.
+                    요약만 출력되도록 해줘.
                     data : %s
                 """,
                 experience.toString());
