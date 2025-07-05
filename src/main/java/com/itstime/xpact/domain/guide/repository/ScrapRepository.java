@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface ScrapRepository extends JpaRepository<Scrap, Long>, ScrapCustomRepository {
 
+    List<Scrap> findAll();
 }

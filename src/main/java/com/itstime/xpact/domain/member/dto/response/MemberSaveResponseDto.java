@@ -17,6 +17,10 @@ public record MemberSaveResponseDto(
         @Schema(description = "회원 나이")
         int age,
 
+        @Schema(description = "학위 구분",
+                example = "대학교")
+        String educationDegree,
+
         @Schema(description = "회원 최종 학력 한 줄",
                 example = "잇타대학교 잇타학과 재학")
         String educationName,
