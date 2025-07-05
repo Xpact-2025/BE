@@ -73,7 +73,7 @@ public class ExperienceConverter {
                     .title(createRequestDto.getTitle())
                     .startDate(createRequestDto.getStartDate())
                     .endDate(createRequestDto.getEndDate())
-                    .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
+//                    .isEnded(createRequestDto.getEndDate().isBefore(LocalDate.now()))
                     .build();
         }
     }
