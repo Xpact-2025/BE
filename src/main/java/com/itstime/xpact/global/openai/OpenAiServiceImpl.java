@@ -84,6 +84,9 @@ public class OpenAiServiceImpl implements OpenAiService {
                     "다음 ','로 구분된 직무에 대해 반드시 요구되는 핵심 스킬 5가지를 도출해줘.(숫자 넣지 마)\n" +
                             "출력 형식: {직무}-{핵심스킬1}/{핵심2}/{핵심스킬3}/{핵심스킬4}/{핵심스킬5}\n\n" +
                             "출력 시 직무는 변형 없이 그대로 출력해라. -와 /는 필수이다.\n" +
+                            "예시:\n" +
+                            "서비스 기획자-사용자 중심 사고/커뮤니케이션/문제 해결력/데이터 분석/콘텐츠 기획력\n" +
+                            "데이터 엔지니어-SQL/데이터 파이프라인/ETL/클라우드 플랫폼/시스템 최적화\n\n" +
                             "%s", joinedDetailNames);
 
             Prompt prompt = new Prompt(promptMessage);
@@ -153,30 +156,27 @@ public class OpenAiServiceImpl implements OpenAiService {
     }
 
     // 3가지 약점 분석 -> 3가지 약점에 맞춘 맞춤형 활동 추천하기
-    public String getRecommendActivitiesByExperiecnes(List<Weakness> weaknesses) {
-        String weaknessString = weaknesses.toString();
-        System.out.println("weaknessString = " + weaknessString);
-        String systemString = """
-                너는 JSON 응답만 출력하는 AI야, 아래와 같이 HashMap<String, List<Long>>에 맞춰 응답해 (```json ``` 포함 엄금)
-                {
-                    "weakName1" : [1, 2, 3, ...],
-                    "weakName2" : [4, 5, 6, ...],
-                    "weakName3" : [7, 8, 9, ...]
-                }
-                """;
-        String userString = String.format("""
-                %s
-                위 약점 데이터를 분석하여, 약점을 보완할만한 활동의 id를 선택하여 해당 weakName으로 할당해줘
-                (하나의 id는 60444를 포함시켜줘 & id는 60444 이상)
-                """, weaknessString);
+    public List<String> getRecommendActivities(String weakness) {
+
+        String systemString = String.join(" ",
+                "너는 입력된 키워드를 기반으로 의미적으로 관련된 직무, 기술, 산업, 직군 키워드를 추천해주는 전문가다.",
+                "추천 키워드는 실제 대외활동이나 채용 공고 등에서 자주 등장하는 실용적인 키워드여야 한다.",
+                "한국어 키워드 7개와 영어 키워드 3개로, 총 10개의 키워드를 쉼표(,)로 구분해서 출력해라.",
+                "다른 설명이나 문장은 절대 포함하지 마.",
+                "예: 해커톤, 데이터베이스, 서버 운영, 웹 개발, 클라우드, 정보보안, 데이터 분석, backend, database, cloud"
+        );
+        String userString = String.format("%s", weakness);
+
         Message userMessage = new UserMessage(userString);
         Message systemMessage = new SystemMessage(systemString);
 
-        Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
+        Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
         ChatResponse response = openAiChatModel.call(prompt);
 
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
-        return result;
+        return Arrays.stream(result.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 }

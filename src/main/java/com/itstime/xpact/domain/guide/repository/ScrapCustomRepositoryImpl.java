@@ -1,7 +1,14 @@
 package com.itstime.xpact.domain.guide.repository;
 
+import com.itstime.xpact.domain.guide.entity.QScrap;
 import com.itstime.xpact.domain.guide.entity.Scrap;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -17,6 +24,9 @@ import java.util.List;
 public class ScrapCustomRepositoryImpl implements ScrapCustomRepository {
 
     private final JdbcTemplate jdbcTemplate;
+
+    private final JPAQueryFactory jpaQueryFactory;
+    private final QScrap scrap = QScrap.scrap;
 
     @Transactional
     public int saveAllWithIgnore(List<Scrap> scraps) {
@@ -54,5 +64,30 @@ public class ScrapCustomRepositoryImpl implements ScrapCustomRepository {
         });
 
         return Arrays.stream(result).sum();
+    }
+
+    @Override
+    public Slice<Scrap> findByTitleContainingKeywords(List<String> keywords, Pageable pageable) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        for (String keyword: keywords) {
+            builder.or(scrap.title.containsIgnoreCase(keyword)); // or로 중복 방지
+        }
+
+        JPAQuery<Scrap> query = jpaQueryFactory
+                .selectFrom(scrap)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1); // limit + 1 for slice
+
+        List<Scrap> results = query.fetch();
+
+        boolean hasNext = results.size() > pageable.getPageSize();
+        if (hasNext) {
+            results.remove(results.size() -1);
+        }
+
+        return new SliceImpl<>(results, pageable, hasNext);
     }
 }
