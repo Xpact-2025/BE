@@ -8,6 +8,7 @@ import com.itstime.xpact.domain.experience.entity.embeddable.SimpleForm;
 import com.itstime.xpact.domain.experience.entity.embeddable.StarForm;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "sub_experience")
+@ToString(exclude = {"id", "tabName", "experience"})
 public class SubExperience extends BaseEntity {
 
     @Id
@@ -51,10 +53,12 @@ public class SubExperience extends BaseEntity {
     @JoinColumn(name = "experience_id")
     private Experience experience;
 
+    @BatchSize(size = 100)
     @Builder.Default
     @OneToMany(mappedBy = "subExperience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Keyword> keywords = new ArrayList<>();
 
+    @BatchSize(size = 100)
     @Builder.Default
     @OneToMany(mappedBy = "subExperience", cascade =  CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<File> files = new ArrayList<>();

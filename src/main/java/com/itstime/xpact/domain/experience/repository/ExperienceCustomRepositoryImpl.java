@@ -25,6 +25,7 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
     public List<Experience> findAllByMember(Member member, String order) {
         QExperience experience = QExperience.experience;
+        QSubExperience subExperience = QSubExperience.subExperience;
 
         OrderSpecifier<?> orderSpecifier = null;
         if(order.equals("LATEST")) {
@@ -34,6 +35,7 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
         }
 
         return queryFactory.selectFrom(experience)
+                .leftJoin(experience.subExperiences,  subExperience).fetchJoin()
                 .where(experience.member.id.eq(member.getId()))
                 .orderBy(orderSpecifier)
                 .fetch();

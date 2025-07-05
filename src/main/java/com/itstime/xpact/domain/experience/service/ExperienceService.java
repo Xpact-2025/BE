@@ -13,6 +13,7 @@ import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +35,13 @@ public class ExperienceService {
 
     public void create(ExperienceCreateRequestDto createRequestDto) throws GeneralException {
         Member member = securityProvider.getCurrentMember();
-        Experience experience = experienceConverter.createExperience(createRequestDto);
+        Pair<Experience, List<SubExperience>> pairExperience = experienceConverter.createExperience(createRequestDto);
+        Experience experience = pairExperience.getLeft();
+        List<SubExperience> subExperiences = pairExperience.getRight();
         setMapping(member, experience);
         experienceRepository.save(experience);
 
-        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience);
+        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience, subExperiences);
     }
 
     private void setMapping(Member member, Experience experience) {
@@ -69,7 +72,7 @@ public class ExperienceService {
         // mapping
         setMapping(updatedSubExperiences, experience);
 
-        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience);
+        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience, updatedSubExperiences);
 
         experienceRepository.save(experience);
     }
@@ -104,8 +107,8 @@ public class ExperienceService {
         experienceRepository.deleteAllByMember(member);
     }
 
-    private void setSummaryAndDetailRecruit(Experience experience) {
-        openAiService.summarizeExperience(experience);
+    private void setSummaryAndDetailRecruit(Experience experience, List<SubExperience> subExperiences) {
+        openAiService.summarizeExperience(experience, subExperiences);
         openAiService.getDetailRecruitFromExperience(experience);
     }
 }
