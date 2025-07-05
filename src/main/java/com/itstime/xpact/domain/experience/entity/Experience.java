@@ -22,7 +22,7 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"detailRecruit"})
+@ToString(exclude = {"detailRecruit", "member", "status", "summary", "subExperiences"})
 public class Experience extends BaseEntity {
 
     @Id
@@ -61,7 +61,7 @@ public class Experience extends BaseEntity {
     private String summary;
 
     @Builder.Default
-    @OneToMany(mappedBy = "experience", cascade =   CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<SubExperience> subExperiences = new ArrayList<>();
 
     @Setter

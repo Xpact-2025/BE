@@ -44,7 +44,8 @@ public class TimeService {
 
                     if (expStart == null) return false; // 시작일자 없는 것은 제외
 
-                    return (expEnd == null || !expEnd.isBefore(startLine)) && (!expStart.isAfter(endLine) && (expStart.isAfter(startLine)));
+                    LocalDate effectedEnd = expEnd != null ? expEnd : LocalDate.MAX; // 진행 중일 경우 고려
+                    return !expStart.isAfter(endLine) && !effectedEnd.isBefore(startLine);
                 })
                 .sorted(Comparator.comparing(Experience::getStartDate))
                 .map(Experience::toTimeLineDto)
@@ -56,7 +57,7 @@ public class TimeService {
 
         experiences.stream()
                 .filter(e -> e.getSummary() == null || e.getSummary().isEmpty())
-                .forEach(openAiService::summarizeExperience);
+                .forEach(e -> openAiService.summarizeExperience(e, e.getSubExperiences()));
     }
 
     public void checkDetailRecruitOfExperience(Long memberId) {

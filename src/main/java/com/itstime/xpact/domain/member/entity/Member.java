@@ -98,6 +98,8 @@ public class Member extends BaseEntity {
                 .name(member.getName())
                 .imgurl(member.getImgurl() != null ? member.getImgurl() : null)
                 .age(member.getAge() != null ? member.getAge() : 0)
+                .educationDegree(member.getEducation() != null && member.getEducation().getDegree() != null
+                        ? member.getEducation().getDegree().getDisplayName() : null)
                 .educationName(
                         member.getEducation() != null && member.getEducation().getEducationName() != null
                                 ? member.getEducation().getEducationName()
@@ -112,6 +114,10 @@ public class Member extends BaseEntity {
                 .name(member.getName())
                 .imgurl(member.getImgurl() != null ? member.getImgurl() : null)
                 .age(member.getAge() != null ? member.getAge() : 0)
+                .educationDegree(
+                        member.getEducation() != null && member.getEducation().getEducationName() != null
+                        ? member.getEducation().getDegree().getDisplayName() : null
+                )
                 .educationName(
                         member.getEducation() != null && member.getEducation().getEducationName() != null
                                 ? member.getEducation().getEducationName()

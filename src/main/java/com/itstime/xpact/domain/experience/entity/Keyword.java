@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @Entity
 @Builder
+@ToString(exclude = {"id", "subExperience"})
 @Table(name = "keyword")
 @NoArgsConstructor
 @AllArgsConstructor

@@ -11,6 +11,7 @@ import com.itstime.xpact.domain.experience.entity.Keyword;
 import com.itstime.xpact.domain.experience.entity.SubExperience;
 import com.itstime.xpact.domain.experience.entity.embeddable.SimpleForm;
 import com.itstime.xpact.domain.experience.entity.embeddable.StarForm;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @Component
 public class ExperienceConverter {
 
-    public Experience createExperience(ExperienceCreateRequestDto createRequestDto) {
+    public Pair<Experience, List<SubExperience>> createExperience(ExperienceCreateRequestDto createRequestDto) {
         Experience experience = commonFieldsBuilder(createRequestDto);
 
         List<SubExperience> subExperiences = createRequestDto.getSubExperiences().stream()
@@ -40,7 +41,7 @@ public class ExperienceConverter {
             }).toList();
 
         setMapping(experience, subExperiences);
-        return experience;
+        return Pair.of(experience, subExperiences);
     }
 
     private void setMapping(Experience experience, List<SubExperience> subExperiences) {
