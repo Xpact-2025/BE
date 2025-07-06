@@ -33,23 +33,26 @@ public class ExperienceService {
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
 
-    public void create(ExperienceCreateRequestDto createRequestDto) throws GeneralException {
+    public Pair<Experience, List<SubExperience>> create(ExperienceCreateRequestDto createRequestDto) throws GeneralException {
         Member member = securityProvider.getCurrentMember();
         Pair<Experience, List<SubExperience>> pairExperience = experienceConverter.createExperience(createRequestDto);
         Experience experience = pairExperience.getLeft();
         List<SubExperience> subExperiences = pairExperience.getRight();
-        setMapping(member, experience);
+        setMapping(member, experience, subExperiences);
         experienceRepository.save(experience);
-
-        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience, subExperiences);
+        return Pair.of(experience, subExperiences);
     }
 
-    private void setMapping(Member member, Experience experience) {
+    private void setMapping(Member member, Experience experience, List<SubExperience> subExperiences) {
         experience.setMember(member);
         member.getExperiences().add(experience);
+
+        experience.getSubExperiences().clear();
+        experience.getSubExperiences().addAll(subExperiences);
+        subExperiences.forEach(subExperience -> subExperience.setExperience(experience));
     }
 
-    public void update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws GeneralException {
+    public Pair<Experience, List<SubExperience>> update(Long experienceId, ExperienceUpdateRequestDto updateRequestDto) throws GeneralException {
         Member member = securityProvider.getCurrentMember();
 
         Experience experience = experienceRepository.findById(experienceId).orElseThrow(() ->
@@ -71,10 +74,8 @@ public class ExperienceService {
 
         // mapping
         setMapping(updatedSubExperiences, experience);
-
-        if(experience.getStatus().equals(Status.SAVE)) setSummaryAndDetailRecruit(experience, updatedSubExperiences);
-
         experienceRepository.save(experience);
+        return Pair.of(experience, updatedSubExperiences);
     }
 
     private void validateOwner(Member member, Experience experience) {
@@ -107,8 +108,8 @@ public class ExperienceService {
         experienceRepository.deleteAllByMember(member);
     }
 
-    private void setSummaryAndDetailRecruit(Experience experience, List<SubExperience> subExperiences) {
-        openAiService.summarizeExperience(experience, subExperiences);
-        openAiService.getDetailRecruitFromExperience(experience);
+    public void setSummaryAndDetailRecruit(Pair<Experience, List<SubExperience>> expPair) {
+        openAiService.summarizeExperience(expPair.getLeft(), expPair.getRight());
+        openAiService.getDetailRecruitFromExperience(expPair.getLeft());
     }
 }

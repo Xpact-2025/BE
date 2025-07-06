@@ -17,4 +17,6 @@ public interface MemberScrapRepository extends JpaRepository<MemberScrap, Long> 
 
     @Query("SELECT ms FROM MemberScrap ms WHERE ms.member = :member AND ms.scrap.id IN :scrapIdList ")
     List<MemberScrap> findByMemberAndScrapIds(Member member, List<Long> scrapIdList);
+
+    List<MemberScrap> findAllByMember(Member member);
 }

@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.experience.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
+import com.itstime.xpact.domain.experience.common.FileType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +24,12 @@ public class File extends BaseEntity {
     @Column(name = "file_url")
     private String fileUrl;
 
+    @Column(name = "file_type")
+    @Enumerated(EnumType.STRING)
+    private FileType fileType;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_experience_id")
     private SubExperience subExperience;
+
 }

@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.guide.service;
 
+import com.itstime.xpact.domain.guide.dto.response.ScrapThumbnailResponseDto;
 import com.itstime.xpact.domain.guide.entity.MemberScrap;
 import com.itstime.xpact.domain.guide.entity.Scrap;
 import com.itstime.xpact.domain.guide.repository.MemberScrapRepository;
@@ -13,8 +14,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ScrapService {
 
@@ -24,6 +27,7 @@ public class ScrapService {
 
     // member가 scrap에 대해 스크랩을 진행하면 MemberScrap 엔티티가 repository에 저장
     // repository에 {member, scrap} 쌍이 이미 존재한다면 DataIntegrityViolationException 발생
+    @Transactional
     public void onScrap(Long scrapId) {
         Member member = securityProvider.getCurrentMember();
         Scrap scrap = scrapRepository.findById(scrapId).orElseThrow(() ->
@@ -40,6 +44,7 @@ public class ScrapService {
 
     // member가 scrap에 대해 스크랩을 진행하면 repository에서 해당 엔티티 삭제
     // 만약 엔티티가 존재하지 않는다면, 예외 throw
+    @Transactional
     public void offScrap(Long scrapId) {
         Member member = securityProvider.getCurrentMember();
         Scrap scrap = scrapRepository.findById(scrapId).orElseThrow(() ->
@@ -49,5 +54,17 @@ public class ScrapService {
                 GeneralException.of(ErrorCode.ALREADY_UNSCRAPPED));
 
         memberScrapRepository.delete(memberScrap);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScrapThumbnailResponseDto> getActivitites() {
+        Member member = securityProvider.getCurrentMember();
+        List<Long> memberScrapIdList = memberScrapRepository.findAllByMember(member)
+                .stream().map(memberScrap -> memberScrap.getScrap().getId()).toList();
+
+        return scrapRepository.findAllById(memberScrapIdList)
+                .stream()
+                .map(scrap -> ScrapThumbnailResponseDto.of(scrap, true))
+                .toList();
     }
 }
