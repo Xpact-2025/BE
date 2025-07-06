@@ -2,6 +2,7 @@ package com.itstime.xpact.domain.experience.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.itstime.xpact.domain.experience.common.ExperienceType;
+import com.itstime.xpact.domain.experience.common.FileType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.entity.*;
@@ -106,7 +107,12 @@ public class DetailExperienceResponseDto {
                                     .action(subExperience.getStarForm().getAction())
                                     .result(subExperience.getStarForm().getResult())
                                     .keywords(subExperience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
-                                    .files(subExperience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()))
+                                    .files(subExperience.getFiles().stream()
+                                            .filter(file -> file.getFileType().equals(FileType.FILE))
+                                            .map(File::getFileUrl).collect(Collectors.toList()))
+                                    .links(subExperience.getFiles().stream()
+                                            .filter(file -> file.getFileType().equals(FileType.LINK))
+                                            .map(File::getFileUrl).collect(Collectors.toList()))
                                     .build();
 
                             case SIMPLE_FORM -> subExperienceResponseDto = SubExperienceResponseDto.builder()
@@ -117,7 +123,12 @@ public class DetailExperienceResponseDto {
                                     .role(subExperience.getSimpleForm().getRole())
                                     .perform(subExperience.getSimpleForm().getPerform())
                                     .keywords(subExperience.getKeywords().stream().map(Keyword::getName).collect(Collectors.toList()))
-                                    .files(subExperience.getFiles().stream().map(File::getFileUrl).collect(Collectors.toList()))
+                                    .files(subExperience.getFiles().stream()
+                                            .filter(file -> file.getFileType().equals(FileType.FILE))
+                                            .map(File::getFileUrl).collect(Collectors.toList()))
+                                    .links(subExperience.getFiles().stream()
+                                            .filter(file -> file.getFileType().equals(FileType.LINK))
+                                            .map(File::getFileUrl).collect(Collectors.toList()))
                                     .build();
                         }
                     }
