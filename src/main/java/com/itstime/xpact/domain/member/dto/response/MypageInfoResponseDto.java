@@ -24,6 +24,9 @@ public record MypageInfoResponseDto (
                 example = "잇타대학교 잇타학과 재학")
         String educationName,
 
+        @Schema(description = "재학 / 휴학 ")
+        String schoolState,
+
         @Schema(description = "희망 직무",
                 example = "서비스 기획자")
         String desiredDetailRecruit

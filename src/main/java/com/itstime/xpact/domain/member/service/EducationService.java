@@ -166,7 +166,7 @@ public class EducationService {
         }
 
         String statusName = schoolStatus.getDisplayName();
-        return String.format("%s %s (%s)",
-                name, major, statusName);
+        return String.format("%s %s",
+                name, major);
     }
 }
