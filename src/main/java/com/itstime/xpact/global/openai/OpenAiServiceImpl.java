@@ -3,11 +3,10 @@ package com.itstime.xpact.global.openai;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.SubExperience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
-import com.itstime.xpact.domain.guide.entity.Weakness;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
-import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -126,7 +125,9 @@ public class OpenAiServiceImpl implements OpenAiService {
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
         DetailRecruit detailRecruit = detailRecruitMap.get(result);
-        experience.setDetailRecruit(detailRecruit);
+        Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow(() ->
+                GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
+        fresh.setDetailRecruit(detailRecruit);
     }
 
     @Async

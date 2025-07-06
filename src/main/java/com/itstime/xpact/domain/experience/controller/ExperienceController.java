@@ -1,7 +1,10 @@
 package com.itstime.xpact.domain.experience.controller;
 
+import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceUpdateRequestDto;
+import com.itstime.xpact.domain.experience.entity.Experience;
+import com.itstime.xpact.domain.experience.entity.SubExperience;
 import com.itstime.xpact.domain.experience.service.ExperienceService;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.response.ErrorResponse;
@@ -14,9 +17,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 
 @RestController
@@ -57,7 +62,8 @@ public class ExperienceController {
             @RequestBody ExperienceCreateRequestDto createRequestDto)
     throws GeneralException {
 
-        experienceService.create(createRequestDto);
+        Pair<Experience, List<SubExperience>> expPair = experienceService.create(createRequestDto);
+        if(Status.valueOf(createRequestDto.getStatus()).equals(Status.SAVE)) experienceService.setSummaryAndDetailRecruit(expPair);
         return ResponseEntity.ok(RestResponse.ok());
     }
 
@@ -114,7 +120,8 @@ public class ExperienceController {
             @RequestBody ExperienceUpdateRequestDto experienceUpdateRequestDto)
     throws GeneralException {
 
-        experienceService.update(experienceId, experienceUpdateRequestDto);
+        Pair<Experience, List<SubExperience>> expPair = experienceService.update(experienceId, experienceUpdateRequestDto);
+        if(Status.valueOf(experienceUpdateRequestDto.getStatus()).equals(Status.SAVE)) experienceService.setSummaryAndDetailRecruit(expPair);
         return ResponseEntity.ok(RestResponse.ok());
     }
 
@@ -150,4 +157,3 @@ public class ExperienceController {
         return ResponseEntity.ok(RestResponse.ok());
     }
 }
-
