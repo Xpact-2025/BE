@@ -3,11 +3,10 @@ package com.itstime.xpact.global.openai;
 import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.entity.SubExperience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
-import com.itstime.xpact.domain.guide.entity.Weakness;
 import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
-import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -24,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -106,33 +106,28 @@ public class OpenAiServiceImpl implements OpenAiService {
     @Transactional
     public void getDetailRecruitFromExperience(Experience experience) {
         String experienceStr = experience.toString();
-        List<String> recruits = detailRecruitToString();
+        Map<String, DetailRecruit> detailRecruitMap = detailRecruitRepository.findAll().stream()
+                .collect(Collectors.toMap(DetailRecruit::getName, Function.identity()));
+
         String message = String.format(
                 """     
                         다음 경험을 분석해서 주어진 recruit 중 가장 적절한 하나를 선택해 주세요.
                         경험: %s
-                        recruit (각 recruit는 '/'로 분리되어 있음) : %s
-                        출력 형식 : {recruit}
+                        recruit (각 recruit는 ', '로 분리되어 있음) : %s
+                        출력 형식 : recruit
                         출력 시 다른 문구 넣지 말고 그저 선택한 recruit만 출력해야함
                 """,
-                experienceStr, recruits
+                experienceStr, detailRecruitMap.values().stream().map(DetailRecruit::getName).collect(Collectors.joining(", "))
         );
+
         Prompt prompt = new Prompt(message);
         ChatResponse response = openAiChatModel.call(prompt);
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
-        DetailRecruit detailRecruit = detailRecruitRepository.findByName(result).orElseThrow(() ->
-                GeneralException.of(ErrorCode.DETAIL_RECRUIT_NOT_FOUND));
-
-        Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow();
+        DetailRecruit detailRecruit = detailRecruitMap.get(result);
+        Experience fresh = experienceRepository.findById(experience.getId()).orElseThrow(() ->
+                GeneralException.of(ErrorCode.EXPERIENCE_NOT_EXISTS));
         fresh.setDetailRecruit(detailRecruit);
-    }
-
-    private List<String> detailRecruitToString() {
-        List<String> recruits = new ArrayList<>();
-        detailRecruitRepository.findAll()
-        .forEach(recruit -> recruits.add(recruit.getName()));
-        return recruits;
     }
 
     @Async
