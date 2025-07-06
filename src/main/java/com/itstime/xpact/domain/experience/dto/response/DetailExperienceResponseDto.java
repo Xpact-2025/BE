@@ -54,6 +54,7 @@ public class DetailExperienceResponseDto {
         private String simpleDescription;
 
         private List<String> files;
+        private List<String> links;
         private List<String> keywords;
     }
 

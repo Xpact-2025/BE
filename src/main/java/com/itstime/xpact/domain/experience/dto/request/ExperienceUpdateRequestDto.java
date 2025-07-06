@@ -68,8 +68,10 @@ public class ExperienceUpdateRequestDto {
         private String simpleDescription;
 
 
-        @Schema(description = "산출물", example = "[\"파일1\", \"파일2\"]")
+        @Schema(description = "산출물_파일", example = "[\"파일1\", \"파일2\"]")
         private List<String> files;
+        @Schema(description = "산출물_링크", example = "[\"링크1\", \"링크2\"]")
+        private List<String> links;
         @Schema(description = "키워드", example = "[\"keyword1\", \"keyword2\"]")
         private List<String> keywords;
     }

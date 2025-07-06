@@ -1,6 +1,7 @@
 package com.itstime.xpact.domain.experience.converter;
 
 import com.itstime.xpact.domain.experience.common.ExperienceType;
+import com.itstime.xpact.domain.experience.common.FileType;
 import com.itstime.xpact.domain.experience.common.FormType;
 import com.itstime.xpact.domain.experience.common.Status;
 import com.itstime.xpact.domain.experience.dto.request.ExperienceCreateRequestDto;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALIFICATION;
 
@@ -33,7 +35,7 @@ public class ExperienceConverter {
                 SubExperience subExperience = subFieldsBuilder(subExperienceDto, ExperienceType.valueOf(createRequestDto.getExperienceType()));
 
                 if(!IS_QUALIFICATION.contains(experience.getExperienceType())) {
-                    setFiles(subExperience, subExperienceDto.getFiles());
+                    setFiles(subExperience, subExperienceDto.getFiles(), subExperienceDto.getLinks());
                 }
                 setKeywords(subExperience, subExperienceDto.getKeywords());
 
@@ -120,20 +122,30 @@ public class ExperienceConverter {
         subExperience.updateSubFields(subExperienceRequestDto, ExperienceType.valueOf(updateRequestDto.getExperienceType()));
 
         if(!IS_QUALIFICATION.contains(ExperienceType.valueOf(updateRequestDto.getExperienceType()))) {
-            setFiles(subExperience, subExperienceRequestDto.getFiles());
+            setFiles(subExperience, subExperienceRequestDto.getFiles(), subExperienceRequestDto.getLinks());
         }
         setKeywords(subExperience, subExperienceRequestDto.getKeywords());
 
         return subExperience;
     }
 
-    private void setFiles(SubExperience subExperience, List<String> files) {
+    private void setFiles(SubExperience subExperience, List<String> files, List<String> links) {
         subExperience.getFiles().clear();
-        subExperience.setFiles(files.stream()
-                .map(url -> File.builder()
+
+        List<File> fileList = Stream.concat(
+                files.stream().map(url -> File.builder()
+                        .fileType(FileType.FILE)
                         .fileUrl(url)
                         .subExperience(subExperience)
-                        .build()).toList());
+                        .build()),
+                links.stream().map(link -> File.builder()
+                        .fileType(FileType.LINK)
+                        .fileUrl(link)
+                        .subExperience(subExperience)
+                        .build())
+        ).toList();
+
+        subExperience.setFiles(fileList);
     }
 
     private void setKeywords(SubExperience subExperience, List<String> keywords) {
