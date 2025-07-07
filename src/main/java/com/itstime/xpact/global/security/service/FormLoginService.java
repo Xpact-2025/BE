@@ -37,6 +37,8 @@ public class FormLoginService implements LoginStrategy {
     private final TokenProvider tokenProvider;
     private final RefreshTokenUtil refreshTokenUtil;
 
+    private static final String DEFAULT_PROFILE_IMAGE = "USER_UPLOADS/defaults/DEFAULT_PROFILE.png";
+
     // 회원 가입 서비스
     @Transactional
     public SignupResponseDto register(SignupRequestDto requestDto) throws GeneralException {
@@ -55,7 +57,8 @@ public class FormLoginService implements LoginStrategy {
                 requestDto.name(),
                 requestDto.birthDate(),
                 Type.FORM,
-                Role.ROLE_USER
+                Role.ROLE_USER,
+                DEFAULT_PROFILE_IMAGE
         );
 
         Member member = SignupRequestDto.toEntity(updatedRequestDto);

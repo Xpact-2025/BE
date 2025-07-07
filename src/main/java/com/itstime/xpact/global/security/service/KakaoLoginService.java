@@ -27,6 +27,8 @@ public class KakaoLoginService implements LoginStrategy {
     private final RefreshTokenUtil refreshTokenUtil;
     private final MemberRepository memberRepository;
 
+    private static final String DEFAULT_PROFILE_IMAGE = "USER_UPLOADS/defaults/DEFAULT_PROFILE.png";
+
     @Override
     public Type supports() {
         return Type.KAKAO;
@@ -56,6 +58,7 @@ public class KakaoLoginService implements LoginStrategy {
                             .name(profile.getKakaoAccount().getName())
                             .role(Role.ROLE_USER)
                             .type(Type.KAKAO)
+                            .imageUrl(DEFAULT_PROFILE_IMAGE)
                             .build();
                     return memberRepository.save(newMember);
                 });
