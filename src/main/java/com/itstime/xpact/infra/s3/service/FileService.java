@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.guide.common.ScrapType;
 import com.itstime.xpact.domain.guide.dto.request.ScrapRequestDto;
+import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.auth.SecurityProvider;
+import com.itstime.xpact.global.config.S3Config;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.infra.s3.dto.FileResponseDto;
+import groovyjarjarantlr4.v4.runtime.misc.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,13 +36,16 @@ public class FileService {
     private final ObjectMapper objectMapper;
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
+
     private final SecurityProvider securityProvider;
+
     private static final String prefix = "USER_UPLOADS";
     private static final String S3_PREFIX = "data/";
+    private static final String DEFAULT_PROFILE_IMAGE = prefix + "/defaults/DEFAULT_PROFILE.png";
+    private static final String PROFILE_PREFIX = "/profiles/";
 
     @Value("${aws.credentials.bucket}")
     private String bucket;
-
 
     public FileResponseDto getPreSignedUrl(String fileName) {
         // key 형식 : USER_UPLOADS/{member_id}/{UUID}_{file_name}
@@ -108,5 +114,58 @@ public class FileService {
         }
 
         return List.of();
+    }
+
+
+    // 프로필 이미지
+    public FileResponseDto getPreSignedProfileUrl(@Nullable String fileName) {
+        Member member = securityProvider.getCurrentMember();
+
+        if (fileName == null || fileName.isBlank()) {
+
+            return FileResponseDto.of(getFileUrl(DEFAULT_PROFILE_IMAGE), DEFAULT_PROFILE_IMAGE);
+        }
+
+        String key = prefix + "/" + member.getId() + PROFILE_PREFIX + "profile.png";
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(
+                b -> b.putObjectRequest(putObjectRequest)
+                        .signatureDuration(Duration.ofMinutes(5)));
+
+        member.setImageUrl(key);
+        return FileResponseDto.of(presignedRequest.url().toString(), key);
+    }
+
+    public String getProfileUrl() {
+
+        Member member = securityProvider.getCurrentMember();
+        String key = prefix + "/" + member.getId() + PROFILE_PREFIX + "profile.png";
+
+        try {
+            s3Client.headObject(
+                    HeadObjectRequest.builder()
+                            .bucket(bucket)
+                            .key(key)
+                            .build()
+            );
+        } catch (NoSuchKeyException e) {
+            throw GeneralException.of(ErrorCode.NO_SUCH_FILE);
+        }
+
+        GetObjectRequest getRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(
+                b -> b.signatureDuration(Duration.ofMinutes(60))
+                        .getObjectRequest(getRequest));
+
+        return presigned.url().toString();
     }
 }
