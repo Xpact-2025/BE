@@ -123,7 +123,7 @@ public class FileService {
 
         if (fileName == null || fileName.isBlank()) {
 
-            return FileResponseDto.of(getFileUrl(DEFAULT_PROFILE_IMAGE), getS3Url(DEFAULT_PROFILE_IMAGE));
+            return FileResponseDto.of(null, getS3Url(DEFAULT_PROFILE_IMAGE));
         }
 
         String key = prefix + "/" + member.getId() + PROFILE_PREFIX + "profile.png";
