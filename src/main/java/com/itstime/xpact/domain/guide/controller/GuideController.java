@@ -1,5 +1,6 @@
 package com.itstime.xpact.domain.guide.controller;
 
+import com.itstime.xpact.domain.guide.dto.response.ScrapDetailResponseDto;
 import com.itstime.xpact.domain.guide.service.GuideService;
 import com.itstime.xpact.global.response.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,5 +47,10 @@ public class GuideController {
             @ParameterObject @PageableDefault(size = 12, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(RestResponse.ok(guideService.getActivities(weaknessOrder, pageable)));
+    }
+
+    @GetMapping("/activities/{activity_id}")
+    public ResponseEntity<RestResponse<ScrapDetailResponseDto>> getActivities(@PathVariable(name = "activity_id") Long scrapId) {
+        return ResponseEntity.ok(RestResponse.ok(guideService.getActivity(scrapId)));
     }
 }

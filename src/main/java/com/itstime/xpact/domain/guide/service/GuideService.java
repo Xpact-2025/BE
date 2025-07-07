@@ -1,9 +1,13 @@
 package com.itstime.xpact.domain.guide.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.dashboard.dto.response.SkillMapResponseDto;
 import com.itstime.xpact.domain.dashboard.entity.CoreSkillMap;
 import com.itstime.xpact.domain.dashboard.repository.CoreSkillMapRepository;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
+import com.itstime.xpact.domain.guide.dto.response.ScrapDetailResponseDto;
 import com.itstime.xpact.domain.guide.dto.response.ScrapThumbnailResponseDto;
 import com.itstime.xpact.domain.guide.dto.response.WeaknessGuideResponseDto;
 import com.itstime.xpact.domain.guide.entity.MemberScrap;
@@ -16,6 +20,7 @@ import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.openai.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +37,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GuideService {
 
+    private final ObjectMapper objectMapper;
     private final SecurityProvider securityProvider;
     private final OpenAiService openAiService;
 
@@ -174,5 +180,34 @@ public class GuideService {
         }
 
         return openAiService.getRecommendActivities(weakness);
+    }
+
+    public ScrapDetailResponseDto getActivity(Long scrapId) {
+        Scrap scrap = scrapRepository.findById(scrapId).orElseThrow(() ->
+                GeneralException.of(ErrorCode.SCRAP_NOT_EXISTS));
+
+        List<String> jobCategory = parsingJobCategory(scrap);
+
+        return ScrapDetailResponseDto.of(scrap, jobCategory);
+    }
+
+    private List<String> parsingJobCategory(Scrap scrap) {
+        List<String> jobCategory;
+
+        if (scrap.getJobCategory() == null || scrap.getJobCategory().trim().isEmpty()) {
+            return List.of(); // 빈 리스트 반환
+        }
+
+        try {
+            jobCategory = objectMapper.readValue(scrap.getJobCategory(), new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            // 파싱 실패 시: 개행, 콤마, 또는 둘 다로 나눈 후 trim
+            jobCategory = Arrays.stream(scrap.getJobCategory()
+                            .split("[,\n\r]")) // 쉼표, 개행 문자 모두 기준
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty()) // 빈 문자열 제거
+                    .toList();
+        }
+        return jobCategory;
     }
 }
