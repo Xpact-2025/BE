@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,8 +38,6 @@ public class FormLoginService implements LoginStrategy {
     private final TokenProvider tokenProvider;
     private final RefreshTokenUtil refreshTokenUtil;
 
-    private static final String DEFAULT_PROFILE_IMAGE = "USER_UPLOADS/defaults/DEFAULT_PROFILE.png";
-
     // 회원 가입 서비스
     @Transactional
     public SignupResponseDto register(SignupRequestDto requestDto) throws GeneralException {
@@ -58,7 +57,7 @@ public class FormLoginService implements LoginStrategy {
                 requestDto.birthDate(),
                 Type.FORM,
                 Role.ROLE_USER,
-                DEFAULT_PROFILE_IMAGE
+                null
         );
 
         Member member = SignupRequestDto.toEntity(updatedRequestDto);

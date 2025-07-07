@@ -32,8 +32,6 @@ public class NaverLoginService implements LoginStrategy {
     private final TokenProvider tokenProvider;
     private final RefreshTokenUtil refreshTokenUtil;
 
-    private static final String DEFAULT_PROFILE_IMAGE = "USER_UPLOADS/defaults/DEFAULT_PROFILE.png";
-
     // 인증코드 얻기
     @Transactional(readOnly = true)
     public String getLoginUrl() {
@@ -52,7 +50,6 @@ public class NaverLoginService implements LoginStrategy {
                             .email(profile.getResponse().getEmail())
                             .role(Role.ROLE_USER)
                             .type(Type.NAVER)
-                            .imageUrl(DEFAULT_PROFILE_IMAGE)
                             .build();
                     return memberRepository.save(newMember);
                 });
