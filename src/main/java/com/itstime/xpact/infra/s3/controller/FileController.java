@@ -39,15 +39,4 @@ public class FileController {
     ) {
         return ResponseEntity.ok(RestResponse.ok(fileService.getPreSignedProfileUrl(fileName)));
     }
-
-    @Operation(summary = "조회 이미지 PresignedURL 얻기 API", description = """
-            이미지를 조회할 URL을 반환합니다.<br>
-            반환된 URL로 이미지에 접근이 가능합니다.<br>
-            """)
-    @GetMapping("/downloads/image")
-    public ResponseEntity<RestResponse<String>> downloadImage() {
-        return ResponseEntity.ok(
-                RestResponse.ok(fileService.getProfileUrl())
-        );
-    }
 }

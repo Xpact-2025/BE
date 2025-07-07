@@ -6,7 +6,6 @@ import com.itstime.xpact.domain.guide.common.ScrapType;
 import com.itstime.xpact.domain.guide.dto.request.ScrapRequestDto;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.auth.SecurityProvider;
-import com.itstime.xpact.global.config.S3Config;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.infra.s3.dto.FileResponseDto;
@@ -43,6 +42,7 @@ public class FileService {
     private static final String S3_PREFIX = "data/";
     private static final String DEFAULT_PROFILE_IMAGE = prefix + "/defaults/DEFAULT_PROFILE.png";
     private static final String PROFILE_PREFIX = "/profiles/";
+    private static final String REGION = "ap-northeast-2";
 
     @Value("${aws.credentials.bucket}")
     private String bucket;
@@ -123,7 +123,7 @@ public class FileService {
 
         if (fileName == null || fileName.isBlank()) {
 
-            return FileResponseDto.of(getFileUrl(DEFAULT_PROFILE_IMAGE), DEFAULT_PROFILE_IMAGE);
+            return FileResponseDto.of(getFileUrl(DEFAULT_PROFILE_IMAGE), getS3Url(DEFAULT_PROFILE_IMAGE));
         }
 
         String key = prefix + "/" + member.getId() + PROFILE_PREFIX + "profile.png";
@@ -131,41 +131,20 @@ public class FileService {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
+                .acl(ObjectCannedACL.PUBLIC_READ)
                 .build();
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(
                 b -> b.putObjectRequest(putObjectRequest)
                         .signatureDuration(Duration.ofMinutes(5)));
 
-        member.setImageUrl(key);
-        return FileResponseDto.of(presignedRequest.url().toString(), key);
+        String imageUrl = getS3Url(key);
+
+        member.setImageUrl(imageUrl);
+        return FileResponseDto.of(presignedRequest.url().toString(), imageUrl);
     }
 
-    public String getProfileUrl() {
-
-        Member member = securityProvider.getCurrentMember();
-        String key = prefix + "/" + member.getId() + PROFILE_PREFIX + "profile.png";
-
-        try {
-            s3Client.headObject(
-                    HeadObjectRequest.builder()
-                            .bucket(bucket)
-                            .key(key)
-                            .build()
-            );
-        } catch (NoSuchKeyException e) {
-            throw GeneralException.of(ErrorCode.NO_SUCH_FILE);
-        }
-
-        GetObjectRequest getRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
-
-        PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(
-                b -> b.signatureDuration(Duration.ofMinutes(60))
-                        .getObjectRequest(getRequest));
-
-        return presigned.url().toString();
+    private String getS3Url(String key) {
+        return "https://" + bucket + ".s3." + REGION + ".amazonaws.com/" + key;
     }
 }
