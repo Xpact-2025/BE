@@ -51,8 +51,9 @@ public class Member extends BaseEntity {
     @Column(name = "age", nullable = true)
     private Integer age;
 
-    @Column(name = "imgurl")
-    private String imgurl;
+    @Setter
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Column(name = "inactive_date")
     private LocalDate inactiveDate;
@@ -96,7 +97,7 @@ public class Member extends BaseEntity {
     public MypageInfoResponseDto toMypageInfoResponseDto(Member member) {
         return MypageInfoResponseDto.builder()
                 .name(member.getName())
-                .imgurl(member.getImgurl() != null ? member.getImgurl() : null)
+                .imgurl(member.getImageUrl() != null ? member.getImageUrl() : null)
                 .age(member.getAge() != null ? member.getAge() : 0)
                 .educationDegree(member.getEducation() != null && member.getEducation().getDegree() != null
                         ? member.getEducation().getDegree().getDisplayName() : null)
@@ -113,7 +114,7 @@ public class Member extends BaseEntity {
     public MemberSaveResponseDto toMemberSaveResponseDto(Member member, EducationSaveResponseDto educationDto, DesiredRecruitResponseDto desiredRecruitDto) {
         return MemberSaveResponseDto.builder()
                 .name(member.getName())
-                .imgurl(member.getImgurl() != null ? member.getImgurl() : null)
+                .imgurl(member.getImageUrl() != null ? member.getImageUrl() : null)
                 .age(member.getAge() != null ? member.getAge() : 0)
                 .educationDegree(
                         member.getEducation() != null && member.getEducation().getEducationName() != null
@@ -134,7 +135,7 @@ public class Member extends BaseEntity {
     public void updateMemberInfo(MemberSaveRequestDto requestDto) {
         if (requestDto.name() != null) this.name = requestDto.name();
         if (requestDto.age() != null) this.age = requestDto.age();
-        if (requestDto.imgurl() != null) this.imgurl = requestDto.imgurl();
+        if (requestDto.imgUrl() != null) this.imageUrl = requestDto.imgUrl();
     }
 
     // 최종학력만 저장

@@ -9,8 +9,9 @@ public record MemberSaveRequestDto(
                 example = "홍길동")
         String name,
 
-        @Schema(description = "사진 이미지 URL")
-        String imgurl,
+        @Schema(description = "프로필 사진의 URL 키 값",
+        example = "USER_UPLOADS/1/profile/profile.png")
+        String imgUrl,
 
         @Schema(description = "회원 나이")
         Integer age,

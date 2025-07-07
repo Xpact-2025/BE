@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itstime.xpact.domain.guide.common.ScrapType;
 import com.itstime.xpact.domain.guide.dto.request.ScrapRequestDto;
+import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.auth.SecurityProvider;
 import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.infra.s3.dto.FileResponseDto;
+import groovyjarjarantlr4.v4.runtime.misc.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,13 +35,17 @@ public class FileService {
     private final ObjectMapper objectMapper;
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
+
     private final SecurityProvider securityProvider;
+
     private static final String prefix = "USER_UPLOADS";
     private static final String S3_PREFIX = "data/";
+    private static final String DEFAULT_PROFILE_IMAGE = prefix + "/defaults/DEFAULT_PROFILE.png";
+    private static final String PROFILE_PREFIX = "/profiles/";
+    private static final String REGION = "ap-northeast-2";
 
     @Value("${aws.credentials.bucket}")
     private String bucket;
-
 
     public FileResponseDto getPreSignedUrl(String fileName) {
         // key 형식 : USER_UPLOADS/{member_id}/{UUID}_{file_name}
@@ -108,5 +114,37 @@ public class FileService {
         }
 
         return List.of();
+    }
+
+
+    // 프로필 이미지
+    public FileResponseDto getPreSignedProfileUrl(@Nullable String fileName) {
+        Member member = securityProvider.getCurrentMember();
+
+        if (fileName == null || fileName.isBlank()) {
+
+            return FileResponseDto.of(null, getS3Url(DEFAULT_PROFILE_IMAGE));
+        }
+
+        String key = prefix + "/" + member.getId() + PROFILE_PREFIX + "profile.png";
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .acl(ObjectCannedACL.PUBLIC_READ)
+                .build();
+
+        PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(
+                b -> b.putObjectRequest(putObjectRequest)
+                        .signatureDuration(Duration.ofMinutes(5)));
+
+        String imageUrl = getS3Url(key);
+
+        member.setImageUrl(imageUrl);
+        return FileResponseDto.of(presignedRequest.url().toString(), imageUrl);
+    }
+
+    private String getS3Url(String key) {
+        return "https://" + bucket + ".s3." + REGION + ".amazonaws.com/" + key;
     }
 }
