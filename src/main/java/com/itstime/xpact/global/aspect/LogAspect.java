@@ -25,8 +25,13 @@ public class LogAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
 
-        System.out.printf("[실행 API Controller] - %s.%s(%s)%n",
-                className, methodName, args.length > 0 ? args[0].toString() : "");
+        if (args.length > 0 && args[0] != null) {
+            System.out.printf("[실행 API Controller] - %s.%s(%s)%n",
+                    className, methodName, args.length > 0 ? args[0].toString() : "");
+        } else {
+            System.out.printf("[실행 API Controller] - %s.%s()%n",
+                    className, methodName);
+        }
 
         Object result = joinPoint.proceed();
         stopWatch.stop();

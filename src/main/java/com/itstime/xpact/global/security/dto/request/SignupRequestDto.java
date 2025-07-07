@@ -14,7 +14,8 @@ public record SignupRequestDto (
         String name,
         LocalDate birthDate,
         Type type,
-        Role role
+        Role role,
+        String imageUrl
 ){
     public static Member toEntity(SignupRequestDto requestDto) {
         return Member.builder()
@@ -24,6 +25,7 @@ public record SignupRequestDto (
                 .birthDate(requestDto.birthDate)
                 .type(requestDto.type)
                 .role(requestDto.role)
+                .imageUrl(requestDto.imageUrl)
                 .build();
     }
 }
