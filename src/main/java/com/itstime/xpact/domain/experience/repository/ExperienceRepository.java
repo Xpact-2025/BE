@@ -32,4 +32,7 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
     List<Object[]> countByDay(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Member member);
 
     void deleteAllByMember(Member member);
+
+    @Query("SELECT e FROM Experience e LEFT JOIN FETCH e.subExperiences")
+    List<Experience> findAllWithSubExperiences();
 }

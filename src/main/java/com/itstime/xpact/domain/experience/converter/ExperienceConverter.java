@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALIFICATION;
@@ -133,12 +133,12 @@ public class ExperienceConverter {
         subExperience.getFiles().clear();
 
         List<File> fileList = Stream.concat(
-                files.stream().map(url -> File.builder()
+                Optional.ofNullable(files).orElseGet(List::of).stream().map(url -> File.builder()
                         .fileType(FileType.FILE)
                         .fileUrl(url)
                         .subExperience(subExperience)
                         .build()),
-                links.stream().map(link -> File.builder()
+                Optional.ofNullable(links).orElseGet(List::of).stream().map(link -> File.builder()
                         .fileType(FileType.LINK)
                         .fileUrl(link)
                         .subExperience(subExperience)

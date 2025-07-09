@@ -106,6 +106,7 @@ public class Member extends BaseEntity {
                                 ? member.getEducation().getEducationName()
                                 : null
                 )
+                .schoolState(member.getEducation().getSchoolStatus().getDisplayName())
                 .desiredDetailRecruit(member.getDesiredRecruit() != null ? member.getDesiredRecruit() : null)
                 .build();
     }
