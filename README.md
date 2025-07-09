@@ -1,62 +1,101 @@
-# Backend Repository
+# ✨ Xpact - 취준생을 위한 경험 정리 서비스
 
-## 📌 프로젝트 개요
+## 🛠️ 기술 스택
+> 안정적이고 확장성 있는 백엔드와 클라우드 기반 인프라 구성
+- ☕ Java 17
+- 🌱 Spring Boot 3.4.4
+- 🐬 MySQL 8.0.40
+- 🚀 Redis 7.4.1
+- 🌐 Nginx 1.27.4
+- 🧬 AWS Lambda
+- 🗂️ AWS S3
+- 🐳 Docker / Docker-Compose
 
-- **프로젝트명:** Xpact
-- **설명:** 취준생을 위한 경험 정리 서비스
-- **기술 스택:** 
-  - Java 17
-  - Spring Boot : 3.4.4
-  - MySQL : 8.0.33
+## 🏗️ 아키텍처 구성
+![](https://private-user-images.githubusercontent.com/80938176/464276901-4b750337-0c15-4192-b6be-946a6fb65a17.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTIwNzY1NDgsIm5iZiI6MTc1MjA3NjI0OCwicGF0aCI6Ii84MDkzODE3Ni80NjQyNzY5MDEtNGI3NTAzMzctMGMxNS00MTkyLWI2YmUtOTQ2YTZmYjY1YTE3LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA3MDklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNzA5VDE1NTA0OFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTA2NmZiNjcwYzEyMjA4MTI2ZGUyMWZjNTk0ODFlN2E4ZWZiNmFlOWQ0OTg3YmFmMTliMjUwOTlkOGRiNmQ2OTcmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.En8yDY7r6pnYyjANfh4tok9moDUAae3E2hQL7GvDfkY)
 
-- **배포 환경:** 미정
+## 🗃️ ERD (Entity Relationship Diagram)
+![](https://private-user-images.githubusercontent.com/80938176/464281461-8594eae7-e068-4007-9a79-7bf5a971cdc0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTIwNzcyOTUsIm5iZiI6MTc1MjA3Njk5NSwicGF0aCI6Ii84MDkzODE3Ni80NjQyODE0NjEtODU5NGVhZTctZTA2OC00MDA3LTlhNzktN2JmNWE5NzFjZGMwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA3MDklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNzA5VDE2MDMxNVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTA3NjQzN2RhODNkZWI0NjRhMDc5ZWUwMDAyZWZkYzg0OTgzMTRkOTRmNjUyZGE5ZTZiMjgzNTgzNDVkZjMxNjEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.uroAeongjpjgHgyyCVlJm9_H9s9Oys3ZmziRqiUdNOw)
 
 
-## 📂 프로젝트 구조
-
+## 📁 프로젝트 구조
 ```
-backend/
-├── src/main/java/com/example/
-│   ├── config/          
-│   ├── domain/
-│   │   ├── controller/      # 도메인 내부로 이동
-│   │   ├── service/         # 도메인 내부로 이동
-│   │   ├── repository/      # 도메인 내부로 이동
-│   │   ├── dto/             # 도메인 내부로 이동
-│   │   └── [기존 엔티티, VO 등]
-│   ├── util/
-│   └── Application.java
-├── src/test/java/com/example/
-├── build.gradle
-└── README.md
+📦xpact
+ ┣ 📂.github 
+ ┃ ┣ 📂ISSUE_TEMPLATE # 이슈 템플릿
+ ┃ ┣ 📂workflows # Github Actions Workflow 설정
+ ┣ 📂lambda # AWS Lambda 코드 (python)
+ ┃ ┣ 📂recruit # 직무 크롤링
+ ┃ ┗ 📂scrap # 활동 크롤링 
+ ┣ 📂nginx
+ ┃ ┣ 📂html
+ ┣ 📂src
+ ┃ ┣ 📂main
+ ┃ ┃ ┣ 📂java
+ ┃ ┃ ┃ ┗ 📂com
+ ┃ ┃ ┃ ┃ ┗ 📂itstime
+ ┃ ┃ ┃ ┃ ┃ ┗ 📂xpact
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂domain # 도메인별 핵심 비즈니스 로직 영역
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂common
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dashboard
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂controller # 도메인 내부 구조
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂request
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂response
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂entity
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂repository
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂service
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂experience
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂guide
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂member
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂recruit
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂global # 전역적으로 사용하는 기술 패키지
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂aspect # AOP 관련 기능 (ex. 로깅)
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂auth # 인증/인가 처리 기능
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config # 스프링 설정 클래스
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂exception # 전역 예외 처리 및 에러코드 정의
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂openai # openAI 관련 로직
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂response # 통일된 응답 정의
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂security # Spring Security 설정 및 필터 로직 
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂webclient
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂openai # OpenAI 호출
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂school # 학교정보 API 호출
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂infra # 인프라, 외부 시스템 연동
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂lambda # AWS lambda 로직
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂recruit
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂s3 # AWS S3 로직
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂controller
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂service
+ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜XpactApplication.java # Spring Boot 메인 실행 클래스
+ ┃ ┃ ┗ 📂resources
+ ┃ ┃ ┃ ┣ 📂static
+ ┃ ┃ ┃ ┣ 📂templates
+ ┃ ┃ ┃ ┣ 📜application-dev.yaml # 개발 프로필
+ ┃ ┃ ┃ ┣ 📜application-local.yaml # 로컬 프로필
+ ┃ ┃ ┃ ┣ 📜application.yaml # 공통 프로필
+ ┣ 📜.env # 중요 환경변수 설정
+ ┣ 📜.gitignore
+ ┣ 📜Dockerfile # Spring 애플리케이션 패키징 Dockerfile
+ ┣ 📜README.md 
+ ┣ 📜build.gradle
+ ┗ 📜docker-compose.yaml # 컨테이너 정의 및 실행 설정 (API Server, Redis, Nginx, Certbot)
 ```
+## Git branch
+- **main**: 🚀 배포 가능한 안정 버전
+- **develop**: 🌱 기능 통합 및 테스트용 브랜치
+- **feature/**: ✨ 새로운 기능 개발용 브랜치 (예: feature/#123/login-api)
+- **fix/**: 🛠️ 긴급 수정 브랜치 (예: fix/#456/critical-bug)
 
+> 브랜치 네이밍 예시: `feat/#이슈넘버/{기능명}` `fix/#이슈넘버/{기능명}`
 
-## 🔥 Git Branch 전략
-
-- **main**: 배포 가능한 안정적인 코드만 포함
-- **develop**: 개발 브랜치, 모든 기능이 병합되는 브랜치
-- **feature/**: 새로운 기능 개발 브랜치 (예: `feature/#이슈넘버/login-api`)
-- **fix/**: 긴급 수정 사항 반영 (예: `fix/#이슈넘버/critical-login-bug`)
-
-> 브랜치 네이밍 예시: `feat/#이슈넘버/{기능명}`  `fix/#이슈넘버/{기능명}`
-
-
-## 📌 Commit Message Convention
+## Commit Message Convention
 
 | Type | 설명 |
 | --- | --- |
 | feature | 새로운 기능 추가 |
 | fix | 버그 수정 |
 | refactor | 코드 리팩토링 |
-| style | 코드 스타일 변경 (포맷팅, 세미콜론 추가 등) |
-| test | 테스트 코드 추가 및 수정 |
 | chore | 빌드 설정, 패키지 변경, 문서 수정 |
 
 > 커밋 예시: `fix/#이슈넘버 : 커밋 내용 설명`
-
-## ⭐ PR & Code Review
-
-- **PR** 1명 이상 approve 후에 merge
-- 24시간 이내에 확인하기
-  
