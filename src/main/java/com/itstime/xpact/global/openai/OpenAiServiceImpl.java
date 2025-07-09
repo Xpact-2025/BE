@@ -81,17 +81,30 @@ public class OpenAiServiceImpl implements OpenAiService {
             log.info("Requesting core skill extraction from OpenAI for detailRecruits: {}", joinedDetailNames);
 
             String promptMessage = format(
-                    "다음 ','로 구분된 직무에 대해 반드시 요구되는 핵심 스킬 5가지를 도출해줘.(숫자 넣지 마)\n" +
-                            "출력 형식: {직무}-{핵심스킬1}/{핵심2}/{핵심스킬3}/{핵심스킬4}/{핵심스킬5}\n\n" +
-                            "출력 시 직무는 변형 없이 그대로 출력해라. -와 /는 필수이다.\n" +
-                            "예시:\n" +
-                            "서비스 기획자-사용자 중심 사고/커뮤니케이션/문제 해결력/데이터 분석/콘텐츠 기획력\n" +
-                            "데이터 엔지니어-SQL/데이터 파이프라인/ETL/클라우드 플랫폼/시스템 최적화\n\n" +
-                            "%s", joinedDetailNames);
+                    """
+                            다음 ','로 구분된 직무에 대해, 각 직무에서 실제로 요구되는 핵심 스킬 5가지를 도출해줘.
+                            
+                            직무별 핵심 스킬은 채용 공고나 직무 정의를 기반으로 현실적으로 중요한 것들을 중심으로 선정해줘.
+                            각 직무마다 정확히 5개 스킬을 도출하고, 중요도 순으로 나열해.
+                            유사하거나 모호한 표현 대신 구체적인 기술명이나 역량명을 써줘.
+                            
+                            출력 형식은 다음과 같아:
+                            {직무}-{핵심스킬1}/{핵심스킬2}/{핵심스킬3}/{핵심스킬4}/{핵심스킬5}
+                            단, 직무 이름은 절대로 변형하지 말고, 하이픈(-)과 슬래시(/)는 반드시 포함해.
+                            
+                            예시:
+                            서비스 기획자-사용자 중심 사고/커뮤니케이션/문제 해결력/데이터 분석/콘텐츠 기획력
+                            데이터 엔지니어-SQL/데이터 파이프라인/ETL/클라우드 플랫폼/시스템 최적화
+                            펀드매니저-재무 분석/투자 전략 수립/위험 관리/시장 트렌드 분석/포트폴리오 관리
+                            안전관리자-산업안전 지식/위험 분석/안전 점검 능력/법규 이해/커뮤니케이션
+                            
+                            
+                            직무 : %s""", joinedDetailNames);
 
             Prompt prompt = new Prompt(promptMessage);
             ChatResponse response = openAiChatModel.call(prompt);
             String responseText = response.getResult().getOutput().getText();
+            System.out.println("responseText = " + responseText);
 
             Arrays.stream(responseText.split("\n")).forEach(string -> {
                 String[] row = string.split("-");
