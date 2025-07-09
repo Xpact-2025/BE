@@ -21,7 +21,6 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "sub_experience")
-@ToString(exclude = {"id", "tabName", "experience"})
 public class SubExperience extends BaseEntity {
 
     @Id
@@ -104,4 +103,17 @@ public class SubExperience extends BaseEntity {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "SubExperience{" +
+                ", subTitle='" + subTitle + '\'' +
+                ", keywords='" + keywords.stream()
+                .map(Keyword::getName)+ '\'' +
+                ", starForm='" + starForm + '\'' +
+                ", simpleForm='" + simpleForm + '\'' +
+                ", simpleDescription='" + simpleDescription + '\'' +
+                '}';
+    }
+
 }

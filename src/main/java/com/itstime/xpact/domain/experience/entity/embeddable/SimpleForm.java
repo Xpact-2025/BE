@@ -6,7 +6,6 @@ import lombok.*;
 
 @Getter
 @Builder
-@ToString
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +15,12 @@ public class SimpleForm {
     private String role;
     @Column(name = "perform", length = 512)
     private String perform;
+
+    @Override
+    public String toString() {
+        return "SimpleForm{" +
+                "role='" + role + '\'' +
+                ", perform='" + perform + '\'' +
+                '}';
+    }
 }
