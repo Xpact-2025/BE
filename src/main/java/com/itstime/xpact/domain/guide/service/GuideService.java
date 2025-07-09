@@ -157,7 +157,7 @@ public class GuideService {
         List<String> weaknessNames = weaknessRepository.findByMemberId(member.getId())
                 .stream()
                 .map(Weakness::getName)
-                .filter(name -> name != null && name.isBlank())
+                .filter(name -> name != null && !name.isBlank())
                 .toList();
 
         Set<String> keywordSet = new HashSet<>();

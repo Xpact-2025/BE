@@ -16,6 +16,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,8 @@ import static java.lang.String.format;
 public class OpenAiServiceImpl implements OpenAiService {
 
     private final OpenAiChatModel openAiChatModel;
+
+    private final RedisTemplate<String, String> redisTemplate;
 
     private final DetailRecruitRepository detailRecruitRepository;
     private final ExperienceRepository experienceRepository;
@@ -159,12 +163,23 @@ public class OpenAiServiceImpl implements OpenAiService {
     // 3가지 약점 분석 -> 3가지 약점에 맞춘 맞춤형 활동 추천하기
     public List<String> getRecommendActivities(String weakness) {
 
+        String cacheKey = "keywords:" + weakness;
+        String cached = redisTemplate.opsForValue().get(cacheKey);
+
+        // Redis Cache 조회
+        if (cached != null && !cached.isBlank()) {
+            return Arrays.stream(cached.split(","))
+                    .map(String::trim)
+                    .filter(str -> !str.isEmpty())
+                    .toList();
+        }
+
         String systemString = String.join(" ",
-                "너는 입력된 키워드를 기반으로 의미적으로 관련된 직무, 기술, 산업, 직군 키워드를 추천해주는 전문가다.",
-                "추천 키워드는 실제 대외활동이나 채용 공고 등에서 자주 등장하는 실용적인 키워드여야 한다.",
-                "한국어 키워드 7개와 영어 키워드 3개로, 총 10개의 키워드를 쉼표(,)로 구분해서 출력해라.",
-                "다른 설명이나 문장은 절대 포함하지 마.",
-                "예: 해커톤, 데이터베이스, 서버 운영, 웹 개발, 클라우드, 정보보안, 데이터 분석, backend, database, cloud"
+                    "너는 입력된 키워드를 기반으로 의미적으로 관련된 직무, 기술, 산업, 직군 키워드를 추천해주는 전문가다.",
+                    "추천 키워드는 실제 대외활동이나 채용 공고 등에서 자주 등장하는 실용적인 키워드여야 한다.",
+                    "한국어 키워드 7개와 영어 키워드 3개로, 총 10개의 키워드를 쉼표(,)로 구분해서 출력해라.",
+                    "다른 설명이나 문장은 절대 포함하지 마.",
+                    "예: 해커톤, 데이터베이스, 서버 운영, 웹 개발, 클라우드, 정보보안, 데이터 분석, backend, database, cloud"
         );
         String userString = String.format("%s", weakness);
 
@@ -176,8 +191,12 @@ public class OpenAiServiceImpl implements OpenAiService {
 
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
+
+        redisTemplate.opsForValue().set(cacheKey, result, 86400, TimeUnit.SECONDS);
+
         return Arrays.stream(result.split(","))
-                .map(String::trim)
-                .collect(Collectors.toList());
+                    .map(String::trim)
+                    .filter(str -> !str.isEmpty())
+                    .collect(Collectors.toList());
     }
 }
