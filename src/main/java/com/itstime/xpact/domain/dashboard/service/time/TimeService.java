@@ -1,6 +1,6 @@
 package com.itstime.xpact.domain.dashboard.service.time;
 
-import com.itstime.xpact.domain.dashboard.controller.HistoryOldResponseDto;
+import com.itstime.xpact.domain.dashboard.dto.response.HistoryOldResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.HistoryResponseDto;
 import com.itstime.xpact.domain.dashboard.dto.response.TimelineResponseDto;
 import com.itstime.xpact.domain.experience.entity.Experience;
