@@ -6,7 +6,6 @@ import lombok.*;
 
 @Getter
 @Builder
-@ToString
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,4 +19,14 @@ public class StarForm {
     private String action;
     @Column(name = "result", length = 512)
     private String result;
+
+    @Override
+    public String toString() {
+        return "starForm{" +
+                "situation='" + situation + '\'' +
+                ", task='" + task + '\'' +
+                ", action='" + action + '\'' +
+                ", result='" + result + '\'' +
+                '}';
+    }
 }
