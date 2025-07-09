@@ -149,4 +149,9 @@ public class DashboardController {
                 )
         );
     }
+
+    @GetMapping("/scrap")
+    public ResponseEntity<RestResponse<List<ScrapResponseDto>>> getScrap() {
+        return ResponseEntity.ok(RestResponse.ok(dashboardService.getScrapList()));
+    }
 }

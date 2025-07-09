@@ -29,9 +29,9 @@ public class ExperienceCustomRepositoryImpl implements ExperienceCustomRepositor
 
         OrderSpecifier<?> orderSpecifier = null;
         if(order.equals("LATEST")) {
-            orderSpecifier = new OrderSpecifier<>(Order.DESC, experience.modifiedTime);
+            orderSpecifier = new OrderSpecifier<>(Order.DESC, experience.endDate);
         } else if(order.equals("OLDEST")) {
-            orderSpecifier = new OrderSpecifier<>(Order.ASC, experience.modifiedTime);
+            orderSpecifier = new OrderSpecifier<>(Order.ASC, experience.endDate);
         }
 
         return queryFactory.selectFrom(experience)

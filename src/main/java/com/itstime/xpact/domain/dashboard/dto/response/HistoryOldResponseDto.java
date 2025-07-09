@@ -1,4 +1,4 @@
-package com.itstime.xpact.domain.dashboard.controller;
+package com.itstime.xpact.domain.dashboard.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

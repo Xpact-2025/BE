@@ -22,7 +22,6 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"detailRecruit", "member", "status", "summary", "subExperiences"})
 public class Experience extends BaseEntity {
 
     @Id
@@ -101,4 +100,15 @@ public class Experience extends BaseEntity {
             this.isEnded = updateRequestDto.getEndDate().isBefore(LocalDate.now());
         }
     }
+
+    @Override
+    public String toString() {
+        return "Experience{" +
+                ", experienceType=" + experienceType +
+                ", title='" + title + '\'' +
+                ", qualification='" + qualification + '\'' +
+                ", publisher='" + publisher + '\'' +
+                '}';
+    }
+
 }
