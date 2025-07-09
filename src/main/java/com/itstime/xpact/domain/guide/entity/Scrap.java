@@ -10,6 +10,7 @@ import com.itstime.xpact.global.exception.ErrorCode;
 import com.itstime.xpact.global.exception.GeneralException;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@BatchSize(size = 20)
 public class Scrap extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
