@@ -5,7 +5,6 @@ import com.itstime.xpact.domain.dashboard.service.ratio.RatioService;
 import com.itstime.xpact.domain.dashboard.service.skillmap.SkillmapService;
 import com.itstime.xpact.domain.dashboard.service.time.TimeService;
 import com.itstime.xpact.domain.guide.entity.MemberScrap;
-import com.itstime.xpact.domain.guide.entity.Scrap;
 import com.itstime.xpact.domain.guide.repository.MemberScrapRepository;
 import com.itstime.xpact.domain.member.entity.Member;
 import com.itstime.xpact.global.auth.SecurityProvider;
@@ -20,7 +19,6 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

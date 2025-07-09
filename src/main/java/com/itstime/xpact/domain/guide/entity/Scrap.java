@@ -2,18 +2,10 @@ package com.itstime.xpact.domain.guide.entity;
 
 import com.itstime.xpact.domain.common.BaseEntity;
 import com.itstime.xpact.domain.guide.common.ScrapType;
-import com.itstime.xpact.domain.guide.entity.embeddable.ScrapActivity;
-import com.itstime.xpact.domain.guide.entity.embeddable.ScrapCompetition;
-import com.itstime.xpact.domain.guide.entity.embeddable.ScrapEducation;
-import com.itstime.xpact.domain.guide.entity.embeddable.ScrapIntern;
-import com.itstime.xpact.global.exception.ErrorCode;
-import com.itstime.xpact.global.exception.GeneralException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
-import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "scrap")
