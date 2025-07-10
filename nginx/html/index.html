@@ -4,66 +4,95 @@
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.png" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:image" content="https://private-user-images.githubusercontent.com/80938176/464466051-1e34795d-66d7-4f1b-aa6a-f44f826c1384.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTIxMTQ3MTgsIm5iZiI6MTc1MjExNDQxOCwicGF0aCI6Ii84MDkzODE3Ni80NjQ0NjYwNTEtMWUzNDc5NWQtNjZkNy00ZjFiLWFhNmEtZjQ0ZjgyNmMxMzg0LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA3MTAlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNzEwVDAyMjY1OFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTBlZjIwYThmY2Q3YWZmNzQyNzNmOTlkMTE3YzdhZmFiNGQ3ODg1MWNjYTg4MTk0NjdlN2ZhNWE5MGI3YzYxZjEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.Pc8SmJZ-IFhAmw-kOfgwFoUD0JnTWzGh5-DddXr17oA" />
+    <meta property="og:title" content="Xpact API Server" />
+    <meta property="og:description" content="Xpact - 취준생을 위한 경험 정리 서비스" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
     <title>Xpact API Server</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            line-height: 1.6;
-            padding: 2rem;
-            max-width: 960px;
-            margin: auto;
-            background-color: #f9fafb;
-            color: #333;
-        }
-
-        h1, h2 {
-            color: #1f2937;
+            font-family: 'Inter', sans-serif;
+            background-color: #fefefe;
+            color: #1e293b;
+            line-height: 1.75;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
         }
 
         h1 {
-            font-size: 2rem;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 0.5rem;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
         h2 {
-            margin-top: 2rem;
             font-size: 1.5rem;
+            font-weight: 700;
+            color: #334155;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid #93c5fd;
+            padding-left: 0.5rem;
         }
 
-        ul {
-            padding-left: 1.5rem;
-        }
-
-        li {
-            margin-bottom: 0.3rem;
+        section {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem 1.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
 
         blockquote {
             background-color: #e0f2fe;
+            border-left: 4px solid #38bdf8;
             padding: 1rem;
-            border-left: 5px solid #38bdf8;
-            color: #0c4a6e;
+            color: #0369a1;
+            font-style: italic;
+            border-radius: 6px;
             margin: 1rem 0;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
         }
 
         img {
             max-width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin: 1rem 0;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+            margin: 1.5rem 0;
         }
 
         pre {
-            background: #111827;
-            color: #f3f4f6;
+            background-color: #0f172a;  /* 다크 배경 */
+            color: #f1f5f9;             /* 밝은 글씨 */
             padding: 1rem;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow-x: auto;
-            font-size: 0.85rem;
+        }
+
+        pre code {
+            background-color: transparent; /* code 안쪽 투명하게 */
+            color: inherit;
         }
 
         code {
+            background-color: #e2e8f0; /* 일반 코드 블럭용 */
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
             font-family: 'Courier New', monospace;
         }
 
@@ -71,19 +100,24 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
-        }
-
-        table, th, td {
-            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.9rem;
         }
 
         th, td {
             padding: 0.75rem;
-            text-align: left;
+            border: 1px solid #e2e8f0;
+            background-color: #fff;
         }
 
         thead {
-            background-color: #f3f4f6;
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
         }
 
         strong {
