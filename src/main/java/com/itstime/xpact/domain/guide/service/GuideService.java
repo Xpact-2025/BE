@@ -97,6 +97,7 @@ public class GuideService {
                     Weakness existing = existingWeakness.get(i);
                     existing.setName(newName);
                     existing.setExplanation(explanation);
+                    weaknessRepository.save(existing);
                 } else {
                     // 존재하지 않을 경우
                     savedWeakness.add(new Weakness(member, newName, explanation));
@@ -156,7 +157,7 @@ public class GuideService {
         List<String> weaknessNames = weaknessRepository.findByMemberId(member.getId())
                 .stream()
                 .map(Weakness::getName)
-                .filter(name -> name != null && name.isBlank())
+                .filter(name -> name != null && !name.isBlank())
                 .toList();
 
         Set<String> keywordSet = new HashSet<>();

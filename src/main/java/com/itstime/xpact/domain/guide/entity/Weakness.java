@@ -50,18 +50,6 @@ public class Weakness extends BaseEntity {
         this.explanation = explanation;
     }
 
-    public Weakness updateWeakness(Member member, List<Weakness> weaknessList) {
-
-        Weakness oldest = weaknessList.stream()
-                .sorted(Comparator.comparing(BaseEntity::getCreatedTime))
-                .findFirst()
-                .orElseThrow(() -> GeneralException.of(ErrorCode.WEAKNESS_NOT_FOUND));
-
-        oldest.setName(name);
-        oldest.setExplanation(explanation);
-        return oldest;
-    }
-
     @Override
     public String toString() {
         return "Weakness{" + "name='" + name + ", explanation='" + explanation + '}';
