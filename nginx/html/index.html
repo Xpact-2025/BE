@@ -148,7 +148,8 @@
 <img src="https://private-user-images.githubusercontent.com/80938176/464281461-8594eae7-e068-4007-9a79-7bf5a971cdc0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTIxMTQyNTMsIm5iZiI6MTc1MjExMzk1MywicGF0aCI6Ii84MDkzODE3Ni80NjQyODE0NjEtODU5NGVhZTctZTA2OC00MDA3LTlhNzktN2JmNWE5NzFjZGMwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA3MTAlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNzEwVDAyMTkxM1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTkxOWU5OTA1MzkyY2IxYWE4NzExYzU3YWUzNjlmZWZkOWYxZDFhZjBmNDhkNTRlNGVkNjc1NTMwOGFlMGE3ZTgmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.RrS6m-G3mItk3V7an-gHUZXxCok-IWQsJFw-jSTlufw" alt="ERD" />
 
 <h2>📁 프로젝트 구조</h2>
-<pre><code>📦xpact
+<pre><code>
+📦xpact
  ┣ 📂.github
  ┃ ┣ 📂ISSUE_TEMPLATE # 이슈 템플릿
  ┃ ┣ 📂workflows # Github Actions Workflow 설정
@@ -158,50 +159,50 @@
  ┣ 📂nginx
  ┃ ┣ 📂html
  ┣ 📂src
- ┃ ┣ 📂main
- ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┗ 📂itstime
- ┃ ┃ ┃ ┃ ┃ ┗ 📂xpact
- ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂domain # 도메인별 핵심 비즈니스 로직 영역
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂common
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dashboard
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂controller # 도메인 내부 구조
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂request
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂response
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂entity
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂repository
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂service
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂experience
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂guide
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂member
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂recruit
- ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂global # 전역적으로 사용하는 기술 패키지
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂aspect # AOP 관련 기능 (ex. 로깅)
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂auth # 인증/인가 처리 기능
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config # 스프링 설정 클래스
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂exception # 전역 예외 처리 및 에러코드 정의
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂openai # openAI 관련 로직
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂response # 통일된 응답 정의
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂security # Spring Security 설정 및 필터 로직
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂webclient
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂openai # OpenAI 호출
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂school # 학교정보 API 호출
- ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂infra # 인프라, 외부 시스템 연동
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂lambda # AWS lambda 로직
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂recruit
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂s3 # AWS S3 로직
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂controller
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂service
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜XpactApplication.java # Spring Boot 메인 실행 클래스
- ┃ ┃ ┗ 📂resources
- ┃ ┃ ┃ ┣ 📂static
- ┃ ┃ ┃ ┣ 📂templates
- ┃ ┃ ┃ ┣ 📜application-dev.yaml # 개발 프로필
- ┃ ┃ ┃ ┣ 📜application-local.yaml # 로컬 프로필
- ┃ ┃ ┃ ┣ 📜application.yaml # 공통 프로필
+ ┃ ┗ 📂main
+ ┃   ┣ 📂java
+ ┃   ┃ ┗ 📂com
+ ┃   ┃   ┗ 📂itstime
+ ┃   ┃     ┗ 📂xpact
+ ┃   ┃       ┣ 📂domain # 도메인별 핵심 비즈니스 로직 영역
+ ┃   ┃       ┃ ┣ 📂common
+ ┃   ┃       ┃ ┣ 📂dashboard
+ ┃   ┃       ┃ ┃ ┣ 📂controller # 도메인 내부 구조
+ ┃   ┃       ┃ ┃ ┣ 📂dto
+ ┃   ┃       ┃ ┃ ┃ ┣ 📂request
+ ┃   ┃       ┃ ┃ ┃ ┗ 📂response
+ ┃   ┃       ┃ ┃ ┣ 📂entity
+ ┃   ┃       ┃ ┃ ┣ 📂repository
+ ┃   ┃       ┃ ┃ ┗ 📂service
+ ┃   ┃       ┃ ┣ 📂experience
+ ┃   ┃       ┃ ┣ 📂guide
+ ┃   ┃       ┃ ┣ 📂member
+ ┃   ┃       ┃ ┗ 📂recruit
+ ┃   ┃       ┣ 📂global # 전역적으로 사용하는 기술 패키지
+ ┃   ┃       ┃ ┣ 📂aspect # AOP 관련 기능 (ex. 로깅)
+ ┃   ┃       ┃ ┣ 📂auth # 인증/인가 처리 기능
+ ┃   ┃       ┃ ┣ 📂config # 스프링 설정 클래스
+ ┃   ┃       ┃ ┣ 📂exception # 전역 예외 처리 및 에러코드 정의
+ ┃   ┃       ┃ ┣ 📂openai # openAI 관련 로직
+ ┃   ┃       ┃ ┣ 📂response # 통일된 응답 정의
+ ┃   ┃       ┃ ┣ 📂security # Spring Security 설정 및 필터 로직
+ ┃   ┃       ┃ ┗ 📂webclient
+ ┃   ┃       ┃   ┣ 📂openai # OpenAI 호출
+ ┃   ┃       ┃   ┗ 📂school # 학교정보 API 호출
+ ┃   ┃       ┣ 📂infra # 인프라, 외부 시스템 연동
+ ┃   ┃       ┃ ┣ 📂lambda # AWS lambda 로직
+ ┃   ┃       ┃ ┃ ┗ 📂recruit
+ ┃   ┃       ┃ ┗ 📂s3 # AWS S3 로직
+ ┃   ┃       ┃   ┣ 📂controller
+ ┃   ┃       ┃   ┣ 📂dto
+ ┃   ┃       ┃   ┗ 📂service
+ ┃   ┃       ┗ 📜XpactApplication.java # Spring Boot 메인 실행 클래스
+ ┃   ┗ 📂resources
+ ┃     ┣ 📂static
+ ┃     ┣ 📂templates
+ ┃     ┣ 📜application-dev.yaml # 개발 프로필
+ ┃     ┣ 📜application-local.yaml # 로컬 프로필
+ ┃     ┗ 📜application.yaml # 공통 프로필
  ┣ 📜.env # 중요 환경변수 설정
  ┣ 📜.gitignore
  ┣ 📜Dockerfile # Spring 애플리케이션 패키징 Dockerfile

@@ -17,6 +17,7 @@ public class RestResponse<T> {
     @Schema(example = "success")
     private String message;
     @Schema(example = "C001")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String code;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
