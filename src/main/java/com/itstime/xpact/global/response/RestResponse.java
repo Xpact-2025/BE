@@ -16,6 +16,8 @@ public class RestResponse<T> {
     private int httpStatus;
     @Schema(example = "success")
     private String message;
+    @Schema(example = "C001")
+    private String code;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
@@ -44,6 +46,7 @@ public class RestResponse<T> {
                 .isSuccess(false)
                 .httpStatus(200)
                 .message(errorCode.getMessage())
+                .code(errorCode.getCode())
                 .build();
     }
 }
