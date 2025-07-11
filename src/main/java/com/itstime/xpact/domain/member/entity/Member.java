@@ -89,6 +89,7 @@ public class Member extends BaseEntity {
         this.email = email;
         this.password = password;
         this.birthDate = birthDate;
+        this.age = age;
         this.type = type;
         this.role = role;
     }
@@ -106,7 +107,11 @@ public class Member extends BaseEntity {
                                 ? member.getEducation().getEducationName()
                                 : null
                 )
-                .schoolState(member.getEducation().getSchoolStatus().getDisplayName())
+                .schoolState(
+                        member.getEducation() != null && member.getEducation().getSchoolStatus() != null
+                                ? member.getEducation().getSchoolStatus().getDisplayName()
+                        : null
+                )
                 .desiredDetailRecruit(member.getDesiredRecruit() != null ? member.getDesiredRecruit() : null)
                 .build();
     }
