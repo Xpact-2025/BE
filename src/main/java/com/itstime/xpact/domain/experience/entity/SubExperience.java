@@ -20,6 +20,7 @@ import static com.itstime.xpact.domain.experience.common.ExperienceType.IS_QUALI
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@BatchSize(size = 20)
 @Table(name = "sub_experience")
 public class SubExperience extends BaseEntity {
 
