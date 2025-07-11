@@ -29,6 +29,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -140,7 +143,17 @@ public class GuideService {
         // 스크랩 여부 조회
         List<MemberScrap> memberScrapList = memberScrapRepository.findByMemberAndScrapIds(member, scrapIdList);
         Set<Long> scrappedScrapIdList = memberScrapList.stream()
-                .map(memberScrap -> memberScrap.getScrap().getId())
+                .map(MemberScrap::getScrap)
+                .filter(scrap -> {
+                    try {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+                        LocalDate endDate = LocalDate.parse(scrap.getEndDate(), formatter);
+                        return endDate.isBefore(LocalDate.now());
+                    } catch (DateTimeParseException ignored) { // endDate에 '채용 마감 시'같은 date가 아닌 string이 있을 때
+                        return true;
+                    }
+                })
+                .map(Scrap::getId)
                 .collect(Collectors.toSet());
 
         return scrapList
