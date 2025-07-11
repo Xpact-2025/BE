@@ -51,12 +51,6 @@ public class DashboardService {
         timeService.checkDetailRecruitOfExperience(securityProvider.getCurrentMemberId());
     }
 
-    // 히스토리 조회
-    public HistoryOldResponseDto getOldExperienceHistory(int year, int month) {
-        Member member = securityProvider.getCurrentMember();
-        return timeService.getOldCountPerDay(year, month, member);
-    }
-
     public HistoryResponseDto getExperienceHistory(int year, int month) {
         Member member = securityProvider.getCurrentMember();
         return timeService.getCountPerDay(year, month, member);

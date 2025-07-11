@@ -18,6 +18,9 @@ public record TimelineResponseDto (
         @Schema(description = "경험 제목",
         example = "IT 연합 동아리 ITTA")
         String title,
+        @Schema(description = "경험 제목",
+                example = "IT 연합 동아리 ITTA")
+        String qualification,
         @Schema(description = "경험 유형",
                 example = "EXTERNAL_ACTIVITIES",
                 allowableValues = {"INTERN", "EXTERNAL_ACTIVITIES", "CONTEST",

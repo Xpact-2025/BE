@@ -148,9 +148,9 @@ public class GuideService {
                     try {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
                         LocalDate endDate = LocalDate.parse(scrap.getEndDate(), formatter);
-                        return !endDate.isAfter(LocalDate.now());
+                        return !endDate.isBefore(LocalDate.now());
                     } catch (DateTimeParseException ignored) { // endDate에 '채용 마감 시'같은 date가 아닌 string이 있을 때
-                        return true;
+                        return false;
                     }
                 })
                 .map(Scrap::getId)

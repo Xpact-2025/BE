@@ -80,6 +80,7 @@ public class Experience extends BaseEntity {
                     .startDate(experience.getStartDate())
                     .endDate(experience.getEndDate())
                     .title(experience.getTitle())
+                    .qualification(experience.getQualification())
                     .experienceType(experience.getExperienceType())
                     .build();
     }

@@ -20,28 +20,27 @@ public class ScrapThumbnailResponseDto {
 
     private Long id;
     private String title;
-    private String weakness;
     private String imgUrl;
     private String dDay;
     private ScrapType scrapType;
     private Boolean isCliped;
 
     public static ScrapThumbnailResponseDto of(Scrap scrap, Boolean isCliped) {
-        Long dDay = null;
+        String dDay = null;
 
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             LocalDate endDate = LocalDate.parse(scrap.getEndDate(), formatter);
-            dDay = -ChronoUnit.DAYS.between(LocalDate.now(), endDate);
+            dDay = String.valueOf(-ChronoUnit.DAYS.between(LocalDate.now(), endDate));
         } catch (DateTimeParseException ignored) { // endDate에 '채용 마감 시'같은 date가 아닌 string이 있을 때
-
+            dDay = scrap.getEndDate();
         }
 
         return ScrapThumbnailResponseDto.builder()
                 .id(scrap.getId())
                 .title(scrap.getTitle())
                 .imgUrl(scrap.getImgUrl())
-                .dDay(String.valueOf(dDay != null ? dDay : scrap.getEndDate()))
+                .dDay(dDay == null ? String.valueOf(dDay) : dDay)
                 .scrapType(scrap.getScrapType())
                 .isCliped(isCliped)
                 .build();

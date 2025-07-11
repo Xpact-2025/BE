@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,6 +76,13 @@ public class ScrapCustomRepositoryImpl implements ScrapCustomRepository {
         for (String keyword: keywords) {
             builder.or(scrap.title.containsIgnoreCase(keyword)); // or로 중복 방지
         }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        LocalDate now = LocalDate.now();
+
+        builder.and(scrap.endDate.gt(formatter.format(now)))
+                .or(scrap.endDate.contains("마감"))
+                .or(scrap.endDate.contains("채용"));
 
         JPAQuery<Scrap> query = jpaQueryFactory
                 .selectFrom(scrap)

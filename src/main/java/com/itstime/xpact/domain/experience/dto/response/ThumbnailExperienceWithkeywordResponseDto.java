@@ -9,6 +9,7 @@ import com.itstime.xpact.domain.experience.entity.SubExperience;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +21,9 @@ public class ThumbnailExperienceWithkeywordResponseDto {
     private Long id;
     private String title;
     private ExperienceType experienceType;
-    private LocalDateTime draftTime;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalDate issueDate;
     private Status status;
     private List<String> keywords;
     private List<String> subTitles;
@@ -30,7 +33,9 @@ public class ThumbnailExperienceWithkeywordResponseDto {
                 .id(experience.getId())
                 .title(experience.getTitle() != null ? experience.getTitle() : experience.getQualification())
                 .experienceType(experience.getExperienceType())
-                .draftTime(experience.getStatus().equals(Status.DRAFT) ? experience.getModifiedTime() : null)
+                .startDate(experience.getStartDate())
+                .endDate(experience.getEndDate())
+                .issueDate(experience.getEndDate())
                 .status(experience.getStatus())
                 .keywords(experience.getSubExperiences().stream()
                         .flatMap(subExperience -> subExperience.getKeywords().stream())
