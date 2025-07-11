@@ -70,6 +70,7 @@ public class DetailExperienceResponseDto {
             dto = DetailExperienceResponseDto.builder()
                     .experienceId(experience.getId())
                     .experienceType(experience.getExperienceType())
+                    .status(experience.getStatus())
                     .qualification(experience.getQualification())
                     .publisher(experience.getPublisher())
                     .issueDate(experience.getEndDate());
@@ -77,6 +78,7 @@ public class DetailExperienceResponseDto {
             dto = DetailExperienceResponseDto.builder()
                     .experienceId(experience.getId())
                     .experienceType(experience.getExperienceType())
+                    .status(experience.getStatus())
                     .title(experience.getTitle())
                     .startDate(experience.getStartDate())
                     .endDate(experience.getEndDate());
