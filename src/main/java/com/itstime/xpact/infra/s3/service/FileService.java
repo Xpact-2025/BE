@@ -93,10 +93,10 @@ public class FileService {
 
     public List<ScrapRequestDto> findCrawlingFile(ScrapType scrapType) {
         LocalDate nowLocalDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
         String nowDate = nowLocalDate.format(formatter);
 
-        String key = S3_PREFIX + scrapType.name().toUpperCase() + "-" + nowDate + ".json";
+        String key = S3_PREFIX + scrapType.name().toUpperCase() + "_" + nowDate + ".json";
         GetObjectRequest getRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
