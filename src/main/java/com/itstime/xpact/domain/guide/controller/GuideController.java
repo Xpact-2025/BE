@@ -49,6 +49,8 @@ public class GuideController {
         return ResponseEntity.ok(RestResponse.ok(guideService.getActivities(weaknessOrder, pageable)));
     }
 
+    @Operation(summary = "공고 상세 조회 API", description = """
+            조회하려는 공고의 아이디를 입력합니다.""")
     @GetMapping("/activities/{activity_id}")
     public ResponseEntity<RestResponse<ScrapDetailResponseDto>> getActivities(@PathVariable(name = "activity_id") Long scrapId) {
         return ResponseEntity.ok(RestResponse.ok(guideService.getActivity(scrapId)));
