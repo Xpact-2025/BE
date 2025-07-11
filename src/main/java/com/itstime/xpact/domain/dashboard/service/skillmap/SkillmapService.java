@@ -56,7 +56,13 @@ public class SkillmapService {
         CoreSkill coreSkill = detailRecruitRepository.findCoreSkillById(detailRecruit.getId())
                 .orElseThrow(() -> CustomException.of(ErrorCode.NOT_FOUND_CORESKILLS));
 
-        String experiences = experienceRepository.findSummaryByMemberId(member.getId()).stream()
+        List<String> summaries = experienceRepository.findSummaryByMemberId(member.getId());
+
+        if(summaries.isEmpty()) {
+            throw CustomException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+        }
+
+        String experiences = summaries.stream()
                 .collect(Collectors.joining("\n"));
 
         List<String> coreSkillList = coreSkill.getCoreSKills();

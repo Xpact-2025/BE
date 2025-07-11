@@ -148,7 +148,7 @@ public class GuideService {
                     try {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
                         LocalDate endDate = LocalDate.parse(scrap.getEndDate(), formatter);
-                        return endDate.isBefore(LocalDate.now());
+                        return !endDate.isAfter(LocalDate.now());
                     } catch (DateTimeParseException ignored) { // endDate에 '채용 마감 시'같은 date가 아닌 string이 있을 때
                         return true;
                     }
@@ -184,8 +184,9 @@ public class GuideService {
 
     // WeaknessOrder != 0 일 때
     private List<String> getKeywords(Member member, int weaknessOrder) {
-        String weakness = weaknessRepository.findByMemberId(member.getId())
-                .get(weaknessOrder - 1)
+        List<Weakness> weaknesses = weaknessRepository.findByMemberId(member.getId());
+        System.out.println("weaknesses = " + weaknesses);
+        String weakness = weaknesses.get(weaknessOrder - 1)
                 .getName();
 
         // 만약 약점 분석이 안 되어있을 경우 우선적으로 분석 필수
