@@ -57,7 +57,7 @@ public class ScrapService {
     }
 
     @Transactional(readOnly = true)
-    public List<ScrapThumbnailResponseDto> getActivitites() {
+    public List<ScrapThumbnailResponseDto> getScrapActivities() {
         Member member = securityProvider.getCurrentMember();
         List<Long> memberScrapIdList = memberScrapRepository.findAllByMember(member)
                 .stream().map(memberScrap -> memberScrap.getScrap().getId()).toList();

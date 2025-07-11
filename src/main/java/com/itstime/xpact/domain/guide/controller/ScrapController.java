@@ -31,7 +31,7 @@ public class ScrapController {
     }
 
     @GetMapping("/activities")
-    public ResponseEntity<RestResponse<List<ScrapThumbnailResponseDto>>> getActivities() {
-        return ResponseEntity.ok(RestResponse.ok(scrapService.getActivitites()));
+    public ResponseEntity<RestResponse<List<ScrapThumbnailResponseDto>>> getScrapActivities() {
+        return ResponseEntity.ok(RestResponse.ok(scrapService.getScrapActivities()));
     }
 }
