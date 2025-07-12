@@ -3,6 +3,7 @@ package com.itstime.xpact.domain.dashboard.service.skillmap;
 import com.itstime.xpact.domain.dashboard.dto.response.SkillMapResponseDto;
 import com.itstime.xpact.domain.dashboard.entity.CoreSkillMap;
 import com.itstime.xpact.domain.dashboard.repository.CoreSkillMapRepository;
+import com.itstime.xpact.domain.experience.entity.Experience;
 import com.itstime.xpact.domain.experience.repository.ExperienceRepository;
 import com.itstime.xpact.domain.guide.service.GuideService;
 import com.itstime.xpact.domain.member.entity.Member;
@@ -11,6 +12,7 @@ import com.itstime.xpact.domain.recruit.entity.DetailRecruit;
 import com.itstime.xpact.domain.recruit.repository.DetailRecruitRepository;
 import com.itstime.xpact.global.exception.CustomException;
 import com.itstime.xpact.global.exception.ErrorCode;
+import com.itstime.xpact.global.exception.GeneralException;
 import com.itstime.xpact.global.webclient.openai.LambdaOpenAiClient;
 import com.itstime.xpact.global.webclient.openai.OpenAiRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,10 @@ public class SkillmapService {
     private final GuideService guideService;
 
     public CompletableFuture<SkillMapResponseDto> evaluate(Member member) {
+        List<Experience> experiecneList = experienceRepository.findByMember(member);
+        if(experiecneList.isEmpty()){
+            throw GeneralException.of(ErrorCode.EXPERIENCES_NOT_ENOUGH);
+        }
 
         // Redis 캐시 먼저 조회
         Optional<CoreSkillMap> cachedCoreSkillMap = coreSkillMapRepository.findById(member.getId());

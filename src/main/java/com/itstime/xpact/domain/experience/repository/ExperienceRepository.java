@@ -35,4 +35,6 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long>, E
 
     @Query("SELECT e FROM Experience e LEFT JOIN FETCH e.subExperiences")
     List<Experience> findAllWithSubExperiences();
+
+    List<Experience> findByMember(Member member);
 }
