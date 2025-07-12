@@ -176,16 +176,16 @@ public class OpenAiServiceImpl implements OpenAiService {
     // 3가지 약점 분석 -> 3가지 약점에 맞춘 맞춤형 활동 추천하기
     public List<String> getRecommendActivities(String weakness) {
 
-        String cacheKey = "keywords:" + weakness;
-        String cached = redisTemplate.opsForValue().get(cacheKey);
-
-        // Redis Cache 조회
-        if (cached != null && !cached.isBlank()) {
-            return Arrays.stream(cached.split(","))
-                    .map(String::trim)
-                    .filter(str -> !str.isEmpty())
-                    .toList();
-        }
+//        String cacheKey = "keywords:" + weakness;
+//        String cached = redisTemplate.opsForValue().get(cacheKey);
+//
+//        // Redis Cache 조회
+//        if (cached != null && !cached.isBlank()) {
+//            return Arrays.stream(cached.split(","))
+//                    .map(String::trim)
+//                    .filter(str -> !str.isEmpty())
+//                    .toList();
+//        }
 
         String systemString = String.join(" ",
                     "너는 입력된 키워드를 기반으로 의미적으로 관련된 직무, 기술, 산업, 직군 키워드를 추천해주는 전문가다.",
@@ -205,7 +205,7 @@ public class OpenAiServiceImpl implements OpenAiService {
         String result = response.getResult().getOutput().getText();
         log.info("result : {}", result);
 
-        redisTemplate.opsForValue().set(cacheKey, result, 86400, TimeUnit.SECONDS);
+//        redisTemplate.opsForValue().set(cacheKey, result, 86400, TimeUnit.SECONDS);
 
         return Arrays.stream(result.split(","))
                     .map(String::trim)
