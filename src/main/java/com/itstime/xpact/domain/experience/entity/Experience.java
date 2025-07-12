@@ -88,7 +88,7 @@ public class Experience extends BaseEntity {
     public void updateExperience(ExperienceUpdateRequestDto updateRequestDto) {
         if(IS_QUALIFICATION.contains(ExperienceType.valueOf(updateRequestDto.getExperienceType()))) {
             this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
-            this.qualification = updateRequestDto.getQualification();
+            this.title = updateRequestDto.getQualification();
             this.publisher = updateRequestDto.getPublisher();
             this.startDate = updateRequestDto.getStartDate();
             this.endDate = updateRequestDto.getEndDate();
