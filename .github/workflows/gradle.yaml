@@ -78,7 +78,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-22.04
-    needs: transfer
+#    needs: transfer
     steps:
       # ec2 접속
       - name: SSH into server and deploy
