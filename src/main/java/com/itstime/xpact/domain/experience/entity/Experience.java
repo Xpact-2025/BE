@@ -79,8 +79,7 @@ public class Experience extends BaseEntity {
             return TimelineResponseDto.builder()
                     .startDate(experience.getStartDate())
                     .endDate(experience.getEndDate())
-                    .title(experience.getTitle())
-                    .qualification(experience.getQualification())
+                    .title(experience.getTitle() != null ? experience.getTitle() : experience.getQualification())
                     .experienceType(experience.getExperienceType())
                     .build();
     }
@@ -88,7 +87,7 @@ public class Experience extends BaseEntity {
     public void updateExperience(ExperienceUpdateRequestDto updateRequestDto) {
         if(IS_QUALIFICATION.contains(ExperienceType.valueOf(updateRequestDto.getExperienceType()))) {
             this.experienceType = ExperienceType.valueOf(updateRequestDto.getExperienceType());
-            this.title = updateRequestDto.getQualification();
+            this.qualification = updateRequestDto.getQualification();
             this.publisher = updateRequestDto.getPublisher();
             this.startDate = updateRequestDto.getStartDate();
             this.endDate = updateRequestDto.getEndDate();
