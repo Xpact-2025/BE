@@ -68,3 +68,10 @@ swagger:
 
 server:
   forward-headers-strategy: framework
+
+springdoc:
+  packages-to-scan:
+    - com.itstime.xpact.domain
+    - com.itstime.xpact.global.test
+    - com.itstime.xpact.global.security
+    - com.itstime.xpact.infra.s3
