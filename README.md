@@ -1,6 +1,28 @@
-# ✨ Xpact - 취준생을 위한 경험 정리 서비스
+# ✨Xpact✨
 
-## 🛠️ 기술 스택
+---
+<a href="https://xpact.site/" target="_blank">
+<img src="https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/key1.png" alt="xpact" width="100%"/>
+<img src="https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/key2.png" alt="xpact" width="100%"/>
+<img src="https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/key3.png" alt="xpact" width="100%"/>
+<img src="https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/key4.png" alt="xpact" width="100%"/>
+<img src="https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/key5.png" alt="xpact" width="100%"/>
+<img src="https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/key6.png" alt="xpact" width="100%"/>
+<img src="https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/key7.png" alt="xpact" width="100%"/>
+
+</a>
+
+
+## 🎁Team Members (팀원 및 팀 소개)🎁
+
+---
+|                                          임원재                                           |                  전유연                   |
+|:--------------------------------------------------------------------------------------:|:--------------------------------------:|
+| <img src="https://avatars.githubusercontent.com/u/80938176?v=4" alt="임원재" width="150"> |   <img src="https://avatars.githubusercontent.com/u/109857975?v=4" alt="전유연" width="150">   |
+|                                       [GitHub](https://github.com/yyytir777)                                       | [GitHub](https://github.com/youyeon11) |
+
+
+## 🛠️기술 스택🛠️
 > 안정적이고 확장성 있는 백엔드와 클라우드 기반 인프라 구성
 - ☕ Java 17
 - 🌱 Spring Boot 3.4.4
@@ -11,16 +33,22 @@
 - 🗂️ AWS S3
 - 🐳 Docker / Docker-Compose
 
-## 🏗️ 아키텍처 구성
-![](https://private-user-images.githubusercontent.com/80938176/464461690-a47f42e5-2637-4ec5-8135-67e71a7bdf3d.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTIxMTM2NTksIm5iZiI6MTc1MjExMzM1OSwicGF0aCI6Ii84MDkzODE3Ni80NjQ0NjE2OTAtYTQ3ZjQyZTUtMjYzNy00ZWM1LTgxMzUtNjdlNzFhN2JkZjNkLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA3MTAlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNzEwVDAyMDkxOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWM0MTI3N2NmYjFkNWZjM2FlMjYzM2JhYTliZDdhYWU1Y2Q1NWU1MTRiMzAwZWNjOWQ1ZjlkNjQ1ODNjZDVhMDImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.BFEKLrCiMTer7InkBp-xPdsW8EfRe5nRgQ0cqCpegiE)
+## 🏗️아키텍처 구성🏗️
+
+---
+![](https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/architecture.png)
 
 <br>
 
-## 🗃️ ERD (Entity Relationship Diagram)
-![](https://private-user-images.githubusercontent.com/80938176/464281461-8594eae7-e068-4007-9a79-7bf5a971cdc0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTIwNzcyOTUsIm5iZiI6MTc1MjA3Njk5NSwicGF0aCI6Ii84MDkzODE3Ni80NjQyODE0NjEtODU5NGVhZTctZTA2OC00MDA3LTlhNzktN2JmNWE5NzFjZGMwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA3MDklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNzA5VDE2MDMxNVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTA3NjQzN2RhODNkZWI0NjRhMDc5ZWUwMDAyZWZkYzg0OTgzMTRkOTRmNjUyZGE5ZTZiMjgzNTgzNDVkZjMxNjEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.uroAeongjpjgHgyyCVlJm9_H9s9Oys3ZmziRqiUdNOw)
+## 🗃️ERD (Entity Relationship Diagram)️🗃️
+
+---
+![](https://xpactbucket.s3.ap-northeast-2.amazonaws.com/PUBLIC/erd.png)
 
 
-## 📁 프로젝트 구조
+## 📁프로젝트 구조📁
+
+---
 ```
 <pre><code>
 📦xpact
@@ -86,6 +114,8 @@
 </code></pre>
 ```
 ## Git branch
+
+---
 - **main**: 🚀 배포 가능한 안정 버전
 - **develop**: 🌱 기능 통합 및 테스트용 브랜치
 - **feature/**: ✨ 새로운 기능 개발용 브랜치 (예: feature/#123/login-api)
@@ -94,6 +124,8 @@
 > 브랜치 네이밍 예시: `feat/#이슈넘버/{기능명}` `fix/#이슈넘버/{기능명}`
 
 ## Commit Message Convention
+
+---
 
 | Type | 설명 |
 | --- | --- |
