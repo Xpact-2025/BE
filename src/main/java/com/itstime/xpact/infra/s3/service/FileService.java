@@ -24,6 +24,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -92,28 +93,32 @@ public class FileService {
     }
 
     public List<ScrapRequestDto> findCrawlingFile(ScrapType scrapType) {
-        LocalDate nowLocalDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        String nowDate = nowLocalDate.format(formatter);
+        List<ScrapRequestDto> results = new ArrayList<>();
 
-        String key = S3_PREFIX + scrapType.name().toUpperCase() + "_" + nowDate + ".json";
-        GetObjectRequest getRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
+        for(int i = 0; i < 3; i++) {
+            LocalDate targetDate = LocalDate.now().minusDays(i);
+            String formattedDate = targetDate.format(formatter);
 
-        // 파일 존재 시 -> json으로 파싱 -> 자바 클래스로 파싱하여 return
-        // 파일 존재하지 않을 시 -> return;
-        try{
-            ResponseInputStream<GetObjectResponse> file = s3Client.getObject(getRequest);
-            return objectMapper.readValue(file, new TypeReference<List<ScrapRequestDto>>() {});
-        } catch (S3Exception e) {
-            log.info("파일을 찾을 수 없습니다.");
-        } catch (Exception e) {
-            log.error("파일을 파싱할 수 없습니다.");
+            String key = S3_PREFIX + scrapType.name().toUpperCase() + "_" + formattedDate + ".json";
+            System.out.println("key = " + key);
+            try {
+                GetObjectRequest getRequest = GetObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .build();
+
+                ResponseInputStream<GetObjectResponse> file = s3Client.getObject(getRequest);
+                List<ScrapRequestDto> data = objectMapper.readValue(file, new TypeReference<List<ScrapRequestDto>>() {});
+                results.addAll(data);
+            } catch (S3Exception e) {
+                log.info("파일을 찾을 수 없습니다.");
+            } catch (Exception e) {
+                log.error("파일을 파싱할 수 없습니다.");
+            }
         }
 
-        return List.of();
+        return results;
     }
 
 
