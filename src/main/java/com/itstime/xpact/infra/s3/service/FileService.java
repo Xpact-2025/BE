@@ -112,6 +112,7 @@ public class FileService {
                 List<ScrapRequestDto> data = objectMapper.readValue(file, new TypeReference<List<ScrapRequestDto>>() {});
                 results.addAll(data);
             } catch (S3Exception e) {
+                log.error(e.getMessage());
                 log.info("파일을 찾을 수 없습니다.");
             } catch (Exception e) {
                 log.error("파일을 파싱할 수 없습니다.");
