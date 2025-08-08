@@ -16,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -34,14 +36,16 @@ public class ScrapCustomRepositoryImpl implements ScrapCustomRepository {
     public int saveAllWithIgnore(List<Scrap> scraps) {
         String sql = """
                 INSERT IGNORE
-                INTO scrap (linkareer_id, scrap_type, title, organizer_name, start_date, end_date, job_category, homepage_url, img_url, benefits, eligibility, on_off_line, enterprise_type, region)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,?)
+                INTO scrap (linkareer_id, scrap_type, title, organizer_name, start_date, end_date, job_category, homepage_url, img_url, benefits, eligibility, on_off_line, enterprise_type, region, created_time, modified_time)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,?, ?, ?)
                 """;
 
         int[] result = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+
                 Scrap scrap = scraps.get(i);
                 ps.setLong(1, scrap.getLinkareerId());
                 ps.setString(2, scrap.getScrapType().name());
@@ -57,6 +61,8 @@ public class ScrapCustomRepositoryImpl implements ScrapCustomRepository {
                 ps.setString(12, scrap.getOnOffLine());
                 ps.setString(13, scrap.getEnterpriseType());
                 ps.setString(14, scrap.getRegion());
+                ps.setTimestamp(15, now);
+                ps.setTimestamp(16, now);
             }
 
             @Override

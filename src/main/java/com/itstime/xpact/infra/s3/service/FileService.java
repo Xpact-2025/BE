@@ -96,7 +96,7 @@ public class FileService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
         List<ScrapRequestDto> results = new ArrayList<>();
 
-        for(int i = 0; i < 3; i++) {
+        for(int i = 1; i <= 3; i++) {
             LocalDate targetDate = LocalDate.now().minusDays(i);
             String formattedDate = targetDate.format(formatter);
 
